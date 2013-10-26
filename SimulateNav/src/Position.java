@@ -11,32 +11,40 @@ class Position {
 	public Position() {
 	}
 
+	public Position(final float x, final float y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public Position(final float x, final float y, final float r) {
+		this.x = x;
+		this.y = y;
+		this.r = r;
+	}
+
 	public void copy(Position p) {
 		x = p.x;
 		y = p.y;
 		r = p.r;
 	}
 
-	public void addLocation(final float x, final float y) {
-		this.x += x;
-		this.y += y;
+	public void subXY(final Position a, final Position b) {
+		x = a.x - b.x;
+		y = a.y - b.y;
 	}
-	
-	public void subLocation(final Position a, final Position b) {
-		this.x = a.x - b.x;
-		this.y = a.y - b.x;
-	}
-	
-	public void addTheta(final float t) {
-		r += t;
+
+	public void subR(final Position a, final Position b) {
+		r = a.r - b.r;
 		if(r <= -PI)    r += TWO_PI;
 		else if(r > PI) r -= TWO_PI;
 	}
 
-	public void subTheta(final Position a, final Position b) {
-		r -= a.r + b.r;
+	public void transform(final float angle, final float dist) {
+		r += angle;
 		if(r <= -PI)    r += TWO_PI;
 		else if(r > PI) r -= TWO_PI;
+		x += dist * Math.cos(r);
+		y += dist * Math.sin(r);
 	}
 
 	public String toString() {

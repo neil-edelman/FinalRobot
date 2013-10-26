@@ -1,7 +1,7 @@
 # MacOSX gcc 4.2.1
 
 TITLE := Swagbot
-FILES := Controller Driver Position Robot Odometer
+FILES := Driver Position Controller
 BDIR  := bin
 SDIR  := src
 OBJS  := $(patsubst %,$(BDIR)/%.class,$(FILES))
@@ -21,7 +21,7 @@ $(BDIR)/%.class: $(SDIR)/%.java
 
 backup:
 	@mkdir -p $(BACK)
-	zip $(BACK)/$(TITLE)-`date +%Y-%m-%dT%H%M%S`.zip Makefile $(SRCS)
+	zip $(BACK)/$(TITLE)-`date +%Y-%m-%dT%H%M%S`.zip Makefile robot.sh $(SRCS)
 
 clean:
 	-rm $(OBJS)
