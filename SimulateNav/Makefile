@@ -8,7 +8,7 @@ OBJS  := $(patsubst %,$(BDIR)/%.class,$(FILES))
 SRCS  := $(patsubst %,$(SDIR)/%.java,$(FILES))
 BACK  := backup
 
-CC   := javac
+CC   := javac #nxjc #javac
 CF   := -g:none -O -verbose -d $(BDIR) $(SDIR)/*.java -Xlint:unchecked
 
 default: $(OBJS)

@@ -2,9 +2,10 @@
  this should be after calibration of radius (you know this, so enter it in) */
 
 import lejos.nxt.Button;
+import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 
-class Lab5 {
+public class Calibrate {
 	private static final int NO_REPEATS    = 10;
 	private static final int FORWARD_SPEED = 250;
 	private static final int ROTATE_SPEED  = 150;
@@ -22,6 +23,7 @@ class Lab5 {
 		Button.setKeyClickTone(Button.ID_ENTER, 500000);
 		Button.setKeyClickVolume(10);
 
+		System.out.println("10 times");
 		for(int i = 0; i < NO_REPEATS; i++) {
 			driveLeg(0.48f);
 			driveLeg(0.48f);
@@ -35,8 +37,8 @@ class Lab5 {
 	}
 
 	/** this is for calibrating; 3 squares 91.44 -> 30.48 cm / tile */
-	public void driveLeg(final float cm) {
-		float circumference = 2.0 * Math.PI * RADIUS;
+	public static void driveLeg(final float cm) {
+		float circumference = 2.0f * (float)Math.PI * RADIUS;
 		float      toLinear = 360f / circumference;
 
 		/* forward */

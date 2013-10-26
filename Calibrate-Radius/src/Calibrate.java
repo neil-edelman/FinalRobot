@@ -1,6 +1,7 @@
 /* calibrate the radius */
 
 import lejos.nxt.Button;
+import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 
 class Lab5 {
