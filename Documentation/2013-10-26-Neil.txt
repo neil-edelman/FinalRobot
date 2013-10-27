@@ -1,0 +1,42 @@
+%%
+
+Worked with Alex to draw up the UML class diagrams Yesterday; Alex has it on his phone.
+
+%%
+
+The Colour class is working perfectly, added that in Yesterday as an initial commit; I have dubbed the Final because Alex thinks that Sex Robot is a stupid name but I don't know what to name it.
+
+%%
+
+SimulateNav: is a programme I wrote to simulate the navigation (without the NXT, just on a computer.) I was at home in the rain. I got it working! I saved great graphs while I was working on it (wasn't there a testing portion of our mark?) I made it very clear. Position.java and Controller.java are very good, I'm going to merge those into the code Tomorrow.
+
+%%
+
+I realise that the specifications are going to change when we get our hardware, but this was introducing error in the odometer and I wasn't sure where . . . and we have to calibrate it sometime.
+
+Calibrate-Radius: calibration of the radius of the wheel, should be done first. It's very imprecise; any ideas? It works by going 2x30.48 tile spaces. I roughly use a binary search to minimise the error. I have dubbed thee Sex Robot 1.0 after the name of our robot (I nominate SwagBot to be the final design, after Alex's Fb group.) It's the Two-Wheeled Robot with the Wheel of Death and the US sensor . . . I'll just take a picture.
+
+	   2.5 too small
+	   2.665 is slightly small
+	   2.7 just a little too small
+	   2.8 too large
+	   2.75 too large
+	   2.72 pretty much
+
+Calibrate-Wheelbase: precision calibration; it actually measures
+radius / wheelbase, so the radius should be done first.
+
+	   15.8 much too small 16.1261
+	   16.13 much too small
+	   20 mUCh too large
+	   17 much too large
+	   16.2 tiny bit too large
+	   16.15 good enough
+
+%%
+
+Odometer: I did a bunch of failed tries to get the Navigation working with SimulateNav, but I realised the Odometer is incorrect. I set up an Odometer which actually works and is not numerically unstable! When you're using their odometer and the robot moves around a lot, the odometer will be less and less precise and eventually will cause a floating point overflow. This is solid. We should take Odomater.java from here. I will merge Tomorrow.
+
+%%
+
+Hardware/Sex-Robot-1_0
