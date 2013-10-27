@@ -4,10 +4,16 @@ import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 
-class Lab5 {
+public class Calibrate {
 	private static final int FORWARD_SPEED = 250;
 	/* you want to know this */
-	private static final float RADIUS      = 2.665f;
+	private static final float RADIUS      = 2.72f;
+	/* 2.5 too small
+	   2.665 is slighly small
+	   2.7 just a little too small
+	   2.8 too large
+	   2.75 too large
+	   2.72 pretty much */
 
 	static final NXTRegulatedMotor lMotor = Motor.A, rMotor = Motor.B;
 
@@ -21,13 +27,12 @@ class Lab5 {
 		driveLeg(30.48f * 2f);
 
 		System.out.println("press enter");
-		while((Button.waitForAnyPress() & Button.ID_ENTER) != 0);
-
+		while((Button.waitForAnyPress() & Button.ID_ENTER) == 0);
 	}
 
 	/** this is for calibrating; 3 squares 91.44 -> 30.48 cm / tile */
-	public void driveLeg(final float cm) {
-		float circumference = 2.0 * Math.PI * RADIUS;
+	public static void driveLeg(final float cm) {
+		float circumference = 2.0f * (float)Math.PI * RADIUS;
 		float      toLinear = 360f / circumference;
 
 		/* forward */
