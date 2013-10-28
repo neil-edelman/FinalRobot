@@ -7,7 +7,7 @@ import lejos.nxt.NXTRegulatedMotor;
 public class Calibrate {
 	private static final int FORWARD_SPEED = 250;
 	/* you want to know this */
-	private static final float RADIUS      = 2.72f;
+	private static final float RADIUS      = 2.707f;
 
 	static final NXTRegulatedMotor lMotor = Motor.A, rMotor = Motor.B;
 
@@ -17,6 +17,8 @@ public class Calibrate {
 		Button.setKeyClickLength(500);
 		Button.setKeyClickTone(Button.ID_ENTER, 500000);
 		Button.setKeyClickVolume(10);
+
+		System.out.println("using " + RADIUS);
 
 		/* drive 2 squares */
 		//driveLeg(30.48f * 2f); /* cm */
