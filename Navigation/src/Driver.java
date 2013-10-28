@@ -7,10 +7,11 @@ class Driver {
 	private static final int DELAY = 100;
 
 	public static void main(String args[]) {
+		int key;
 
 		Robot r = new Robot();
 
-		r.turnTo(45f);
+		r.turnTo(90f);
 
 		System.err.println(r);
 		while(r.getStatus() != Robot.Status.IDLE) {
@@ -20,6 +21,9 @@ class Driver {
 				Thread.currentThread().interrupt();
 			}
 		}
+		System.out.println("press!");
+		key = Button.waitForAnyPress();
+		if((key & Button.ID_ESCAPE) != 0) return;
 
 		r.travelTo(20f, 20f);
 
@@ -33,8 +37,9 @@ class Driver {
 		}
 
 		System.err.println(r);
-		System.out.println("press enter");
-		while((Button.waitForAnyPress() & Button.ID_ENTER) == 0);
+		System.out.println("press!");
+		key = Button.waitForAnyPress();
+		if((key & Button.ID_ESCAPE) != 0) return;
 	}
 
 }

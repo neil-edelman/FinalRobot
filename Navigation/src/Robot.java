@@ -20,11 +20,45 @@ class Robot implements TimerListener {
 	public final static String    NAME = "Sex Robot";
 	private static final int NAV_DELAY = 100; /* ms */
 
-	private static final float    ANGLE_TOLERANCE = (float)Math.toRadians(1.0);
+	private static final float    ANGLE_TOLERANCE = (float)Math.toRadians(0.1);
 	private static final float DISTANCE_TOLERANCE = 1f;
 
-	private Controller           anglePID = new Controller(5f, 1f, 1f, -250, 250);
-	private Controller        distancePID = new Controller(10f, 1f, 1f, -250, 250);
+	/* 
+	 anglePID
+	 200 - over
+	 500
+	 1000
+	 10000 - constant
+	 5000
+	 2000 - decaying
+	 3000
+	 4000 - constant
+	 3500
+	 3200
+	 3000
+	 2000 - dec
+	 2500 - constant
+	 2200
+	 2100
+	 2000 - dec
+	 2050
+	 2075
+	 2090 - constant
+	 2080
+	 2078
+	 2076 decay
+	 Ku  = 2077
+	 Pu ~= 500ms
+	 distancePID
+	 ...
+	 0.5 Ku
+	 0.45 Ku, 1.2 Kp / Pu
+	 0.6 Ku, 2Kp/Pu, KpPu/8 <- this one is coolest */
+
+	/* Ziegler-Nichols method was used to get close to the optimum */
+	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f, -350, 350);
+	/* fixme!!!! this has not been optimised */
+	private Controller distancePID = new Controller(10f, 0f, 0f, -250, 250);
 
 	private Status     status = Status.IDLE;
 	private Odometer odometer = new Odometer(leftMotor, rightMotor);
@@ -98,10 +132,10 @@ class Robot implements TimerListener {
 		/* calculate the delta beteen the target and the current and apply magic */
 		Position current = odometer.getPositionCopy();
 		delta.subR(target, current);
-		float right = anglePID.nextOutput(delta.r);
+		float right = anglePID.nextOutput(delta.r, NAV_DELAY);
 
 		/* tolerence */
-		if(anglePID.isWithin(ANGLE_TOLERANCE)) {
+		if(anglePID.isWithin(ANGLE_TOLERANCE, 1)) {
 			this.stop();
 			status = Status.IDLE;
 			return;
@@ -120,9 +154,9 @@ class Robot implements TimerListener {
 		delta.subR(target, current);
 		float distance = (float)Math.sqrt(delta.x*delta.x + delta.y*delta.y);
 
-		float turn = anglePID.nextOutput(delta.r);
+		float turn = anglePID.nextOutput(delta.r, NAV_DELAY);
 
-		float speed = distancePID.nextOutput(distance);// * Math.cos(Math.toRadians(p.theta));
+		float speed = distancePID.nextOutput(distance, NAV_DELAY);// * Math.cos(Math.toRadians(p.theta));
 
 		/* tolerence */
 		if(distancePID.isWithin(DISTANCE_TOLERANCE)) {
