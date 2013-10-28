@@ -10,15 +10,9 @@ public class Calibrate {
 	private static final int FORWARD_SPEED = 250;
 	private static final int ROTATE_SPEED  = 150;
 	/* you know this from experimenting, enter it in */
-	private static final float RADIUS      = 2.72f;
+	private static final float RADIUS      = 2.707f;
 	/* this is the variable that you are varying */
-	private static final float WHEELBASE   = 16.15f;
-	/* 15.8 much too small 16.1261
-	   16.13 much too small
-	   20 mUCh too large
-	   17 much too large
-	   16.2 tiny bit too large
-	   16.15 good enought */
+	private static final float WHEELBASE   = 16.061533f;
 
 	static final NXTRegulatedMotor lMotor = Motor.A, rMotor = Motor.B;
 
@@ -29,7 +23,7 @@ public class Calibrate {
 		Button.setKeyClickTone(Button.ID_ENTER, 500000);
 		Button.setKeyClickVolume(10);
 
-		System.out.println("10 times");
+		System.out.println("10 times " + WHEELBASE);
 		for(int i = 0; i < NO_REPEATS; i++) {
 			driveLeg(0.48f);
 			driveLeg(0.48f);
