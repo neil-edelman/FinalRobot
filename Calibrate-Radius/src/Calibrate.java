@@ -20,8 +20,8 @@ public class Calibrate {
 
 		/* drive 2 squares */
 		//driveLeg(30.48f * 2f); /* cm */
-		/* I've got a tape measure that's more precise; it's 297cm long */
-		driveLeg(297f); /* cm */
+		/* I've got a tape measure that's more precise; it's 300cm long */
+		driveLeg(300f); /* cm */
 
 		System.out.println("press enter");
 		while((Button.waitForAnyPress() & Button.ID_ENTER) == 0);
