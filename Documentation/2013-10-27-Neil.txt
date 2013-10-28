@@ -1,0 +1,42 @@
+%%
+
+We had a meeting.
+
+%%
+
+Navigation: Me and Alex worked on this. Brought in Position.java and Controller.java from SimulateNav/ and Odometer.java from Odometer/. This is good code. It just works! That's what you get when writing standards-compliant code. This is so cool! it works like a ninja.
+
+Ziegler-Nichols Method for angular control
+	 200 - over
+	 500
+	 1000
+	 10000 - constant
+	 5000
+	 2000 - decaying
+	 3000
+	 4000 - constant
+	 3500
+	 3200
+	 3000
+	 2000 - dec
+	 2500 - constant
+	 2200
+	 2100
+	 2000 - dec
+	 2050
+	 2075
+	 2090 - constant
+	 2080
+	 2078
+	 2076 decay
+	 Ku  = 2077
+	 Pu ~= 500ms
+	 0.5 Ku
+	 0.45 Ku, 1.2 Kp / Pu
+	 0.6 Ku, 2Kp/Pu, KpPu/8 */
+
+	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 500f, 0.6f * 2077f * 500f / 8f, -350, 350);
+	private Controller    anglePID = new Controller(0.45f * 2077f, 1.2f * 0.45f * 2077f / 500f, 0, -350, 350);
+	private Controller    anglePID = new Controller(0.5f * 2077f, 0, 0, -350, 350);
+
+The third one works the best, but the first one is the coolest; I'll pick the latter. Still going to optimise the distance.
