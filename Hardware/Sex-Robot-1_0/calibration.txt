@@ -1,15 +1,16 @@
-Calibrate-Radius
+128 Calibrate-Radius
 
-version b6824554e2
+Test 128.1: hardware Sex-Robot-1_0, software Calibrate-Radius b6824554e2
 
-           2.5 too small
-           2.665 is slightly small
-           2.7 just a little too small
-           2.8 too large
-           2.75 too large
-           2.72 pretty much
+2.5 too small
+2.665 is slightly small
+2.7 just a little too small
+2.8 too large
+2.75 too large
+2.72 pretty much
+2.72 cm
 
-version 13d0d32ce4
+Test 128.2: hardware Sex-Robot-1_0, software Calibrate-Radius 13d0d32ce4
 
 2.72 to much (317/297) 2.72 ~= 2.9
 2.90 -- (280/300) 2.9 ~= 2.707
@@ -29,16 +30,19 @@ version 13d0d32ce4
 2.8 -- (290/300) 2.8 = 2.707
 2.707 cm
 
-Calibrate-Wheelbase version b6824554e2
+129 Calibrate-Wheelbase 
 
-           15.8 much too small 16.1261
-           16.13 much too small
-           20 mUCh too large
-           17 much too large
-           16.2 tiny bit too large
-           16.15 good enough
+Test 129.1: hardware Sex-Robot-1_0, software Calibrate-Wheelbase b6824554e2
 
-Calibrate-Wheelbase version 5d791e1af8
+15.8 much too small 16.1261
+16.13 much too small
+20 mUCh too large
+17 much too large
+16.2 tiny bit too large
+16.15 good enough
+16.15 cm
+
+Test 129.2: hardware Sex-Robot-1_0, software Calibrate-Wheelbase 5d791e1af8
 
 16.07 -> 10
 16.0  -> -15
@@ -60,4 +64,4 @@ Calibrate-Wheelbase version 5d791e1af8
 16.061533 -> -0.2
 16.061534 -> 2
 
-16.061533 cm is good enough
+16.061533 cm is good enough (this is very precise)
