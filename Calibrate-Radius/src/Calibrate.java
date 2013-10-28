@@ -8,12 +8,6 @@ public class Calibrate {
 	private static final int FORWARD_SPEED = 250;
 	/* you want to know this */
 	private static final float RADIUS      = 2.72f;
-	/* 2.5 too small
-	   2.665 is slighly small
-	   2.7 just a little too small
-	   2.8 too large
-	   2.75 too large
-	   2.72 pretty much */
 
 	static final NXTRegulatedMotor lMotor = Motor.A, rMotor = Motor.B;
 
@@ -24,7 +18,10 @@ public class Calibrate {
 		Button.setKeyClickTone(Button.ID_ENTER, 500000);
 		Button.setKeyClickVolume(10);
 
-		driveLeg(30.48f * 2f);
+		/* drive 2 squares */
+		//driveLeg(30.48f * 2f); /* cm */
+		/* I've got a tape measure that's more precise; it's 297cm long */
+		driveLeg(297f); /* cm */
 
 		System.out.println("press enter");
 		while((Button.waitForAnyPress() & Button.ID_ENTER) == 0);
@@ -32,8 +29,7 @@ public class Calibrate {
 
 	/** this is for calibrating; 3 squares 91.44 -> 30.48 cm / tile */
 	public static void driveLeg(final float cm) {
-		float circumference = 2.0f * (float)Math.PI * RADIUS;
-		float      toLinear = 360f / circumference;
+		float toLinear = 360f / (2.0f * (float)Math.PI * RADIUS);
 
 		/* forward */
 		lMotor.setSpeed(FORWARD_SPEED);
