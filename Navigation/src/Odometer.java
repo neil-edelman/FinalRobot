@@ -1,6 +1,13 @@
 /* Odometer running in background will keep track of proprioception.
  fixme: if we run faster, the period will have to decrese */
 
+/* the odometer runs in standard co-ordinates (ISO 80000-2:2009)
+ with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
+ approxomations about zero) eg counter-clockwise radians; this is the same used
+ in Math.atan2. The travelTo (and turnTo) take degrees and convert them to
+ radians (it's much faster converting them once vs converting atan2 10 times a
+ second) */
+
 import lejos.util.Timer;
 import lejos.util.TimerListener;
 import lejos.nxt.Motor;
