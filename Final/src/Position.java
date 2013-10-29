@@ -22,7 +22,7 @@ class Position {
 		this.r = r;
 	}
 
-	public void copy(Position p) {
+	public void set(Position p) {
 		x = p.x;
 		y = p.y;
 		r = p.r;

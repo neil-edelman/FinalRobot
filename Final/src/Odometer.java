@@ -1,15 +1,12 @@
-/* Lab 4, Group 51 -- Alex Bhandari-Young and Neil Edelman */
+/* Odometer running in background will keep track of proprioception.
+ fixme: if we run faster, the period will have to decrese */
 
-/* experiment going left with 15.8 width; using +/-
-	 ((180.0 * Math.PI * 15.8 * 90.0 / 360.0) / (Math.PI * Odometer.RADIUS)
-	 ((180.0 * 15.8 * 90.0 / 360.0) / (Odometer.RADIUS)
-	 RADIUS error times
-	 2.8:   -60   4x
-	 2.75:  -60  10x
-	 2.7:   -30  10x
-	 2.65:   15  10x
-	 2.67:   -3  10x
-	 2.665:   0  10x -> 2.665(3) */
+/* the odometer runs in standard co-ordinates (ISO 80000-2:2009)
+ with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
+ approxomations about zero) eg counter-clockwise radians; this is the same used
+ in Math.atan2. The travelTo (and turnTo) take degrees and convert them to
+ radians (it's much faster converting them once vs converting atan2 10 times a
+ second) */
 
 /*
 Coordinate System:
@@ -41,28 +38,32 @@ and conversly new_theta = -old_theta + 90.
 
 */
 
+
 import lejos.util.Timer;
 import lejos.util.TimerListener;
+import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 
 public class Odometer implements TimerListener {
 
-	/* MAYBE: have the time be a fn of the speed */
-	static final int ODOMETER_DELAY = 25;
-	static final float RADIUS       = 2.665f;
-	static final float WIDTH        = 19.595f; /*value used with experimental mul_width: 15.8f*/ /* 15.9 16.0 15.24 */
-	/* experiment: rotated by 10 000 went 4.75, 10000/360/4.75 */
-	//static final float MUL_WIDTH    = 0.171f;
+	private static final int   ODO_DELAY = 25;
+	private static final float PI        = (float)Math.PI;
+	private static final float RADIUS    = 2.72f;
+	private static final float WHEELBASE = 16.15f;
 
-	final NXTRegulatedMotor leftMotor, rightMotor;
+	private final NXTRegulatedMotor leftMotor, rightMotor;
 
-	Timer timer = new Timer(ODOMETER_DELAY, this);
+	private Timer timer = new Timer(ODO_DELAY, this);
 
-   /*Displacemnt and heading are stored as ints. Division is not performed
-    *until the final calculation to prevent accumulated error*/
-	int dispTimesTwo, headingTimesTwo;
-	Position p     = new Position();
-	Position pCopy = new Position();
+	/* these are tach values, always from when the programme started;
+	 they are better then floats because using floats for this is numerecally
+	 unstable! when the robot moves around a lot, the odometer will be less
+	 and less precise and eventually will cause a floating point overflow;
+	 ints just loop back */
+	int intTraveled, intTurn;
+
+	Position position = new Position();
+	Position    pCopy = new Position();
 
 	/** constructor */
 	public Odometer(final NXTRegulatedMotor leftMotor, final NXTRegulatedMotor rightMotor) {
@@ -75,57 +76,55 @@ public class Odometer implements TimerListener {
 		timer.stop();
 	}
 
-	/** TimerListener function */
 	public void timedOut() {
-
 		/* get tach values */
-		int leftTacho = leftMotor.getTachoCount();
-		int rightTacho = rightMotor.getTachoCount();
-      /* compute change in 2*position and 2*heading */
-      int dDispTimesTwo = rightTacho + leftTacho - this.dispTimesTwo;
-		int dHeadingTimesTwo = rightTacho - leftTacho - this.headingTimesTwo;
+		int  left = leftMotor.getTachoCount();
+		int right = rightMotor.getTachoCount();
 
-		/* Convert change in displacment to cm */
-		float radianDisp = (float)Math.toRadians(0.5f * dDispTimesTwo) * RADIUS;
-		/* Convert change in theta to radians */
-		float dtheta = (float)Math.toRadians(0.5f * dHeadingTimesTwo) * WIDTH; //MUL_WIDTH was here
+		/* translate into traveled and turned (in some units) */
+		int delTraveled = right + left;
+		int delTurn     = right - left;
 
-		float dx = radianDisp * (float)Math.cos(dtheta);
-		float dy = radianDisp * (float)Math.sin(dtheta);
+		/* subtract off the accumulated */
+		delTraveled -= this.intTraveled;
+		delTurn     -= this.intTurn;
 
+		/* get it in real world units */
+		/* (i/2) * (2Pi r) * (1/360) */
+		float d = (delTraveled) * (PI * RADIUS) / (360f); /* cm */
+		/* (i/2) / (w/2) * (2Pi r) * (1/360) */
+		float r = (delTurn / WHEELBASE) * (PI * RADIUS) / (180f); /* radians */
+
+		/* add it to the position at which the robot thinks it is */
 		synchronized(this) {
-			p.x += dx;
-			p.y += dy;
-			p.theta += dtheta;
-         /*theta kept in the range: (-180,180]*/
-			if(p.theta <= -180f) p.theta += 360f;
-			if(180f < p.theta) p.theta -= 360f;
+			position.transform(r, d);
 		}
 
-		this.dispTimesTwo += dDispTimesTwo;
-		this.headingTimesTwo += dHeadingTimesTwo;
+		/* add it to the class variable */
+		this.intTraveled += delTraveled;
+		this.intTurn     += delTurn;
 	}
 
-	/** accessors */
+	/** this gets a position copy so we can save the position for real-time
+	 updates (position copy is assumed to be accessed one time) */
 	public Position getPositionCopy() {
 		synchronized(this) {
-			pCopy.copy(p);
+			pCopy.set(position);
 		}
 		return pCopy;
 	}
 
 	public String toString() {
 		synchronized(this) {
-			return "" + p;
+			return "Odo" + position;
 		}
 	}
 
    /** setters */
    public void setPosition(Position position) {
       synchronized(this) {
-         p.x = position.x;
-         p.y = position.y;
-         p.theta = position.theta;
+         position.set(position);
       }
    }
+
 }
