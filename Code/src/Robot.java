@@ -12,24 +12,21 @@ import lejos.util.Timer;
 import lejos.util.TimerListener;
 import lejos.nxt.Button;
 
-////
-
 /* Robot */
 
 class Robot implements TimerListener {
 
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING };
 
-	public final static String    NAME = "Sex Robot";
+	public final static String    NAME = "Sex Robot"; /* change */
 	private static final int NAV_DELAY = 100; /* ms */
 
-	private static final float    ANGLE_TOLERANCE = (float)Math.toRadians(0.1);
-	private static final float DISTANCE_TOLERANCE = 1f;
-	
-   private static final NXTRegulatedMotor leftMotor  = Motor.A;
+	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
+	private static final float    ANGLE_MARGINAL_TOLERANCE = 2.0f; /* rad/s */
+	private static final float          DISTANCE_TOLERANCE = 1f; /* cm */
+
+	private static final NXTRegulatedMotor leftMotor  = Motor.A;
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
-
-
 
 	/* Ziegler-Nichols method was used to get close to the optimum */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f, -350, 350);
@@ -69,13 +66,8 @@ class Robot implements TimerListener {
       }
    }
 
-
-
-
-
-	/** this acts as the control */
+	/** this acts as the control; selects based on what it is doing */
 	public void timedOut() {
-
       switch(status) { //idle, rotating, traveling
 			case IDLE:
 				break;
@@ -88,6 +80,7 @@ class Robot implements TimerListener {
 		}
 	}
 
+	/** this shuts down all components that have timers, etc */
 	public void shutdown() {
 		odometer.shutdown();
 		status = Status.IDLE;
@@ -97,8 +90,11 @@ class Robot implements TimerListener {
 	public void turnTo(final float degrees) {
 		if(degrees <= -180 || degrees > 180) throw new IllegalArgumentException();
 
+		/* anglePID, which we need, could have old values, reset it */
 		anglePID.reset();
 
+		/* set the target's angle and set rotate (the timedOut method will call
+		 turn until it turns or is stopped) */
 		target.r = (float)Math.toRadians(degrees);
 		status = Status.ROTATING;
 	}
@@ -106,9 +102,14 @@ class Robot implements TimerListener {
 	/** this sets the target to (x, y) and travels */
 	public void travelTo(final float x, final float y) {
 
+		/* distance and angle need to be reset (we use them) */
 		distancePID.reset();
 		anglePID.reset();
 
+		/* fixme: we should do a thing here that sets the line perp to the
+		 dest for travelTo oscillations */
+
+		/* we set distance, TRAVELLING, and let timedOut's travel do the rest */
 		target.x = x;
 		target.y = y;
 		status = Status.TRAVELLING;
@@ -116,13 +117,18 @@ class Robot implements TimerListener {
 
 	/** this implements a rotation by parts */
 	private void rotate() {
-		/* calculate the delta beteen the target and the current and apply magic */
+		/* calculate the delta beteen the target and the current */
 		Position current = odometer.getPositionCopy();
 		delta.subR(target, current);
+
+		/* apply magic (PID control, input the error and the time, output what
+		 the value should be so it gets to the setpoint fastest, in this case,
+		 the right wheel; the left is the inverse) */
 		float right = anglePID.nextOutput(delta.r, NAV_DELAY);
 
-		/* tolerence */
-		if(anglePID.isWithin(ANGLE_TOLERANCE, 1)) {
+		/* the PID control goes forever, but it's good enough within this
+		 tolerence (angle, derivative) then STOP */
+		if(anglePID.isWithin(ANGLE_TOLERANCE, ANGLE_MARGINAL_TOLERANCE)) {
 			this.stop();
 			status = Status.IDLE;
 			return;
@@ -134,18 +140,20 @@ class Robot implements TimerListener {
 
 	/** travels to a certain position */
 	private void travel() {
-		/* calculate */
+		/* calculate the angle from the current heading to the desired heading
+		 and the speed; fixme: if it goes over, it has to come at it again */
 		Position current = odometer.getPositionCopy();
 		delta.subXY(target, current);
 		target.r = (float)Math.atan2(delta.y, delta.x);
 		delta.subR(target, current);
 		float distance = (float)Math.sqrt(delta.x*delta.x + delta.y*delta.y);
 
+		/* apply magic */
 		float turn = anglePID.nextOutput(delta.r, NAV_DELAY);
+		float speed = distancePID.nextOutput(distance, NAV_DELAY);
+		// haven't docided where to put this: * Math.cos(Math.toRadians(p.r));
 
-		float speed = distancePID.nextOutput(distance, NAV_DELAY);// * Math.cos(Math.toRadians(p.theta));
-
-		/* tolerence */
+		/* tolerence on the distance */
 		if(distancePID.isWithin(DISTANCE_TOLERANCE)) {
 			this.stop();
 			status = Status.IDLE;
@@ -156,10 +164,10 @@ class Robot implements TimerListener {
 		this.setSpeeds(speed - turn, speed + turn);
 	}
 
+	/** what should be printed when our robot is called eg in printf */
 	public String toString() {
 		return NAME + /*this.hashCode()+*/" is " + status;
 	}
-
 
 	/** set r/l speeds indepedently */
 	private void setSpeeds(final float l, final float r) {
