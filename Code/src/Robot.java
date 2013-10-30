@@ -166,7 +166,7 @@ class Robot implements TimerListener {
 
 	/** what should be printed when our robot is called eg in printf */
 	public String toString() {
-		return NAME + /*this.hashCode()+*/" is " + status;
+		return NAME + /*this.hashCode()+*/" is " + status + " at " + odometer;
 	}
 
 	/** set r/l speeds indepedently */

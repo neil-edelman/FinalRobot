@@ -8,22 +8,29 @@ class Driver {
 
 	public static void main(String args[]) {
 		int key;
+		float a = 0f, b;
 
 		Robot r = new Robot();
 
-		r.turnTo(90f);
+		for( ; ; ) {
+			a += 90f;
+			b = a % 360;
+			if(b <= -180)    b += 360f;
+			else if(b > 180) b -= 360f;
+			r.turnTo(b);
 
-		System.err.println(r);
-		while(r.getStatus() != Robot.Status.IDLE) {
-			try {
-				Thread.sleep(DELAY);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
+			System.err.println(r);
+			while(r.getStatus() != Robot.Status.IDLE) {
+				try {
+					Thread.sleep(DELAY);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
+			System.err.println(r + " (press)");
+			key = Button.waitForAnyPress();
+			if((key & Button.ID_ESCAPE) != 0) break;
 		}
-		System.out.println("press!");
-		key = Button.waitForAnyPress();
-		if((key & Button.ID_ESCAPE) != 0) return;
 
 		r.travelTo(20f, 20f);
 
@@ -37,7 +44,7 @@ class Driver {
 		}
 
 		System.err.println(r);
-		System.out.println("press!");
+		System.err.println(r + " (press)");
 		key = Button.waitForAnyPress();
 		if((key & Button.ID_ESCAPE) != 0) return;
 	}
