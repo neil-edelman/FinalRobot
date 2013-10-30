@@ -25,7 +25,7 @@ Coordinate System:
                     -90 Deg: -y axis                    
 
 
-Theta range: (-180,180]
+Theta range: (-180,180] which we convert (-Pi, Pi]
 
 Ints are used to store the tachocount because floats have an upper bound of 10^6 (reached at 2778 revolutions).
 This necessitates using ints until the final calculation. Thus twice the displacment is stored to prevent having

@@ -49,22 +49,21 @@ class Robot implements TimerListener {
 	public Position getPosition() {
 		return odometer.getPositionCopy();
 	}
-   public void setPosition(Position position) {
-      synchronized(this) {
-         odometer.setPosition(position);
-      }
-   }
+
+	/* odometer is syncronised */
+	public void setPosition(Position position) {
+		odometer.setPosition(position);
+	}
 
 	public Status getStatus() {
 		return status;
 	}
 
-
-   public Position getTarget() {
-      synchronized(this) {
-         return target;
-      }
-   }
+	public Position getTarget() {
+		synchronized(this) {
+			return target;
+		}
+	}
 
 	/** this acts as the control; selects based on what it is doing */
 	public void timedOut() {
@@ -95,7 +94,7 @@ class Robot implements TimerListener {
 
 		/* set the target's angle and set rotate (the timedOut method will call
 		 turn until it turns or is stopped) */
-		target.r = (float)Math.toRadians(degrees);
+		target.setTheta((float)Math.toRadians(degrees));
 		status = Status.ROTATING;
 	}
 
@@ -119,12 +118,12 @@ class Robot implements TimerListener {
 	private void rotate() {
 		/* calculate the delta beteen the target and the current */
 		Position current = odometer.getPositionCopy();
-		delta.subR(target, current);
+		delta.subTheta(target, current);
 
 		/* apply magic (PID control, input the error and the time, output what
 		 the value should be so it gets to the setpoint fastest, in this case,
 		 the right wheel; the left is the inverse) */
-		float right = anglePID.nextOutput(delta.r, NAV_DELAY);
+		float right = anglePID.nextOutput(delta.getTheta(), NAV_DELAY);
 
 		/* the PID control goes forever, but it's good enough within this
 		 tolerence (angle, derivative) then STOP */
@@ -141,17 +140,18 @@ class Robot implements TimerListener {
 	/** travels to a certain position */
 	private void travel() {
 		/* calculate the angle from the current heading to the desired heading
-		 and the speed; fixme: if it goes over, it has to come at it again */
+		 and the speed; fixme: if it goes over, it has to come at it again:
+		 signed distance (but that opens up a whole can of worms) */
 		Position current = odometer.getPositionCopy();
 		delta.subXY(target, current);
-		target.r = (float)Math.atan2(delta.y, delta.x);
-		delta.subR(target, current);
+		target.setTheta((float)Math.atan2(delta.y, delta.x));
+		delta.subTheta(target, current);
 		float distance = (float)Math.sqrt(delta.x*delta.x + delta.y*delta.y);
 
 		/* apply magic */
-		float turn = anglePID.nextOutput(delta.r, NAV_DELAY);
-		float speed = distancePID.nextOutput(distance, NAV_DELAY);
-		// haven't docided where to put this: * Math.cos(Math.toRadians(p.r));
+		float turn  = anglePID.nextOutput(delta.getTheta(), NAV_DELAY);
+		float speed = distancePID.nextOutput(distance,      NAV_DELAY);
+		// haven't decided where to put this: * Math.cos(Math.toRadians(p.r));
 
 		/* tolerence on the distance */
 		if(distancePID.isWithin(DISTANCE_TOLERANCE)) {
