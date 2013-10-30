@@ -5,6 +5,10 @@ import java.lang.IllegalArgumentException;
 /*<N extends Number> was so cool, but aritmetic operations can't be applied to
  Number */
 public class Controller {
+	/* this causes the controller to slowly forget values in the distant past;
+	 should be < 1 */
+	private final static float FORGET = 0.99f;
+
 	/* who has time to fine tune these? */
 	private static final float kiTokpDef = 0.4f;
 	private static final float kdTokpDef = 0.2f;
@@ -65,14 +69,15 @@ public class Controller {
 		/* pid */
 		float pid = p + i + d;
 
-		/* limit output and update to values for the next time */
+		/* limit output and update to values for the next time; should be
+		 integral * FORGET ^ dt + e but not noticable */
 		eLast = e;
 		if(isLimit) {
-			if(pid > max)      pid  = max;
-			else if(pid < min) pid  = min;
-			else          integral += e;
+			if(pid > max)      pid = max;
+			else if(pid < min) pid = min;
+			else          integral = integral /* * FORGET*/ + e;
 		} else {
-			integral += e;
+			integral = integral /* * FORGET*/ + e;
 		}
 
 		/* kp * e + ki * (int e) + kd * (d/dt e) */

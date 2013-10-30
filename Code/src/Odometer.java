@@ -8,7 +8,7 @@
  radians (it's much faster converting them once vs converting atan2 10 times a
  second) */
 
-/*
+/* from TA:
 Coordinate System:
 
                      90 Deg: y axis                     
