@@ -1,0 +1,12 @@
+%%
+
+Alex merged the Navigation into Final and I helped.
+
+%%
+
+Alex reorginised the code and I spectated. It's good; I like it. Some changes:
+
+/Final -> /Code
+/Calibrate-Radius etc -> Calibration/Calibrate-Radius
+/SimulateNav ect -> Simulation/SimulateNav
+/Hardware -> Documentation/Hardware
