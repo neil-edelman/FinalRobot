@@ -1,6 +1,6 @@
 128 Calibrate-Radius
 
-Test 128.1: hardware Sex-Robot-1_0, software Calibrate-Radius b6824554e2
+2013-10-26 Test 128.1: hardware Sex-Robot-1_0, software Calibrate-Radius b6824554e2
 
 2.5 too small
 2.665 is slightly small
@@ -10,7 +10,7 @@ Test 128.1: hardware Sex-Robot-1_0, software Calibrate-Radius b6824554e2
 2.72 pretty much
 2.72 cm
 
-Test 128.2: hardware Sex-Robot-1_0, software Calibrate-Radius 13d0d32ce4
+2013-10-28 Test 128.2: hardware Sex-Robot-1_0, software Calibrate-Radius 13d0d32ce4
 
 2.72 to much (317/297) 2.72 ~= 2.9
 2.90 -- (280/300) 2.9 ~= 2.707
@@ -32,7 +32,7 @@ Test 128.2: hardware Sex-Robot-1_0, software Calibrate-Radius 13d0d32ce4
 
 129 Calibrate-Wheelbase 
 
-Test 129.1: hardware Sex-Robot-1_0, software Calibrate-Wheelbase b6824554e2
+2013-10-26 Test 129.1: hardware Sex-Robot-1_0, software Calibrate-Wheelbase b6824554e2
 
 15.8 much too small 16.1261
 16.13 much too small
@@ -42,7 +42,7 @@ Test 129.1: hardware Sex-Robot-1_0, software Calibrate-Wheelbase b6824554e2
 16.15 good enough
 16.15 cm
 
-Test 129.2: hardware Sex-Robot-1_0, software Calibrate-Wheelbase 5d791e1af8
+2013-10-28 Test 129.2: hardware Sex-Robot-1_0, software Calibrate-Wheelbase 5d791e1af8
 
 16.07 -> 10
 16.0  -> -15
