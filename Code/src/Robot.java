@@ -67,17 +67,17 @@ class Robot implements TimerListener {
 
 	/** this acts as the control; selects based on what it is doing */
 	public void timedOut() {
-      switch(status) { //idle, rotating, traveling
-			case IDLE:
+		switch(status) { //idle, rotating, traveling
+			case TRAVELLING:
+				this.travel();
 				break;
 			case ROTATING:
 				this.rotate();
 				break;
-			case TRAVELLING:
-				this.travel();
-				break;
 			case LOCALISING:
 				this.localising();
+				break;
+			case IDLE:
 				break;
 		}
 	}

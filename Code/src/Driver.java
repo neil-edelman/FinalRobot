@@ -11,9 +11,12 @@ class Driver {
 		float a = 0f, b;
 
 		Swagbot robot = new Swagbot();
-		Display display = new Display(robot); //instantiated and started
+		// stupid Display display = new Display(robot); //instantiated and started
 
+		System.err.println("Loc:");
 		robot.localise();
+		key = Button.waitForAnyPress();
+		if((key & Button.ID_ESCAPE) != 0) return;
 
 		for( ; ; ) {
 			a += 90f;
