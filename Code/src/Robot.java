@@ -170,7 +170,7 @@ class Robot implements TimerListener {
 	}
 
 	/** set r/l speeds indepedently */
-	private void setSpeeds(final float l, final float r) {
+	protected void setSpeeds(final float l, final float r) {
 		leftMotor.setSpeed(l);
 		if(l > 0) {
 			leftMotor.forward();
