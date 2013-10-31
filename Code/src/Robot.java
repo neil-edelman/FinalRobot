@@ -76,7 +76,15 @@ class Robot implements TimerListener {
 			case TRAVELLING:
 				this.travel();
 				break;
+			case LOCALISING:
+				this.localise();
+				break;
 		}
+	}
+
+	/** not set, just return to idle */
+	protected void localise() {
+		status = Status.IDLE;
 	}
 
 	/** this shuts down all components that have timers, etc */
