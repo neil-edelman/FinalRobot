@@ -16,7 +16,11 @@ public class Swagbot extends Robot {
 		this.setSpeeds(-speed,speed);
 	}
 
-//	void localise(boolean doLight) {
+	/** override the method */
+	protected void localising() {
+		System.err.println("Loco!");
+		status = Status.IDLE;
+	}
 //
 //      status = Status.LOCALISING;
 //      

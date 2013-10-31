@@ -77,20 +77,20 @@ class Robot implements TimerListener {
 				this.travel();
 				break;
 			case LOCALISING:
-				this.localise();
+				this.localising();
 				break;
 		}
-	}
-
-	/** not set, just return to idle */
-	protected void localise() {
-		status = Status.IDLE;
 	}
 
 	/** this shuts down all components that have timers, etc */
 	public void shutdown() {
 		odometer.shutdown();
 		status = Status.IDLE;
+	}
+
+	/** set localising */
+	protected void localise() {
+		status = Status.LOCALISING;
 	}
 
 	/** this sets the target to a (-180,180] degree and turns */
@@ -120,6 +120,12 @@ class Robot implements TimerListener {
 		target.x = x;
 		target.y = y;
 		status = Status.TRAVELLING;
+	}
+
+	/** the other robots' extending it will override this method */
+	protected void localising() {
+		System.err.println("no localising");
+		status = Status.IDLE;
 	}
 
 	/** this implements a rotation by parts */

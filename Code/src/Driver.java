@@ -13,6 +13,8 @@ class Driver {
 		Swagbot robot = new Swagbot();
 		Display display = new Display(robot); //instantiated and started
 
+		robot.localise();
+
 		for( ; ; ) {
 			a += 90f;
 			b = a % 360;
