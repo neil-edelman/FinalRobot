@@ -10,17 +10,17 @@ class Driver {
 		int key;
 		float a = 0f, b;
 
-		Robot r = new Robot();
-      Display display = new Display(r); //instantiated and started
+		Swagbot robot = new Swagbot();
+		Display display = new Display(robot); //instantiated and started
 
 		for( ; ; ) {
 			a += 90f;
 			b = a % 360;
 			if(b <= -180)    b += 360f;
 			else if(b > 180) b -= 360f;
-			r.turnTo(b);
+			robot.turnTo(b);
 
-			while(r.getStatus() != Robot.Status.IDLE) {
+			while(robot.getStatus() != Robot.Status.IDLE) {
 				try {
 					Thread.sleep(DELAY);
 				} catch (InterruptedException e) {
@@ -31,10 +31,10 @@ class Driver {
 			if((key & Button.ID_ESCAPE) != 0) break;
 		}
 
-		r.travelTo(30.48f, 30.48f);
+		robot.travelTo(30.48f, 30.48f);
 
-		System.err.println(r);
-		while(r.getStatus() != Robot.Status.IDLE) {
+		System.err.println(robot);
+		while(robot.getStatus() != Robot.Status.IDLE) {
 			try {
 				Thread.sleep(DELAY);
 			} catch (InterruptedException e) {
