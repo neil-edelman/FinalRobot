@@ -11,7 +11,7 @@ class Driver {
 		float a = 0f, b;
 
 		Swagbot robot = new Swagbot();
-		// stupid Display display = new Display(robot); //instantiated and started
+		Display display = new Display(robot);
 
 		System.err.println("Loc:");
 		robot.localise();

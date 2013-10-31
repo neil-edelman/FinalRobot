@@ -18,7 +18,7 @@ class Robot implements TimerListener {
 
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING };
 
-	public final static String    NAME = "Sex Robot"; /* change */
+	private final static String   NAME = "Sex Robot"; /* change */
 	private static final int NAV_DELAY = 100; /* ms */
 
 	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
@@ -34,8 +34,8 @@ class Robot implements TimerListener {
 	private Controller distancePID = new Controller(10f, 0f, 0f, -250, 250);
 
 	protected Status     status = Status.IDLE;
-	private Odometer odometer = new Odometer(leftMotor, rightMotor);
-	private Position   target = new Position(), delta = new Position();
+	protected Odometer odometer = new Odometer(leftMotor, rightMotor);
+	protected Position   target = new Position(), delta = new Position();
 
 	private Timer timer = new Timer(NAV_DELAY, this);
 
@@ -65,6 +65,10 @@ class Robot implements TimerListener {
 		}
 	}
 
+	public String getName() {
+		return NAME;
+	}
+
 	/** this acts as the control; selects based on what it is doing */
 	public void timedOut() {
 		switch(status) { //idle, rotating, traveling
@@ -91,6 +95,14 @@ class Robot implements TimerListener {
 	/** set localising */
 	protected void localise() {
 		status = Status.LOCALISING;
+	}
+
+	/** this sets a constant turning speed (used in localising) */
+	protected void turn(final float rate) {
+		if((status == Status.ROTATING) || (status == Status.TRAVELLING)) {
+			status = Status.IDLE;
+		}
+		this.setSpeeds(-rate, rate);
 	}
 
 	/** this sets the target to a (-180,180] degree and turns */

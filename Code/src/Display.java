@@ -1,37 +1,48 @@
 /* Lab 4, Group 51 -- Alex Bhandari-Young and Neil Edelman */
 
+//import java.lang.IllegalArgumentException;
+
 import lejos.nxt.LCD;
 import lejos.util.Timer;
 import lejos.util.TimerListener;
 
 public class Display implements TimerListener{
-	public static final int LCD_REFRESH = 100/*temp: swich back to 100 later*/;
-	private Timer displayTimer;
-   private Robot robot;
-   private Position position;
-   private String drawText = "No text to draw";
-	
-	public Display(Robot robot) {
+	public static final int LCD_REFRESH = 500;
+
+	private static String drawText = "No text to draw";
+
+	private Timer displayTimer = new Timer(LCD_REFRESH, this);
+	private boolean isStarted = false;
+	private Robot robot;
+
+	public Display(final Robot robot) {
 		this.robot = robot;
-		this.displayTimer = new Timer(LCD_REFRESH, this);
-		displayTimer.start();// start the timer
+		displayTimer.start();
+		isStarted = true;
 	}
-	
-	public void timedOut() { 
+
+	public void start() {
+		if(isStarted) return;
+		displayTimer.start();
+	}
+
+	public void stop() {
+		if(!isStarted) return;
+		displayTimer.stop();
+	}
+
+	public void timedOut() {
+		Position position = robot.getPosition();
 		LCD.clear();
-      position = robot.getPosition();
-		LCD.drawString("X value: ", 0, 0);
-		LCD.drawString("Y value: ", 0, 1);
-		LCD.drawString("Theta value: ", 0, 2);
-		LCD.drawString("Distance: ", 0, 3);
-      LCD.drawString(drawText, 0, 4);
-		LCD.drawInt((int)(position.x), 13, 0);
-		LCD.drawInt((int)(position.y), 13, 1);
-		LCD.drawInt((int)(position.getTheta()), 13, 2);
-//      LCD.drawInt(robot.getDistance(), 13, 3);
+		LCD.drawString("" + robot.getName(), 0, 0, true);
+		LCD.drawString("" + robot.getStatus(), 0, 1);
+		LCD.drawString("" + position, 0, 2);
+		LCD.drawString(drawText, 0, 3);
 	}
-   public void setText(String text) {
-      this.drawText = text; 
-   }
+
+	/** fixme: some sort of bounds check */
+	public static void setText(String text) {
+		drawText = text; 
+	}
 
 }
