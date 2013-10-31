@@ -10,6 +10,9 @@ public class Swagbot extends Robot {
 	private Colour       colour = new Colour();
 	private UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 
+	private byte locoData[] = new byte[128]; /* ~76 */
+	private int locoCount;
+
 	public Swagbot() {
 		super();
 	}
@@ -25,10 +28,24 @@ public class Swagbot extends Robot {
 		Position p = odometer.getPositionCopy();
 		int  sonic = pingSonar();
 		float    t = (float)Math.toDegrees(p.getTheta());
-		Display.setText("t = " + (int)t + " us " + sonic);
+		locoData[locoCount++] = (byte)sonic; /* fixme: ignore errors! */
+		Display.setText("t=" + (int)t + ";#" + locoCount + ",us" + sonic);
 		if(t >= 0f || t <= -5f) return;
+
+		/* code only goes though to this point on last localise */
 		this.stop();
 		status = Status.IDLE;
+
+		/* calculate; locoData[locoCount-1] is the distance (FIXME!) */
+		/* fixme: it only localises facing out, but the same idea */
+		int left, right;
+		for(left = 0; left < locoCount; left++) {
+			if(locoData[left] < 50) break;
+		}
+		for(right = locoCount - 1; right >= 0; right++) {
+			if(locoData[right] < 50) break;
+		}
+		Display.setText(left + "; " + right);
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
