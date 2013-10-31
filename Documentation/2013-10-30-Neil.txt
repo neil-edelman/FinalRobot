@@ -1,0 +1,8 @@
+%%
+
+Made Mod to test the mod fn on -'ve variables. Restored from backup files which were lost in the re-organising.
+
+%%
+
+Started localising.
+
