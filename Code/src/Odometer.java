@@ -60,7 +60,8 @@ public class Odometer implements TimerListener {
 	 unstable! when the robot moves around a lot, the odometer will be less
 	 and less precise and eventually will cause a floating point overflow;
 	 ints just loop back */
-	int intTraveled, intTurn;
+	private int intTraveled, intTurn;
+	private int time;
 
 	Position position = new Position();
 	Position    pCopy = new Position();
@@ -76,7 +77,8 @@ public class Odometer implements TimerListener {
 		timer.stop();
 	}
 
-	public void timedOut() {
+	public void timedOut() { synchronized(this) {
+		time -= (int)System.currentTimeMillis();
 		/* get tach values */
 		int  left = leftMotor.getTachoCount();
 		int right = rightMotor.getTachoCount();
@@ -103,6 +105,16 @@ public class Odometer implements TimerListener {
 		/* add it to the class variable */
 		this.intTraveled += delTraveled;
 		this.intTurn     += delTurn;
+
+		time += (int)System.currentTimeMillis();
+	}}
+
+	public int codeTime() {
+		synchronized(this) {
+			int t = time;
+			time = 0;
+			return t;
+		}
 	}
 
 	/** this gets a position copy so we can save the position for real-time

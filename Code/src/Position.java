@@ -70,22 +70,34 @@ class Position {
 		/* too bad sinc is in Java Oracle extended :[ */
 		/* float exp_min is -126 but exp_max is 127, we're going to ignore the
 		 unbalanced last one */
-		if(angle >= MIN_ANGLE || angle <= -MIN_ANGLE) {
+//		if(angle >= MIN_ANGLE || angle <= -MIN_ANGLE) {
 			/* object co-ordinates */
-			float div = dist / angle;
-			float xObject = div * ((float)Math.sin(angle));
-			float yObject = div * ((float)Math.cos(angle) - 1f);
+//			float div = dist / angle;
+//			float xObject = div * ((float)Math.sin(angle));
+//			float yObject = div * ((float)Math.cos(angle) - 1f);
 			/* matrix transformation */
-			float c = (float)Math.cos(t);
-			float s = (float)Math.sin(t);
-			x +=  c*xObject + s*yObject;
-			y += -s*xObject + c*yObject;
-		} else {
+//			float c = (float)Math.cos(t);
+//			float s = (float)Math.sin(t);
+//			x +=  c*xObject + s*yObject;
+//			y += -s*xObject + c*yObject;
+//		} else {
 			/* l'H\^opital's rule about close-to-zero */
-			float tIntermedate = t + angle * 0.5f;
-			x += dist * Math.cos(tIntermedate);
-			y += dist * Math.sin(tIntermedate);
-		}
+//			float tIntermedate = t + angle * 0.5f;
+//			x += dist * Math.cos(tIntermedate);
+//			y += dist * Math.sin(tIntermedate);
+//		}
+		/* we need these */
+		final float angle2 = angle * angle;
+		final float angle3 = angle2 * angle;
+		final float c      = (float)Math.cos(t);
+		final float s      = (float)Math.sin(t);
+
+		/* object co-ordinates expanded in a Taylor series */
+		float dx = dist * (1f          - angle2 / 6f  /* + O(angle^4) */);
+		float dy = dist * (-angle / 2f + angle3 / 24f /* - O(angle^5) */);
+		/* matrix transformation */
+		x +=  c*dx + s*dy;
+		y += -s*dx + c*dy;
 		/* update the angle */
 		t += angle;
 		if(t <= -PI)    t += TWO_PI;
