@@ -3,8 +3,10 @@ import java.lang.IllegalArgumentException;
 /* Position: defines a position */
 
 class Position {
-	private static final float PI     = (float)Math.PI;
-	private static final float TWO_PI = (float)(2.0 * Math.PI);
+	private static final float PI        = (float)Math.PI;
+	private static final float TWO_PI    = (float)(2.0 * Math.PI);
+	/* it will break down at 32 cm / 100 ms = 11.52 km/h (a world record pace) */
+	private static final float MIN_ANGLE = Float.MIN_NORMAL * 32f;
 
 	/* these should be ints; I am lazy; (x, y) can be any value so I am making
 	 them public */
@@ -60,14 +62,31 @@ class Position {
 		else if(t > PI) t -= TWO_PI;
 	}
 
-	/* affine transformation; given a distance and an angle (assume divided up
-	 along the distance,) compute the approximate rectification (assuming the
-	 distance or the angle is small) using the expectation value of the angle */
-	/* fixme: compute it exactly */
+	/** behold the awesome power of math! given a distance and an angle which
+	 is divided up along the distance evenly, compute the next distance, angle
+	 using the affine transformations and the calculus of rectification
+	 (this results in a heart, if you draw it out for const dist) */
 	public void transform(final float angle, final float dist) {
-		float tIntermedate = t + angle * 0.5f;
-		x += dist * Math.cos(tIntermedate);
-		y += dist * Math.sin(tIntermedate);
+		/* too bad sinc is in Java Oracle extended :[ */
+		/* float exp_min is -126 but exp_max is 127, we're going to ignore the
+		 unbalanced last one */
+		if(angle >= MIN_ANGLE || angle <= -MIN_ANGLE) {
+			/* object co-ordinates */
+			float div = dist / angle;
+			float xObject = div * ((float)Math.sin(angle));
+			float yObject = div * ((float)Math.cos(angle) - 1f);
+			/* matrix transformation */
+			float c = (float)Math.cos(t);
+			float s = (float)Math.sin(t);
+			x +=  c*xObject + s*yObject;
+			y += -s*xObject + c*yObject;
+		} else {
+			/* l'H\^opital's rule about close-to-zero */
+			float tIntermedate = t + angle * 0.5f;
+			x += dist * Math.cos(tIntermedate);
+			y += dist * Math.sin(tIntermedate);
+		}
+		/* update the angle */
 		t += angle;
 		if(t <= -PI)    t += TWO_PI;
 		else if(t > PI) t -= TWO_PI;
