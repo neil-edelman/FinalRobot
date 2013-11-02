@@ -1,0 +1,15 @@
+Full precision
+--------------
+(1/\theta * Sin[\theta], 1/\theta * (Cos[\theta]-1))
+Working: 19 to 21 (500 / 25) ms
+Idle: 8 to 11 (500 / 25) ms
+
+Approximate
+-----------
+Working: 0 to 2 (500 / 25) ms
+Idle: 0 to 1 (500 / 25) ms
+
+Taylor O(\theta^3)
+------------------
+Working: 0 to 2 (500 / 25) ms
+Idle: 0 to 1 (500 / 25) ms
