@@ -172,7 +172,10 @@ class Robot implements TimerListener {
 		delta.subXY(target, current);
 		target.setTheta((float)Math.atan2(delta.y, delta.x));
 		delta.subTheta(target, current);
-		float distance = (float)Math.hypot(delta.x, delta.y);
+		/* test: (forget it, I'll just use sqrt) excessively slow on some
+		 machines, we are going no where near overflow */
+		/*float distance = (float)Math.hypot(delta.x, delta.y);*/
+		float distance = (float)Math.sqrt(delta.x*delta.x + delta.y*delta.y);
 
 		/* apply magic */
 		float turn  = anglePID.nextOutput(delta.getTheta(), NAV_DELAY);
