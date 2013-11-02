@@ -99,7 +99,7 @@ public class Odometer implements TimerListener {
 
 		/* add it to the position at which the robot thinks it is */
 		synchronized(this) {
-			position.transform(r, d);
+			position.arc(r, d);
 		}
 
 		/* add it to the class variable */

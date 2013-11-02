@@ -63,41 +63,30 @@ class Position {
 	}
 
 	/** behold the awesome power of math! given a distance and an angle which
-	 is divided up along the distance evenly, compute the next distance, angle
-	 using the affine transformations and the calculus of rectification
-	 (this results in a heart, if you draw it out for parametric const dist) */
-	public void transform(final float angle, final float dist) {
-		/* too bad sinc is in Java Oracle extended :[ */
-		/* float exp_min is -126 but exp_max is 127, we're going to ignore the
-		 unbalanced last one */
-//		if(angle >= MIN_ANGLE || angle <= -MIN_ANGLE) {
-			/* object co-ordinates */
-//			float div = dist / angle;
-//			float xObject = div * ((float)Math.sin(angle));
-//			float yObject = div * ((float)Math.cos(angle) - 1f);
-			/* matrix transformation */
-//			float c = (float)Math.cos(t);
-//			float s = (float)Math.sin(t);
-//			x +=  c*xObject + s*yObject;
-//			y += -s*xObject + c*yObject;
-//		} else {
-			/* l'H\^opital's rule about close-to-zero */
-//			float tIntermedate = t + angle * 0.5f;
-//			x += dist * Math.cos(tIntermedate);
-//			y += dist * Math.sin(tIntermedate);
-//		}
-		/* we need these */
+	 is divided up along the distance evenly (an arc,) compute the next
+	 distance, angle using the affine transformations and the calculus of
+	 rectification (this results in a heart, if you draw it out for parametric
+	 const dist) */
+	public void arc(final float angle, final float dist) {
+
+		/* the exact answer ran ten times slower then the separated code; I
+		 guess the hardware is slow at trig; we're using small theta, so we can
+		 expand this in a Taylor series; it makes a lot of sense and eliminates
+		 l'H\^opital's rule about close-to-zero resulting in cache-friendly
+		 code; it runs in faster then the separated (angle, forward) code */
+
 		final float angle2 = angle * angle;
 		final float angle3 = angle2 * angle;
-		final float c      = (float)Math.cos(t);
+		final float c      = (float)Math.cos(t); /* we may use these elsewhere */
 		final float s      = (float)Math.sin(t);
 
-		/* object co-ordinates expanded in a Taylor series */
+		/* object co-ordinates expanded in a Taylor series:
+		 dx = dist*Sinc[angle]; dy = dist/angle(Cos[angle]-1) */
 		float dx = dist * (1f          - angle2 / 6f  /* + O(angle^4) */);
 		float dy = dist * (-angle / 2f + angle3 / 24f /* - O(angle^5) */);
-		/* matrix transformation */
-		x +=  c*dx + s*dy;
-		y += -s*dx + c*dy;
+		/* inverse rotation + transformation matrix transformation */
+		x +=  c*dx - s*dy;
+		y +=  s*dx + c*dy;
 		/* update the angle */
 		t += angle;
 		if(t <= -PI)    t += TWO_PI;
