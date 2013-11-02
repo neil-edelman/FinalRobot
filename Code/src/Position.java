@@ -60,13 +60,17 @@ class Position {
 		else if(t > PI) t -= TWO_PI;
 	}
 
-	/* fixme: add the expectation value (1/2 rotate, advance, 1/2 rotate) */
+	/* affine transformation; given a distance and an angle (assume divided up
+	 along the distance,) compute the approximate rectification (assuming the
+	 distance or the angle is small) using the expectation value of the angle */
+	/* fixme: compute it exactly */
 	public void transform(final float angle, final float dist) {
+		float tIntermedate = t + angle * 0.5f;
+		x += dist * Math.cos(tIntermedate);
+		y += dist * Math.sin(tIntermedate);
 		t += angle;
 		if(t <= -PI)    t += TWO_PI;
 		else if(t > PI) t -= TWO_PI;
-		x += dist * Math.cos(t);
-		y += dist * Math.sin(t);
 	}
 
 	public String toString() {
