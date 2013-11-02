@@ -65,7 +65,7 @@ class Position {
 	/** behold the awesome power of math! given a distance and an angle which
 	 is divided up along the distance evenly, compute the next distance, angle
 	 using the affine transformations and the calculus of rectification
-	 (this results in a heart, if you draw it out for const dist) */
+	 (this results in a heart, if you draw it out for parametric const dist) */
 	public void transform(final float angle, final float dist) {
 		/* too bad sinc is in Java Oracle extended :[ */
 		/* float exp_min is -126 but exp_max is 127, we're going to ignore the
