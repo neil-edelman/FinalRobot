@@ -65,10 +65,6 @@ class Robot implements TimerListener {
 		}
 	}
 
-	public int getOdoCodeTime() {
-		return odometer.codeTime();
-	}
-
 	public String getName() {
 		return NAME;
 	}

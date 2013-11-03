@@ -38,7 +38,6 @@ public class Display implements TimerListener{
 		LCD.drawString("" + robot.getStatus(), 0, 1);
 		LCD.drawString("" + position, 0, 2);
 		LCD.drawString(drawText, 0, 3, true);
-		LCD.drawString("" + robot.getOdoCodeTime(), 0, 4);
 	}
 
 	/** fixme: some sort of bounds check */
