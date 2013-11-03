@@ -22,11 +22,12 @@ public class Colour {
 	static Vector3f styrofoam = new Vector3f(0.569778f, 0.546741f, 0.611144f);
 	static Vector3f woodblock = new Vector3f(0.795851f, 0.438809f, 0.414174f);
 
-	ColorSensor      cs = new ColorSensor(SensorPort.S3);
+	ColorSensor      cs;
 	Vector3f     colour = new Vector3f();
 	Vector3f colourDiff = new Vector3f();
 
-	public Colour() {
+	public Colour(final SensorPort port) {
+		cs = new ColorSensor(port);
 	}
 
 	public Value getColourValue() {

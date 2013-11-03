@@ -1,19 +1,23 @@
 import lejos.nxt.Button;
 
+import lejos.nxt.SensorPort;
+
 /* this is a driver that instantaties a Robot and makes it do stuff */
 
 class Driver {
 
 	private static final int DELAY = 100;
 
+	private static final SensorPort  sonicPort = SensorPort.S4;
+	private static final SensorPort colourPort = SensorPort.S3;
+
 	public static void main(String args[]) {
 		int key;
 		float a = 0f, b;
 
-		Swagbot robot = new Swagbot();
+		Swagbot robot = new Swagbot(sonicPort, colourPort);
 		Display display = new Display(robot);
 
-		System.err.println("Loc:");
 		robot.localise();
 		key = Button.waitForAnyPress();
 		if((key & Button.ID_ESCAPE) != 0) return;

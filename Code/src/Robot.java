@@ -1,6 +1,6 @@
 import java.lang.IllegalArgumentException;
 
-import lejos.nxt.Motor;
+import lejos.nxt.Motor; /* workaround for nxj error */
 import lejos.nxt.NXTRegulatedMotor;
 
 import lejos.nxt.Sound;
@@ -16,6 +16,10 @@ import lejos.nxt.Button;
 
 class Robot implements TimerListener {
 
+	/* should be in Driver, but causes crash */
+	private static final NXTRegulatedMotor  leftMotor = Motor.A;
+	private static final NXTRegulatedMotor rightMotor = Motor.B;
+
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING };
 
 	private final static String   NAME = "Sex Robot"; /* change */
@@ -24,9 +28,6 @@ class Robot implements TimerListener {
 	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
 	private static final float    ANGLE_MARGINAL_TOLERANCE = 2.0f; /* rad/s */
 	private static final float          DISTANCE_TOLERANCE = 1f; /* cm */
-
-	private static final NXTRegulatedMotor leftMotor  = Motor.A;
-	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
 	/* Ziegler-Nichols method was used to get close to the optimum */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f, -350, 350);
