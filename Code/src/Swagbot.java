@@ -4,13 +4,18 @@ import lejos.nxt.SensorPort;
 import lejos.nxt.Sound; /* pause */
 
 public class Swagbot extends Robot {
+	class Loco {
+		byte  cm;
+		float theta;
+	}
+
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
 	private static final int SONAR_DELAY = 20;
 
 	private Colour       colour = new Colour();
 	private UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 
-	private byte locoData[] = new byte[128]; /* ~76 */
+	private Loco locoData[] = new Loco[128]; /* ~76 */
 	private int locoCount;
 
 	public Swagbot() {
@@ -28,7 +33,8 @@ public class Swagbot extends Robot {
 		Position p = odometer.getPositionCopy();
 		int  sonic = pingSonar();
 		float    t = (float)Math.toDegrees(p.getTheta());
-		locoData[locoCount++] = (byte)sonic; /* fixme: ignore errors! */
+		locoData[locoCount].theta = p.getTheta();
+		locoData[locoCount].cm = (byte)sonic; /* fixme: ignores errors! */
 		Display.setText("t=" + (int)t + ";#" + locoCount + ",us" + sonic);
 		if(t >= 0f || t <= -5f) return;
 
@@ -40,12 +46,12 @@ public class Swagbot extends Robot {
 		/* fixme: it only localises facing out, but the same idea */
 		int left, right;
 		for(left = 0; left < locoCount; left++) {
-			if(locoData[left] < 50) break;
+			if(locoData[left].cm < 50) break;
 		}
 		for(right = locoCount - 1; right >= 0; right++) {
-			if(locoData[right] < 50) break;
+			if(locoData[right].cm < 50) break;
 		}
-		Display.setText(left + "; " + right);
+		Display.setText(locoData[left].theta + "; " + locoData[right].theta);
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
