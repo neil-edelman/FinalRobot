@@ -39,13 +39,14 @@ public class Robot implements TimerListener {
 	private Controller distancePID = new Controller(10f, 0f, 0f);
 
 	protected Status     status = Status.IDLE;
-	protected Odometer odometer = new Odometer(leftMotor, rightMotor);
 	protected Position   target = new Position(), delta = new Position();
+	protected Odometer odometer;
 
 	private Timer timer = new Timer(NAV_DELAY, this);
 
 	/** the constructor */
 	public Robot() {
+		odometer = new Odometer(leftMotor, rightMotor);
 		/* (this looks promising, must reseach)
 		leftMotor.setAccelertion(3000);
 		rightotor.setAccelertion(3000);*/
@@ -196,6 +197,8 @@ public class Robot implements TimerListener {
 
 	/**************************************/
 
+	/* accesors/modifiers */
+
 	/** pass this on to the odometer (odometer is syncronised) */
 	public Position getPosition() {
 		return odometer.getPositionCopy();
@@ -225,8 +228,12 @@ public class Robot implements TimerListener {
 
 	/** what should be printed when our robot is called eg in printf */
 	public String toString() {
-		return NAME /*+ this.hashCode()*/ + " is " + status + " at " + odometer;
+		synchronized(this) {
+			return NAME /*+ this.hashCode()*/ + " is " + status + " at " + odometer;
+		}
 	}
+
+	/* output functions */
 
 	/** set r/l speeds indepedently */
 	protected void setSpeeds(final float l, final float r) {
