@@ -5,3 +5,7 @@ Struggled with, it turns out, an API error.
 Struggled with Bluetooth.
 
 Worked on hardware with Alex.
+
+Fucking signed bytes in Java! Fuck this took so long to track down the bug.
+
+%%
