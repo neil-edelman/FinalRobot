@@ -7,8 +7,8 @@ public class Swagbot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
 	private static final int SONAR_DELAY = 20;
 
-	private Colour           colour;
-	private UltrasonicSensor sonic;
+	private   Colour           colour;
+	protected UltrasonicSensor sonic;
 
 	public Swagbot(final SensorPort sonicPort, final SensorPort colourPort) {
 		super();
