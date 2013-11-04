@@ -16,7 +16,7 @@ import lejos.nxt.Button;
 
 class Robot implements TimerListener {
 
-	/* should be in Driver, but causes crash */
+	/* should be in Driver, but causes crash in nxj */
 	private static final NXTRegulatedMotor  leftMotor = Motor.A;
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
