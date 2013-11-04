@@ -199,12 +199,9 @@ public class Robot implements TimerListener {
 
 	/* accesors/modifiers */
 
-	/** pass this on to the odometer (odometer is syncronised) */
-	/* fixme? this is kind of scetchy . . . for what is it used? think it
-	 may interfere in the methods above when called from a diff thread
-	 (but we have no threads, so it's iffy) maybe have a second copy? */
+	/** pass this on to the odometer */
 	public Position getPosition() {
-		return odometer.getPositionCopy();
+		return odometer.getLastPosition();
 	}
 
 	/** pass this on to the odometer (odometer is syncronised) */

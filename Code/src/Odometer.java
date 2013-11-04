@@ -114,6 +114,11 @@ public class Odometer implements TimerListener {
 		return pCopy;
 	}
 
+	/** for info methods */
+	public Position getLastPosition() {
+		return pCopy;
+	}
+
 	public String toString() {
 		synchronized(this) {
 			return "Odo" + position;
