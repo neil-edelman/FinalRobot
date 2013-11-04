@@ -1,16 +1,18 @@
+/* localising robot extends robot */
+
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound; /* pause */
 
-public class Swagbot extends Robot {
+public class Locobot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
 	private static final int SONAR_DELAY = 20;
 
 	private   Colour           colour;
 	protected UltrasonicSensor sonic;
 
-	public Swagbot(final SensorPort sonicPort, final SensorPort colourPort) {
+	public Locobot(final SensorPort sonicPort, final SensorPort colourPort) {
 		super();
 		sonic  = new UltrasonicSensor(sonicPort);
 		colour = new Colour(colourPort);

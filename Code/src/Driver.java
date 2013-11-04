@@ -15,7 +15,7 @@ class Driver {
 		int key;
 		float a = 0f, b;
 
-		Swagbot robot = new Swagbot(sonicPort, colourPort);
+		Robot robot = new Locobot(sonicPort, colourPort);
 		Display display = new Display(robot);
 
 		robot.localise();
