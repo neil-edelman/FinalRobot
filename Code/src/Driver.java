@@ -41,7 +41,7 @@ class Driver {
 			if((key & Button.ID_ESCAPE) != 0) break;
 		}
 
-		robot.travelTo(30.48f, 30.48f);
+		robot.travelTo(10f, 10f /*30.48f, 30.48f*/);
 
 		System.err.println(robot);
 		while(robot.getStatus() != Robot.Status.IDLE) {

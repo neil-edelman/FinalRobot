@@ -36,7 +36,7 @@ public class Robot implements TimerListener {
 	 the battery voltage causes some lag when low */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f);
 	/* fixme!!!! this has not been optimised */
-	private Controller distancePID = new Controller(10f, 0f, 0f);
+	private Controller distancePID = new Controller(30f, 1f, 1f);
 
 	protected Status     status = Status.IDLE;
 	protected Position   target = new Position(), delta = new Position();

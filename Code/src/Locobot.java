@@ -5,6 +5,8 @@ import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound; /* pause */
 
+import java.util.ArrayList;
+
 public class Locobot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
 	private static final int SONAR_DELAY = 20;
@@ -21,10 +23,12 @@ public class Locobot extends Robot {
 	}
 
 	/* temp sensing array (fixme! varible numbers) */
-	private static final int LOCO_NO = 128;
-	private byte locoCm[] = new byte[LOCO_NO]; /* ~76 */
-	private float locoT[] = new float[LOCO_NO]; /* ~76 */
-	private int locoCount;
+	//private static final int LOCO_NO = 128;
+	//private byte locoCm[] = new byte[LOCO_NO]; /* ~76 */
+	//private float locoT[] = new float[LOCO_NO]; /* ~76 */
+	//private int locoCount;
+
+	private ArrayList<Ping> pings = new ArrayList<Ping>(128);
 
 	/** override this method */
 	protected void localise() {
@@ -41,12 +45,14 @@ public class Locobot extends Robot {
 		float    t = (float)Math.toDegrees(p.getTheta());
 
 		/* record */
-		locoCm[locoCount] = (byte)sonic; /* fixme: ignores errors! */
-		locoT[locoCount]  = t;
-		locoCount++;
+		//locoCm[locoCount] = (byte)sonic; /* fixme: ignores errors! */
+		//locoT[locoCount]  = t;
+		//locoCount++;
+		pings.add(new Ping(p, sonic)); /* malloc is slow */
 
 		/* display */
-		Display.setText("t=" + (int)t + ";#" + locoCount + ",us" + sonic);
+		//Display.setText("t=" + (int)t + ";#" + locoCount + ",us" + sonic);
+		Display.setText("t=" + (int)t + ";#" + pings.size() + ",us" + sonic);
 		if(t >= 0f || t <= -5f) return;
 
 		/* code only goes though to this point on last localise */
@@ -55,14 +61,15 @@ public class Locobot extends Robot {
 
 		/* calculate (FIXME!) */
 		/* fixme: it only localises facing out, but the same idea */
-		int left, right;
+		/*int left, right;
 		for(left = 0; left < locoCount; left++) {
 			if(lt(locoCm[left], (byte)50)) break;
 		}
 		for(right = locoCount - 1; right >= 0; right--) {
 			if(lt(locoCm[right], (byte)50)) break;
 		}
-		Display.setText2("(" + locoCount + ") " + (int)locoT[left] + "; " + (int)locoT[right]);
+		Display.setText2("(" + locoCount + ") " + (int)locoT[left] + "; " + (int)locoT[right]);*/
+		Ping.correct(pings);
 	}
 
 	/** why they don't have unsigned compare in the Java specs is beyond me,
