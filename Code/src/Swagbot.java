@@ -10,27 +10,38 @@ public class Swagbot extends Robot {
 	private Colour           colour;
 	private UltrasonicSensor sonic;
 
-	private byte locoData[] = new byte[128]; /* ~76 */
-	private int locoCount;
-
 	public Swagbot(final SensorPort sonicPort, final SensorPort colourPort) {
 		super();
 		sonic  = new UltrasonicSensor(sonicPort);
 		colour = new Colour(colourPort);
 	}
 
+	/* temp sensing array (fixme! varible numbers) */
+	private static final int LOCO_NO = 128;
+	private byte locoCm[] = new byte[LOCO_NO]; /* ~76 */
+	private float locoT[] = new float[LOCO_NO]; /* ~76 */
+	private int locoCount;
+
 	/** override this method */
 	protected void localise() {
 		status = Status.LOCALISING;
+		//Display.setText2(""+this.pingSonar());
 		this.turn(100f);
 	}
 
 	/** override this method */
 	protected void localising() {
+
 		Position p = odometer.getPositionCopy();
 		int  sonic = pingSonar();
 		float    t = (float)Math.toDegrees(p.getTheta());
-		locoData[locoCount] = (byte)sonic; /* fixme: ignores errors! */
+
+		/* record */
+		locoCm[locoCount] = (byte)sonic; /* fixme: ignores errors! */
+		locoT[locoCount]  = t;
+		locoCount++;
+
+		/* display */
 		Display.setText("t=" + (int)t + ";#" + locoCount + ",us" + sonic);
 		if(t >= 0f || t <= -5f) return;
 
@@ -38,16 +49,17 @@ public class Swagbot extends Robot {
 		this.stop();
 		status = Status.IDLE;
 
-		/* calculate; locoData[locoCount-1] is the distance (FIXME!) */
+		/* calculate (FIXME!) */
 		/* fixme: it only localises facing out, but the same idea */
 		int left, right;
 		for(left = 0; left < locoCount; left++) {
-			if(locoData[left] < 50) break;
+			if(locoCm[left] < 50) break;
 		}
-		for(right = locoCount - 1; right >= 0; right++) {
-			if(locoData[right] < 50) break;
+		for(right = locoCount - 1; right >= 0; right--) {
+			if(locoCm[right] < 50) break;
 		}
-		Display.setText(left + "; " + right);
+		Display.setText2(locoCount + "! " + left + ":" + locoT[left] + "; " + right + ":" + locoT[right]);
+		Display.setText("0 " + locoT[0] + " " + locoCm[0]);
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the

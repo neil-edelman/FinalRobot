@@ -9,7 +9,8 @@ import lejos.util.TimerListener;
 public class Display implements TimerListener{
 	public static final int LCD_REFRESH = 500;
 
-	private static String drawText = "No text to draw";
+	private static String drawText1 = "No text to draw";
+	private static String drawText2 = "(yet)";
 
 	private Timer displayTimer = new Timer(LCD_REFRESH, this);
 	private boolean isStarted = false;
@@ -36,13 +37,18 @@ public class Display implements TimerListener{
 		LCD.clear();
 		LCD.drawString("" + robot.getName(), 0, 0, true);
 		LCD.drawString("" + robot.getStatus(), 0, 1);
-		LCD.drawString("" + position, 0, 2);
-		LCD.drawString(drawText, 0, 3, true);
+		LCD.drawString("" + position, 0, 2, true);
+		LCD.drawString(drawText1, 0, 3);
+		LCD.drawString(drawText2, 0, 4);
 	}
 
 	/** fixme: some sort of bounds check */
 	public static void setText(String text) {
-		drawText = text; 
+		drawText1 = text; 
 	}
 
+	/** fixme: some sort of bounds check */
+	public static void setText2(String text) {
+		drawText2 = text; 
+	}
 }
