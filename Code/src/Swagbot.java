@@ -18,8 +18,8 @@ public class Swagbot extends Robot {
 
 	/* temp sensing array (fixme! varible numbers) */
 	private static final int LOCO_NO = 128;
-	private byte locoCm[] = new byte[LOCO_NO]; /* ~76 */
-	private float locoT[] = new float[LOCO_NO]; /* ~76 */
+	private short locoCm[] = new short[LOCO_NO]; /* ~76 */
+	private float locoT[]  = new float[LOCO_NO]; /* ~76 */
 	private int locoCount;
 
 	/** override this method */
@@ -37,7 +37,8 @@ public class Swagbot extends Robot {
 		float    t = (float)Math.toDegrees(p.getTheta());
 
 		/* record */
-		locoCm[locoCount] = (byte)sonic; /* fixme: ignores errors! */
+		locoCm[locoCount] = (short)sonic; /* fixme: ignores errors! */
+		/* FIXME! signed byte bullshit aaauuugh */
 		locoT[locoCount]  = t;
 		locoCount++;
 
@@ -58,8 +59,7 @@ public class Swagbot extends Robot {
 		for(right = locoCount - 1; right >= 0; right--) {
 			if(locoCm[right] < 50) break;
 		}
-		Display.setText2(locoCount + "! " + left + ":" + locoT[left] + "; " + right + ":" + locoT[right]);
-		Display.setText("0 " + locoT[0] + " " + locoCm[0]);
+		Display.setText2("(" + locoCount + ") " + (int)locoT[left] + "; " + (int)locoT[right]);
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
