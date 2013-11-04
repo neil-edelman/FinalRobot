@@ -9,38 +9,47 @@ public class Controller {
 	 should be < 1 */
 	private final static float FORGET = 0.99f;
 
-	/* who has time to fine tune these? */
-	private static final float kiTokpDef = 0.4f;
-	private static final float kdTokpDef = 0.2f;
-
 	float kp, ki, kd; /* proportional, intergal, derivative */
 	float e, eLast;   /* setpoint - current value */
 	float integral, derivative;
 	float min, max;   /* limits */
 	boolean isLimit, isFirst = true;
 
-	/* just give convenient values */
+	/* just p */
 	public Controller(final float p) {
 		if(p <= 0) throw new IllegalArgumentException();
 		kp = p;
-		ki = p * kiTokpDef;
-		kd = p * kdTokpDef;
+		ki = 0;
+		kd = 0;
+	}
+
+	/* pid */
+	public Controller(final float p, final float i, final float d) {
+		this(p);
+		ki = i;
+		kd = d;
 	}
 
 	/* with a (min,max) value */
-	public Controller(final float p, final float min, final float max) {
+	/*public Controller(final float p, final float min, final float max) {
 		this(p);
 		if(min > max) throw new IllegalArgumentException();
 		this.min = min;
 		this.max = max;
 		isLimit  = true;
-	}
+	}*/
 
-	/* with a (min,max) value */
-	public Controller(final float p, final float i, final float d, final float min, final float max) {
-		this(p, min, max);
-		ki = i;
-		kd = d;
+	/** sets the limit that nextOutput returned value will be (positive, will
+	 set min to -limit) */
+	public void setLimit(final float limit) {
+		if(limit <= 0) throw new IllegalArgumentException();
+		min = -limit;
+		max =  limit;
+		isLimit = true;
+	}
+	
+	public void clearLimit() {
+		isLimit = false;
 	}
 
 	/** returns the next step */
