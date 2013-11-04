@@ -11,10 +11,12 @@ public class Locobot extends Robot {
 
 	private   Colour           colour;
 	protected UltrasonicSensor sonic;
+	protected LightSensor      light;
 
-	public Locobot(final SensorPort sonicPort, final SensorPort colourPort) {
+	public Locobot(final SensorPort sonicPort, final SensorPort lightPort, final SensorPort colourPort) {
 		super();
 		sonic  = new UltrasonicSensor(sonicPort);
+		light  = new LightSensor(lightPort);
 		colour = new Colour(colourPort);
 	}
 

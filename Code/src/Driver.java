@@ -9,13 +9,14 @@ class Driver {
 	private static final int DELAY = 100;
 
 	private static final SensorPort  sonicPort = SensorPort.S4;
+	private static final SensorPort  lightPort = SensorPort.S1;
 	private static final SensorPort colourPort = SensorPort.S3;
 
 	public static void main(String args[]) {
 		int key;
 		float a = 0f, b;
 
-		Robot robot = new Locobot(sonicPort, colourPort);
+		Robot robot = new Locobot(sonicPort, lightPort, colourPort);
 		Display display = new Display(robot);
 
 		robot.localise();
