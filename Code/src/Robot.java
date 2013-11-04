@@ -49,8 +49,6 @@ public class Robot implements TimerListener {
 		/* (this looks promising, must reseach)
 		leftMotor.setAccelertion(3000);
 		rightotor.setAccelertion(3000);*/
-		/* this is just static, set the limit once and it's done */
-		distancePID.setLimit(DEFAULT_LIMIT_DISTANCE);
 		/* start the timer for updates (timedOut) */
 		timer.start();
 	}
@@ -108,8 +106,7 @@ public class Robot implements TimerListener {
 		if(degrees <= -180 || degrees > 180) throw new IllegalArgumentException();
 
 		/* anglePID, which we need, could have old values, reset it */
-		anglePID.setLimit(limit);
-		anglePID.reset();
+		anglePID.reset(limit);
 
 		/* set the target's angle and set rotate (the timedOut method will call
 		 turn until it turns or is stopped) */
@@ -121,9 +118,8 @@ public class Robot implements TimerListener {
 	public void travelTo(final float x, final float y) {
 
 		/* distance and angle need to be reset (we use them) */
-		anglePID.setLimit(DEFAULT_LIMIT_ANGLE);
-		anglePID.reset();
-		distancePID.reset();
+		anglePID.reset(DEFAULT_LIMIT_ANGLE);
+		distancePID.reset(DEFAULT_LIMIT_DISTANCE);
 
 		/* fixme: we should do a thing here that sets the line perp to the
 		 dest for travelTo oscillations */

@@ -30,28 +30,6 @@ public class Controller {
 		kd = d;
 	}
 
-	/* with a (min,max) value */
-	/*public Controller(final float p, final float min, final float max) {
-		this(p);
-		if(min > max) throw new IllegalArgumentException();
-		this.min = min;
-		this.max = max;
-		isLimit  = true;
-	}*/
-
-	/** sets the limit that nextOutput returned value will be (positive, will
-	 set min to -limit) */
-	public void setLimit(final float limit) {
-		if(limit <= 0) throw new IllegalArgumentException();
-		min = -limit;
-		max =  limit;
-		isLimit = true;
-	}
-	
-	public void clearLimit() {
-		isLimit = false;
-	}
-
 	/** returns the next step */
 	public float nextOutput(final float error, final float dt) {
 
@@ -97,9 +75,19 @@ public class Controller {
 	 be used more then once */
 	public void reset() {
 		isFirst    = true;
+		isLimit    = false;
 		integral   = 0f;
 		derivative = 0f;
 		e          = 0f;
+	}
+
+	/** resets the pid and sets [limit] on the next time you use it */
+	public void reset(final float limit) {
+		if(limit <= 0) throw new IllegalArgumentException();
+		this.reset();
+		min = -limit;
+		max =  limit;
+		isLimit = true;		
 	}
 
 	/** checking if it's w/i epsilon */
@@ -108,10 +96,10 @@ public class Controller {
 	}
 	public boolean isWithin(final float tolerance, final float derTol) {
 		if((e < -tolerance) || (e > tolerance)) return false;
-		/*if(isFirst) return true;*/
+		/*if(isFirst) return true; <- always true in the next line */
 		return (derivative >= -derTol) || (derivative >= derTol);
 	}
-	
+
 	/** print useful things */
 	public String toString() {
 		return "Cont" + this.hashCode() + "(" + (int)e + ":" + kp + "," + ki + "," + kd + ")";
