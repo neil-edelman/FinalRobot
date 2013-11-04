@@ -3,3 +3,5 @@
 Struggled with, it turns out, an API error.
 
 Struggled with Bluetooth.
+
+Worked on hardware with Alex.
