@@ -62,7 +62,7 @@ public class Robot implements TimerListener {
 
 	/** this acts as the control; selects based on what it is doing */
 	public void timedOut() {
-		switch(status) { //idle, rotating, traveling
+		switch(status) {
 			case TRAVELLING:
 				this.travel();
 				break;
@@ -200,6 +200,9 @@ public class Robot implements TimerListener {
 	/* accesors/modifiers */
 
 	/** pass this on to the odometer (odometer is syncronised) */
+	/* fixme? this is kind of scetchy . . . for what is it used? think it
+	 may interfere in the methods above when called from a diff thread
+	 (but we have no threads, so it's iffy) maybe have a second copy? */
 	public Position getPosition() {
 		return odometer.getPositionCopy();
 	}
