@@ -1,4 +1,5 @@
 %%
 
-Stuggled with, it turns out, an API error.
+Struggled with, it turns out, an API error.
 
+Struggled with Bluetooth.
