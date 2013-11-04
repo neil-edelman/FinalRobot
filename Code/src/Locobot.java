@@ -41,35 +41,27 @@ public class Locobot extends Robot {
 	protected void localising() {
 
 		Position p = odometer.getPositionCopy();
-		int  sonic = pingSonar();
 		float    t = (float)Math.toDegrees(p.getTheta());
+		int  sonic = pingSonar();
 
-		/* record */
-		//locoCm[locoCount] = (byte)sonic; /* fixme: ignores errors! */
-		//locoT[locoCount]  = t;
-		//locoCount++;
-		pings.add(new Ping(p, sonic)); /* malloc is slow */
+		/* record; fixme: check error out of 0 .. 255, it hasn't happened yet */
+		pings.add(new Ping(p, sonic)); /* ouch, malloc is slow . . . :[ */
 
 		/* display */
-		//Display.setText("t=" + (int)t + ";#" + locoCount + ",us" + sonic);
-		Display.setText("t=" + (int)t + ";#" + pings.size() + ",us" + sonic);
+		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
 		if(t >= 0f || t <= -5f) return;
 
-		/* code only goes though to this point on last localise */
+		/* code only goes though to this point on last localising */
 		this.stop();
 		status = Status.IDLE;
 
-		/* calculate (FIXME!) */
-		/* fixme: it only localises facing out, but the same idea */
-		/*int left, right;
-		for(left = 0; left < locoCount; left++) {
-			if(lt(locoCm[left], (byte)50)) break;
+		/* calculate */
+		Ping.setOdometer(odometer);
+		if(Ping.correct(pings)) {
+			Display.setText2("loco " + odometer.getPositionCopy());
+		} else {
+			Display.setText2("loco failed");
 		}
-		for(right = locoCount - 1; right >= 0; right--) {
-			if(lt(locoCm[right], (byte)50)) break;
-		}
-		Display.setText2("(" + locoCount + ") " + (int)locoT[left] + "; " + (int)locoT[right]);*/
-		Ping.correct(pings);
 	}
 
 	/** why they don't have unsigned compare in the Java specs is beyond me,

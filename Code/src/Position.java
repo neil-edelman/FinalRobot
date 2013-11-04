@@ -23,11 +23,11 @@ class Position {
 		this.y = y;
 	}
 
-	public Position(final float x, final float y, final float t) {
-		if(t > 180 || t <= -180) throw new IllegalArgumentException();
+	public Position(final float x, final float y, final float deg) {
+		if(deg > 180 || deg <= -180) throw new IllegalArgumentException();
 		this.x = x;
 		this.y = y;
-		this.t = (float)Math.toRadians(t);
+		this.t = (float)Math.toRadians(deg);
 	}
 
 	/* getters */
@@ -47,6 +47,11 @@ class Position {
 	public void setTheta(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t = t;
+	}
+
+	public void setXY(final float x, final float y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	/* operators */
@@ -75,7 +80,7 @@ class Position {
 		 l'H\^opital's rule about close-to-zero resulting in cache-friendly
 		 code; it runs in faster then the separated (angle, forward) code */
 
-		final float angle2 = angle * angle;
+		final float angle2 = angle  * angle;
 		final float angle3 = angle2 * angle;
 		final float c      = (float)Math.cos(t); /* we may use these elsewhere */
 		final float s      = (float)Math.sin(t);

@@ -125,11 +125,16 @@ public class Odometer implements TimerListener {
 		}
 	}
 
-   /** setters */
-   public void setPosition(Position position) {
-      synchronized(this) {
-         position.set(position);
-      }
-   }
+	/** setters */
+	public void setDegrees(final float deg) {
+		synchronized(this) {
+			position.setTheta((float)Math.toRadians(deg));
+		}
+	}
+	public void setXY(final float x, final float y) {
+		synchronized(this) {
+			position.setXY(x, y);
+		}
+	}
 
 }

@@ -204,11 +204,6 @@ public class Robot implements TimerListener {
 		return odometer.getLastPosition();
 	}
 
-	/** pass this on to the odometer (odometer is syncronised) */
-	public void setPosition(Position position) {
-		odometer.setPosition(position);
-	}
-
 	public Status getStatus() {
 		synchronized(this) {
 			return status;
