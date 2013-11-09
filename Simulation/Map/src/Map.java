@@ -12,7 +12,9 @@ public class Map {
 	public static void main(String args[]) {
 		Map map = new Map(12, 12);
 		//map.fill(0, 9, 2, 11, Square.OPEN);
-		map.set(0, 0, Square.OPEN);
+		//map.set(0, 0, Square.OPEN);
+		//map.set(3, 3, Square.OPEN);
+		map.line(0, 0, 3, 11, Square.OPEN);
 		System.err.println(map);
 	}
 
@@ -34,6 +36,7 @@ public class Map {
 		explore[y][x] = 4;
 		//for(byte yIso[] : explore) {
 			//for(byte b : yIso) { this is why you need pointers
+		/* fixme: laughably inefficient */
 		for(int j = 0; j < ySize; j++) {
 			for(int i = 0; i < xSize; i++) {
 				int d = 4 - Math.round((float)Math.hypot(i - x, j - y));
@@ -52,6 +55,31 @@ public class Map {
 		for(int y = y1; y <= y2; y++) {
 			for(int x = x1; x <= x2; x++) {
 				box[y][x] = (byte)sq.ordinal();
+			}
+		}
+	}
+
+	/** Bresenham */
+	public void line(int x1, int y1, int x2, int y2, final Square sq) {
+		// fixme: some checks
+		// fixme: hmm, draw a thick line?
+		final int dx = (x1 > x2) ? (x1 - x2) : (x2 - x1);
+		final int dy = (y1 > y2) ? (y1 - y2) : (y2 - y1);
+		final int sx = (x1 < x2) ? 1 : -1;
+		final int sy = (y1 < y2) ? 1 : -1;
+		int err = dx - dy;
+		/* this is great for drawing graphics, but we need a better way */
+		for( ; ; ) {
+			this.set(x1, y1, sq);
+			if(x1 == x2 && y1 == y2) break;
+			int e2 = 2 * err;
+			if (e2 > -dy) {
+				err = err - dy;
+				x1  = x1 + sx;
+			}
+			if (e2 < dx) {
+				err = err + dx;
+				y1  = y1 + sy;
 			}
 		}
 	}
