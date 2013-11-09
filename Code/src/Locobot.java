@@ -3,7 +3,9 @@
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
-import lejos.nxt.Sound; /* pause */
+import lejos.nxt.Sound;         /* pause */
+
+import lejos.nxt.comm.RConsole; /* take out in production */
 
 import java.util.ArrayList;
 
@@ -33,7 +35,7 @@ public class Locobot extends Robot {
 	/** override this method */
 	protected void localise() {
 		status = Status.LOCALISING;
-		//Display.setText2(""+this.pingSonar());
+		RConsole.openBluetooth(0);
 		this.turn(100f);
 	}
 
@@ -42,6 +44,7 @@ public class Locobot extends Robot {
 
 		Position p = odometer.getPositionCopy();
 		float    t = (float)Math.toDegrees(p.getTheta());
+		/* sonic is after odometer.getPositionCopy() because it moved */
 		int  sonic = pingSonar();
 
 		/* record; fixme: check error out of 0 .. 255, it hasn't happened yet */
@@ -49,18 +52,20 @@ public class Locobot extends Robot {
 
 		/* display */
 		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
+		RConsole.println("" + p.x + "\t" + p.y + "\t" + t + "\t" + sonic);
 		if(t >= 0f || t <= -5f) return;
 
 		/* code only goes though to this point on last localising */
 		this.stop();
 		status = Status.IDLE;
+		RConsole.close();
 
 		/* calculate */
 		Ping.setOdometer(odometer);
 		if(Ping.correct(pings)) {
-			Display.setText2("loco " + odometer.getPositionCopy());
+			Display.setText("loco " + odometer.getPositionCopy());
 		} else {
-			Display.setText2("loco failed");
+			Display.setText("loco failed");
 		}
 	}
 

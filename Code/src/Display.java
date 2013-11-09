@@ -9,8 +9,8 @@ import lejos.util.TimerListener;
 public class Display implements TimerListener{
 	public static final int LCD_REFRESH = 500;
 
-	private static String drawText1 = "No text to draw";
-	private static String drawText2 = "(yet)";
+	private static String drawText1 = "Exterminate.";
+	private static String drawText2 = "Exterminate.";
 
 	private Timer displayTimer = new Timer(LCD_REFRESH, this);
 	private boolean isStarted = false;
