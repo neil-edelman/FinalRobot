@@ -68,7 +68,8 @@ public class Map {
 		final int sx = (x1 < x2) ? 1 : -1;
 		final int sy = (y1 < y2) ? 1 : -1;
 		int err = dx - dy;
-		/* this is great for drawing graphics, but we need a better way */
+		/* fixme: this is great for drawing graphics, but we need a better way */
+		/* fixme: draw a rectangle fountain-fill */
 		for( ; ; ) {
 			this.set(x1, y1, sq);
 			if(x1 == x2 && y1 == y2) break;
