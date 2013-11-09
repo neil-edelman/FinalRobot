@@ -4,34 +4,31 @@
 import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
 
-//import java.io.BufferedReader;
 import java.util.Scanner;
 import java.io.FileReader;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Ping {
 
 	public static void main(String args[]) {
-		//BufferedReader in = null;
 		Scanner in = null;
 		String line;
 		ArrayList<Ping> pings = new ArrayList<Ping>(128);
 		Position p = new Position();
-		float x;
-		int y;
+		int cm;
 
 		/* read */
 		try {
-			//in = new BufferedReader(new FileReader("pings.data"));
-			//for(int i = 0; (line = in.readLine()) != null; i++) {
-			in = new Scanner(new FileReader("pings.data"));
+			in = new Scanner(new FileReader("outloco1.data"));
 			for(int i = 0; in.hasNextFloat(); i++) {
-				x = in.nextFloat();
-				p.setTheta((float)Math.toRadians(x));
-				y = in.nextInt();
-				pings.add(new Ping(p, y));
+				p.setXY(in.nextFloat(), in.nextFloat());
+				p.setDegrees(in.nextFloat());
+				cm = in.nextInt();
+				pings.add(new Ping(p, cm));
+				//System.err.println(p + ": " + cm);
 			}
 		} catch(FileNotFoundException e) {
 			System.err.println("Not found.");
@@ -43,64 +40,98 @@ public class Ping {
 			in.close();
 		}
 
+		Ping.correct(pings);
+
 		/* out */
 		for(Ping ping : pings) {
-			System.out.println(ping.angle + "\t" + toInt(ping.cm));
-		}
-		Ping.correct(pings);
+			/*System.out.println(ping.position.getDegrees() + "\t" + ping.cm);*/
+			if(ping.cm >= 255 || ping.cm < 0) continue;
+			System.out.println("" + ping.x + "\t" + ping.y);
+		 }
 	}
 
-	private static void close(Closeable c) {
-		if(c != null) {
-			try {
-				c.close();
-			} catch (IOException e) {
-				System.err.println(e.getMessage());
-			}
-		}
-	}
+	private static final float SONIC_IN_ROBOT = 20;
 
 	private static final byte THRESHOLD = 50;
 	private static final byte  MIN_LOCO = 7;
 
-	private float angle; /* fixme later */
-	private byte  cm;
+	private Position position = new Position();
+	private int      cm;
+	private float    x, y; /* derived */
+	private float    chiSq;
 
 	public Ping(final Position p, final int reading) {
-		angle = (float)Math.toDegrees(p.getTheta());
-		cm    = (byte)reading; /* fixme: ignores errors! */
+		position.set(p);
+		cm = reading;
+		/* derive */
+		float a = p.getRadians();
+		float b = cm + SONIC_IN_ROBOT;
+		x = p.x + (float)Math.cos(a) * b;
+		y = p.y + (float)Math.sin(a) * b;
 	}
 
 	/* fixme: very rought */
 	/* fixme: it only localises facing out, but the same idea */
-	public static boolean correct(final ArrayList<Ping> list) {
+	public static boolean correct(final ArrayList<Ping> pings) {
 		int size, r, l;
 		Ping left, right;
 
-		size = list.size();
-		if(size < 8) return false;
+		size = pings.size();
+		if(size < MIN_LOCO) return false;
 
-		/* left hit; for(left : list) oh good grief, really? */
-		for(l = 0; !lt((left = list.get(l)).cm, THRESHOLD); l++) {
+		/* left hit; for(left : list) */
+		for(l = 0; (left = pings.get(l)).cm > THRESHOLD; l++) {
 			if(l >= size) return false;
 		}
 
 		/* right hit; the list is garaunteed to have some elemnent lt by above */
-		for(r = size - 1; !lt((right = list.get(r)).cm, THRESHOLD); r--);
+		for(r = size - 1; (right = pings.get(r)).cm > THRESHOLD; r--);
 
-		float deg = 45f - (left.angle + right.angle) * 0.5f;
-		System.err.println(deg + ": " + (int)left.angle + " + " + (int)right.angle);
+		float deg = 45f - (left.position.getDegrees() + right.position.getDegrees()) * 0.5f;
+		System.err.println(deg + ": " + (int)left.position.getDegrees() + " + " + (int)right.position.getDegrees());
+
+		/* real */
+		float s_x = 0, s_y = 0, ss_xx = 0, ss_yy = 0, ss_xy = 0, a, b;
+		int n = 0;
+		for(Ping ping : pings) {
+			if(ping.cm >= 255 || ping.cm < 0 || ping.y < 0) continue;
+			n++;
+			s_x   += ping.x;
+			s_y   += ping.y;
+			ss_xx += ping.x * ping.x;
+			ss_yy += ping.y * ping.y;
+			ss_xy += ping.x * ping.y;
+		}
+		ss_xx -= s_x * s_x / n;
+		ss_yy -= s_y * s_y / n;
+		ss_xy -= s_x * s_y / n;
+		a = ss_xy / ss_xx;
+		b = s_y / n - a * s_x / n;
+		System.err.println("" + a + "x + " + b);
+
+		/* read */
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter("robot.gnu", "UTF-8");
+			writer.println("set term postscript eps enhanced");
+			writer.println("set output \"robot.eps\"");
+			writer.println("set xlabel \"x\"");
+			writer.println("set ylabel \"y\"");
+			writer.println("set size ratio -1");
+			writer.println("#set size square");
+			writer.println("y(x) = " + a + "*x + " + b);
+			writer.println("plot \"robot.data\" using 1:2 title \"Robot\" with linespoints, \\");
+			writer.println("y(x) title \"Fit\"");
+		} catch(FileNotFoundException e) {
+			System.err.println("Not created: " + e.getMessage());
+		} catch(SecurityException e) {
+			System.err.println("Can not create: " + e.getMessage());
+		} catch (IOException e) {
+			System.err.println("IO crazy!: " + e.getMessage());
+		} finally {
+			writer.close();
+		}
 
 		return true;
-	}
-
-	/** why they don't have unsigned compare in the Java specs is beyond me,
-	 something like <{unsigned}; I mean it's in the hardware, and I occasionally
-	 need to use it (okay, so this is the only time I've used it) */
-	private static boolean lt(final byte a, final byte b) {
-		return (a < b) ^ ((a < 0) != (b < 0));
-	}
-	private static int toInt(final byte a) {
-		return (a < 0) ? (a + 256) : (a);
 	}
 }
