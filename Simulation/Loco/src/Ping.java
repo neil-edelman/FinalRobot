@@ -5,7 +5,6 @@ import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
 
 import java.util.Scanner;
-import java.io.FileReader;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class Ping {
 
 		/* read */
 		try {
-			in = new Scanner(new FileReader("inloco1.data"));
+			in = new Scanner(System.in);
 			for(int i = 0; in.hasNextFloat(); i++) {
 				p.setXY(in.nextFloat(), in.nextFloat());
 				p.setDegrees(in.nextFloat());
@@ -36,24 +35,22 @@ public class Ping {
 			in.close();
 		}
 
-		if(!Ping.correct(pings)) System.err.println("Coudn't localise.");
+		/* do calculations! */
+		if(!Ping.correct(pings)) System.err.println("Couldn't localise.");
 
 		/* out */
 		for(Ping ping : pings) {
-			/*System.out.println(ping.position.getDegrees() + "\t" + ping.cm);*/
-			if(ping.cm >= 255 || ping.cm < 0) continue;
-			System.out.println("" + ping.x + "\t" + ping.y);
+			System.out.println("" + ping.x + "\t" + ping.y + "\t" + ping.colour);
 		 }
 	}
 
-	private static final float SONIC_IN_ROBOT = 20;
-
-	private static final byte THRESHOLD = 50;
-	private static final byte  MIN_LOCO = 7;
+	/***** fixme: measure don't guess */
+	private static final float SONIC_IN_ROBOT = 15;
 
 	private Position position = new Position();
 	private int      cm;
 	private float    x, y; /* derived */
+	private int colour;    /* gnuplot */
 
 	public Ping(final Position p, final int reading) {
 		position.set(p);
@@ -66,32 +63,12 @@ public class Ping {
 	}
 
 	public static boolean correct(final ArrayList<Ping> pings) {
-//		int size, r, l;
-//		Ping left, right;
-
-//		size = pings.size();
-//		if(size < MIN_LOCO) return false;
-
-		/* left hit; for(left : list) */
-//		for(l = 0; (left = pings.get(l)).cm > THRESHOLD; l++) {
-//			if(l >= size) return false;
-//		}
-
-		/* right hit; the list is garaunteed to have some elemnent lt by above */
-//		for(r = size - 1; (right = pings.get(r)).cm > THRESHOLD; r--);
-
-//		float deg = 45f - (left.position.getDegrees() + right.position.getDegrees()) * 0.5f;
-//		System.err.println(deg + ": " + (int)left.position.getDegrees() + " + " + (int)right.position.getDegrees());
-
-		/* determine the area that is most close by a hack, should be the
-		 integral of all the area, but this is okay (2n instead of n;)
-		 we don't expect to be placed 1.7m away */
-		/*for(Ping ping : pings) {
-			if(ping.cm < closest.cm) closest = ping;
-		}*/
-		int closest, cm;
-		int index, l, r, i, len = pings.size();
-		for(closest = 255, index = 0, i = 0; i < len; i++) {
+		/* determine the area that is most close taking the minimum;
+		 should be the integral of all the area, but this is okay
+		 (2n instead of n;) we don't expect to be placed 1.7m away */
+		int closest = 255, cm;
+		int index = 0, left, right, len = pings.size();
+		for(int i = 0; i < len; i++) {
 			cm = pings.get(i).cm;
 			if(cm < closest) {
 				closest = cm;
@@ -100,72 +77,126 @@ public class Ping {
 		}
 		if(closest >= 255) return false; /* in a big room? */
 
-		/* now go to the 255's at either end (we assume they're their) */
-		for(l = index - 1; ; l--) {
-			if(l <= 0) l = len - 1;
-			if(l == index) return false;
-			if(pings.get(l).cm >= 255) break;
+		/* now go to the 255's at either end (we assume that 255's exist) */
+		/* FIXME: more! what if the block is against the wall? this is where
+		 we'd weed it out (easily! just check the radial derivative) */
+		for(left = index - 1; ; left--) {
+			if(left < 0) left = len - 1;
+			if(left == index) return false;
+			if(pings.get(left).cm >= 255) break;
 		}
-		for(r = index + 1; ; r++) {
-			if(r > len) r = 0;
-			/* if(r == index) return false; never happen */
-			if(pings.get(r).cm >= 255) break;
+		for(right = index + 1; ; right++) {
+			if(right >= len) right = 0;
+			/* if(r == index) return false; is never going to happen */
+			if(pings.get(right).cm >= 255) break;
 		}
 
-		/* do hand-wavey and say that this has been constantly sampled for
-		 conveniece */
-		int rEff = r;
-		if(rEff < l) rEff += len;
-		if(rEff - l < MIN_LOCO) return false;
-		int mid = (rEff + l) / 2;
+		/* hand-wavey say that this has been constantly sampled for conveniece */
+		/* FIXME: check to make sure it's the middle, adjust */
+		int rEff = right;
+		if(rEff < left) rEff += len;
+		int mid = (rEff + left) / 2;
 		if(mid >= len) mid -= len;
-		System.err.println("l " + l + "--> " + mid + " <--r " + r);
-/*
-  l---r
-		(i > l) && (i < r)
---r   l--
-		((i > l) && (i < r)) ^ (l > r)
-*/
+		System.err.println("left " + left + "--> " + mid + " <--" + right + " right");
 
-		float s_x = 0, s_y = 0, ss_xx = 0, ss_yy = 0, ss_xy = 0;
-		int n = 0;
-		for(Ping ping : pings) {
-			if(ping.cm >= 255 || ping.cm < 0 || ping.y < 0 /* fixme */) continue;
-			n++;
-			s_x   += ping.x;
-			s_y   += ping.y;
-			ss_xx += ping.x * ping.x;
-			ss_yy += ping.y * ping.y;
-			ss_xy += ping.x * ping.y;
+		/*for(Ping ping : pings)
+		 if(((i > left) && (i < mid)) ^ (left > mid))
+		 else if(((i > mid) && (i < right)) ^ (mid > right))*/
+
+		/* covarience */
+		Ping ping;
+		float s_xl = 0, s_yl = 0, ss_xxl = 0, ss_yyl = 0, ss_xyl = 0;
+		int nl = 0;
+		for(int i = left + 1; ; i++) {
+			if(i >= len) i = 0;
+			if(i == mid) break;
+			ping = pings.get(i);
+			ping.colour = 1;
+			nl++;
+			s_xl   += ping.x;
+			s_yl   += ping.y;
+			ss_xxl += ping.x * ping.x;
+			ss_yyl += ping.y * ping.y;
+			ss_xyl += ping.x * ping.y;
 		}
-		ss_xx -= s_x * s_x / n;
-		ss_yy -= s_y * s_y / n;
-		ss_xy -= s_x * s_y / n;
-
+		if(nl < 2) return false;
+		ss_xxl -= s_xl * s_xl / nl;
+		ss_yyl -= s_yl * s_yl / nl;
+		ss_xyl -= s_xl * s_yl / nl;
 		/*float cov_xx = ss_xx / n;
-		float cov_yy = ss_yy / n;
-		float cov_xy = ss_xy / n;*/
-		/*float m = cov_xy / cov_xx;
-		 float b = (s_y/n) - cov_xy / cov_xx * (s_x/n);*/
-		/*float A = -ss_xy;
-		 float B = ss_xx;
-		 float C = ss_xx * (s_y/n) - ss_xy * (s_x/n);
-		 <- this is not helpful */
+		 float cov_yy = ss_yy / n;
+		 float cov_xy = ss_xy / n;*/
+		System.err.println("Left covarience of " + nl + " points.");
+		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
+		int nr = 0;
+		for(int i = mid; ; i++) {
+			if(i >= len) i = 0;
+			if(i == right) break;
+			ping = pings.get(i);
+			ping.colour = 2;
+			nr++;
+			s_xr   += ping.x;
+			s_yr   += ping.y;
+			ss_xxr += ping.x * ping.x;
+			ss_yyr += ping.y * ping.y;
+			ss_xyr += ping.x * ping.y;
+		}
+		if(nr < 2) return false;
+		ss_xxr -= s_xr * s_xr / nr;
+		ss_yyr -= s_yr * s_yr / nr;
+		ss_xyr -= s_xr * s_yr / nr;
+		System.err.println("Right covarience of " + nr + " points.");
 
+		/* get the equation from magic */
 		/* FIXME!!! I don't know how to do PCA! it hurts my brain! for now,
-		 just hope that the line isn't vertical */
-		float m = ss_xy / ss_xx;
-		float b = s_y / n - m * s_x / n;
+		 just blindly hope that the line isn't too vertical */
+		float ml = ss_xyl / ss_xxl;
+		float bl = s_yl / nl - ml * s_xl / nl;
+
+		float mr = ss_xyr / ss_xxr;
+		float br = s_yr / nr - mr * s_xr / nr;
 
 		/*System.err.println("ss_xx " + ss_xx + "; ss_yy + " + ss_yy + "; ss_xy " + ss_xy);*/
-		System.err.println("" + m + "*x + " + b);
 		/*System.err.println("cov(xx) " + cov_xx + ", cov(yy) " + cov_yy + ", cov(xy) " + cov_xy);*/
 		/*System.err.println("" + A + "x + " + B + "y = " + C);*/
+		System.err.println("yl = " + ml + "*xl + " + bl);
+		System.err.println("yr = " + mr + "*xr + " + br);
+
+		/* fixme: this is stupid; if we knew how, we would just go here
+		 directly */
+		/*         y = mx + b
+		  mx - y + b = 0
+		 (ss_xy / ss_xx) x -        y + ((s_y/n) - ss_xy / ss_xx * (s_x/n)) = 0
+		 (ss_xy)x          - (ss_xx)y + (ss_xx * (s_y/n) - ss_xy * (s_x/n)) = 0
+		 Ax + By + C = 0 */
+		float one_norm;
+
+		float Al = ss_xyl;
+		float Bl = -ss_xxl;
+		float Cl = ss_xxl * (s_yl/nl) - ss_xyl * (s_xl/nl);
+		one_norm = 1f / (float)Math.hypot(Al, Bl);
+		if(Cl < 0) one_norm = -one_norm;
+		Al *= one_norm;
+		Bl *= one_norm;
+		Cl *= one_norm;
+		
+		float Ar = ss_xyr;
+		float Br = -ss_xxr;
+		float Cr = ss_xxr * (s_yr/nr) - ss_xyr * (s_xr/nr);
+		one_norm = 1f / (float)Math.hypot(Ar, Br);
+		if(Cr < 0) one_norm = -one_norm;
+		Ar *= one_norm;
+		Br *= one_norm;
+		Cr *= one_norm;
+		
+		System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
+		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
 
 		/* fix the angles to by 90\deg by modifying them according to the
-		 ratio of the variences */
+		 ratio of the variences? or preferably, build this into the
+		 regression */
 
-		/* read */
+		/* write gnuplot file */
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter("robot.gnu", "UTF-8");
@@ -173,11 +204,17 @@ public class Ping {
 			writer.println("set output \"robot.eps\"");
 			writer.println("set xlabel \"x\"");
 			writer.println("set ylabel \"y\"");
-			writer.println("#set size ratio -1");
-			writer.println("set size square");
-			writer.println("y(x) = " + m + "*x + " + b);
-			writer.println("plot \"robot.data\" using 1:2 title \"Robot\" with linespoints, \\");
-			writer.println("y(x) title \"Fit\"");
+			writer.println("set size ratio -1");
+			writer.println("#set size square");
+			writer.println("set palette maxcolors 3");
+			writer.println("set palette defined (0 '#bbbbbb', 1 '#990000', 2 '#009999')");
+			writer.println("l(x) = " + ml + "*x + " + bl);
+			writer.println();
+			writer.println("r(x) = " + mr + "*x + " + br);
+			writer.println("set object circle at first 0,0 radius char 0.5 fillcolor rgb 'red' fillstyle solid noborder");
+			writer.println("plot \"robot.data\" using 1:2:3 title \"Robot\" with linespoints palette, \\");
+			writer.println("l(x) title \"left " + Al + "*x + " + Bl + "*y + " + Cl + " = 0\", \\");
+			writer.println("r(x) title\"right " + Ar + "*x + " + Br + "*y + " + Cr + " = 0\"");
 		} catch(Exception e) {
 			System.err.println("Not created: " + e.getMessage());
 		} finally {
