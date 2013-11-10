@@ -4,6 +4,6 @@ set xlabel "x"
 set ylabel "y"
 #set size ratio -1
 set size square
-y(x) = 0.8612787*x + 42.21396
+y(x) = -1.1340432*x + 42.889206
 plot "robot.data" using 1:2 title "Robot" with linespoints, \
 y(x) title "Fit"

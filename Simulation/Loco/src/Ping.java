@@ -22,13 +22,13 @@ public class Ping {
 
 		/* read */
 		try {
-			in = new Scanner(new FileReader("outloco1.data"));
+			in = new Scanner(new FileReader("inloco1.data"));
 			for(int i = 0; in.hasNextFloat(); i++) {
 				p.setXY(in.nextFloat(), in.nextFloat());
 				p.setDegrees(in.nextFloat());
 				cm = in.nextInt();
 				pings.add(new Ping(p, cm));
-				System.err.println("" + p + ": " + cm);
+				System.err.println(i + " -- " + p + ": " + cm);
 			}
 		} catch(Exception e) {
 			System.err.println(e.getMessage());
@@ -65,27 +65,68 @@ public class Ping {
 		y = p.y + (float)Math.sin(a) * b;
 	}
 
-	/* fixme: very rought */
-	/* fixme: it only localises facing out, but the same idea */
 	public static boolean correct(final ArrayList<Ping> pings) {
-		int size, r, l;
-		Ping left, right;
+//		int size, r, l;
+//		Ping left, right;
 
-		size = pings.size();
-		if(size < MIN_LOCO) return false;
+//		size = pings.size();
+//		if(size < MIN_LOCO) return false;
 
 		/* left hit; for(left : list) */
-		for(l = 0; (left = pings.get(l)).cm > THRESHOLD; l++) {
-			if(l >= size) return false;
-		}
+//		for(l = 0; (left = pings.get(l)).cm > THRESHOLD; l++) {
+//			if(l >= size) return false;
+//		}
 
 		/* right hit; the list is garaunteed to have some elemnent lt by above */
-		for(r = size - 1; (right = pings.get(r)).cm > THRESHOLD; r--);
+//		for(r = size - 1; (right = pings.get(r)).cm > THRESHOLD; r--);
 
-		float deg = 45f - (left.position.getDegrees() + right.position.getDegrees()) * 0.5f;
-		System.err.println(deg + ": " + (int)left.position.getDegrees() + " + " + (int)right.position.getDegrees());
+//		float deg = 45f - (left.position.getDegrees() + right.position.getDegrees()) * 0.5f;
+//		System.err.println(deg + ": " + (int)left.position.getDegrees() + " + " + (int)right.position.getDegrees());
 
-		/* real */
+		/* determine the area that is most close by a hack, should be the
+		 integral of all the area, but this is okay (2n instead of n;)
+		 we don't expect to be placed 1.7m away */
+		/*for(Ping ping : pings) {
+			if(ping.cm < closest.cm) closest = ping;
+		}*/
+		int closest, cm;
+		int index, l, r, i, len = pings.size();
+		for(closest = 255, index = 0, i = 0; i < len; i++) {
+			cm = pings.get(i).cm;
+			if(cm < closest) {
+				closest = cm;
+				index   = i;
+			}
+		}
+		if(closest >= 255) return false; /* in a big room? */
+
+		/* now go to the 255's at either end (we assume they're their) */
+		for(l = index - 1; ; l--) {
+			if(l <= 0) l = len - 1;
+			if(l == index) return false;
+			if(pings.get(l).cm >= 255) break;
+		}
+		for(r = index + 1; ; r++) {
+			if(r > len) r = 0;
+			/* if(r == index) return false; never happen */
+			if(pings.get(r).cm >= 255) break;
+		}
+
+		/* do hand-wavey and say that this has been constantly sampled for
+		 conveniece */
+		int rEff = r;
+		if(rEff < l) rEff += len;
+		if(rEff - l < MIN_LOCO) return false;
+		int mid = (rEff + l) / 2;
+		if(mid >= len) mid -= len;
+		System.err.println("l " + l + "--> " + mid + " <--r " + r);
+/*
+  l---r
+		(i > l) && (i < r)
+--r   l--
+		((i > l) && (i < r)) ^ (l > r)
+*/
+
 		float s_x = 0, s_y = 0, ss_xx = 0, ss_yy = 0, ss_xy = 0;
 		int n = 0;
 		for(Ping ping : pings) {
@@ -121,6 +162,9 @@ public class Ping {
 		/*System.err.println("cov(xx) " + cov_xx + ", cov(yy) " + cov_yy + ", cov(xy) " + cov_xy);*/
 		/*System.err.println("" + A + "x + " + B + "y = " + C);*/
 
+		/* fix the angles to by 90\deg by modifying them according to the
+		 ratio of the variences */
+
 		/* read */
 		PrintWriter writer = null;
 		try {
@@ -142,4 +186,5 @@ public class Ping {
 
 		return true;
 	}
+
 }
