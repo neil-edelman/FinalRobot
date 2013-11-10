@@ -28,19 +28,15 @@ public class Ping {
 				p.setDegrees(in.nextFloat());
 				cm = in.nextInt();
 				pings.add(new Ping(p, cm));
-				//System.err.println(p + ": " + cm);
+				System.err.println("" + p + ": " + cm);
 			}
-		} catch(FileNotFoundException e) {
-			System.err.println("Not found.");
-			return;
-		} catch (IOException e) {
-			System.err.println("IO crazy!");
-			return;
+		} catch(Exception e) {
+			System.err.println(e.getMessage());
 		} finally {
 			in.close();
 		}
 
-		Ping.correct(pings);
+		if(!Ping.correct(pings)) System.err.println("Coudn't localise.");
 
 		/* out */
 		for(Ping ping : pings) {
@@ -58,7 +54,6 @@ public class Ping {
 	private Position position = new Position();
 	private int      cm;
 	private float    x, y; /* derived */
-	private float    chiSq;
 
 	public Ping(final Position p, final int reading) {
 		position.set(p);
@@ -91,10 +86,10 @@ public class Ping {
 		System.err.println(deg + ": " + (int)left.position.getDegrees() + " + " + (int)right.position.getDegrees());
 
 		/* real */
-		float s_x = 0, s_y = 0, ss_xx = 0, ss_yy = 0, ss_xy = 0, a, b;
+		float s_x = 0, s_y = 0, ss_xx = 0, ss_yy = 0, ss_xy = 0;
 		int n = 0;
 		for(Ping ping : pings) {
-			if(ping.cm >= 255 || ping.cm < 0 || ping.y < 0) continue;
+			if(ping.cm >= 255 || ping.cm < 0 || ping.y < 0 /* fixme */) continue;
 			n++;
 			s_x   += ping.x;
 			s_y   += ping.y;
@@ -105,9 +100,26 @@ public class Ping {
 		ss_xx -= s_x * s_x / n;
 		ss_yy -= s_y * s_y / n;
 		ss_xy -= s_x * s_y / n;
-		a = ss_xy / ss_xx;
-		b = s_y / n - a * s_x / n;
-		System.err.println("" + a + "x + " + b);
+
+		/*float cov_xx = ss_xx / n;
+		float cov_yy = ss_yy / n;
+		float cov_xy = ss_xy / n;*/
+		/*float m = cov_xy / cov_xx;
+		 float b = (s_y/n) - cov_xy / cov_xx * (s_x/n);*/
+		/*float A = -ss_xy;
+		 float B = ss_xx;
+		 float C = ss_xx * (s_y/n) - ss_xy * (s_x/n);
+		 <- this is not helpful */
+
+		/* FIXME!!! I don't know how to do PCA! it hurts my brain! for now,
+		 just hope that the line isn't vertical */
+		float m = ss_xy / ss_xx;
+		float b = s_y / n - m * s_x / n;
+
+		/*System.err.println("ss_xx " + ss_xx + "; ss_yy + " + ss_yy + "; ss_xy " + ss_xy);*/
+		System.err.println("" + m + "*x + " + b);
+		/*System.err.println("cov(xx) " + cov_xx + ", cov(yy) " + cov_yy + ", cov(xy) " + cov_xy);*/
+		/*System.err.println("" + A + "x + " + B + "y = " + C);*/
 
 		/* read */
 		PrintWriter writer = null;
@@ -117,17 +129,13 @@ public class Ping {
 			writer.println("set output \"robot.eps\"");
 			writer.println("set xlabel \"x\"");
 			writer.println("set ylabel \"y\"");
-			writer.println("set size ratio -1");
-			writer.println("#set size square");
-			writer.println("y(x) = " + a + "*x + " + b);
+			writer.println("#set size ratio -1");
+			writer.println("set size square");
+			writer.println("y(x) = " + m + "*x + " + b);
 			writer.println("plot \"robot.data\" using 1:2 title \"Robot\" with linespoints, \\");
 			writer.println("y(x) title \"Fit\"");
-		} catch(FileNotFoundException e) {
+		} catch(Exception e) {
 			System.err.println("Not created: " + e.getMessage());
-		} catch(SecurityException e) {
-			System.err.println("Can not create: " + e.getMessage());
-		} catch (IOException e) {
-			System.err.println("IO crazy!: " + e.getMessage());
 		} finally {
 			writer.close();
 		}
