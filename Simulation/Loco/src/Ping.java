@@ -193,9 +193,12 @@ public class Ping {
 		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
 
 		/* covarient basis . . . metric tensor . . . bla bla bla */
-		/* [ Ar Br Cr ]
-		   [ Al Bl Cl ]
-		   [  0  0  1 ] */
+
+		/* [ Ar Br Cr ] [ 0 0 Cr ] [d(Ar, Br)                ] [ Ar/sx Br/sx   ]
+		   [ Al Bl Cl ]=[ 0 0 Cl ] [             d(Al, Bl)   ] [ Al/sy Bl/sy   ]
+		   [  0  0  1 ] [ 0 0  1 ] [                       1 ] [             1 ]
+		 tan t = -Ar/Br = Al/Bl (?) */
+		/* fixme: code goes here */
 
 		/* write gnuplot file */
 		PrintWriter writer = null;
