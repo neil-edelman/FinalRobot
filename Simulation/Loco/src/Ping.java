@@ -192,9 +192,10 @@ public class Ping {
 		System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
 		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
 
-		/* fix the angles to by 90\deg by modifying them according to the
-		 ratio of the variences? or preferably, build this into the
-		 regression */
+		/* covarient basis . . . metric tensor . . . bla bla bla */
+		/* [ Ar Br Cr ]
+		   [ Al Bl Cl ]
+		   [  0  0  1 ] */
 
 		/* write gnuplot file */
 		PrintWriter writer = null;
