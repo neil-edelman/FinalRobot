@@ -64,8 +64,8 @@ public class Ping {
 
 	public static boolean correct(final ArrayList<Ping> pings) {
 		/* determine the area that is most close taking the minimum;
-		 should be the integral of all the area, but this is okay
-		 (2n instead of n;) we don't expect to be placed 1.7m away */
+		 should be the integral of all the area, but this is okay,
+		 we expect the closest thing to be the wall at the start */
 		int closest = 255, cm;
 		int index = 0, left, right, len = pings.size();
 		for(int i = 0; i < len; i++) {
@@ -119,14 +119,15 @@ public class Ping {
 			ss_yyl += ping.y * ping.y;
 			ss_xyl += ping.x * ping.y;
 		}
+		System.err.println("Left covarience of " + nl + " points.");
 		if(nl < 2) return false;
-		ss_xxl -= s_xl * s_xl / nl;
-		ss_yyl -= s_yl * s_yl / nl;
-		ss_xyl -= s_xl * s_yl / nl;
+		//ss_xxl -= s_xl * s_xl / nl;
+		//ss_yyl -= s_yl * s_yl / nl;
+		//ss_xyl -= s_xl * s_yl / nl;
 		/*float cov_xx = ss_xx / n;
 		 float cov_yy = ss_yy / n;
 		 float cov_xy = ss_xy / n;*/
-		System.err.println("Left covarience of " + nl + " points.");
+
 		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
 		int nr = 0;
 		for(int i = mid; ; i++) {
@@ -141,28 +142,35 @@ public class Ping {
 			ss_yyr += ping.y * ping.y;
 			ss_xyr += ping.x * ping.y;
 		}
-		if(nr < 2) return false;
-		ss_xxr -= s_xr * s_xr / nr;
-		ss_yyr -= s_yr * s_yr / nr;
-		ss_xyr -= s_xr * s_yr / nr;
 		System.err.println("Right covarience of " + nr + " points.");
+		if(nr < 2) return false;
+		//ss_xxr -= s_xr * s_xr / nr;
+		//ss_yyr -= s_yr * s_yr / nr;
+		//ss_xyr -= s_xr * s_yr / nr;
 
 		/* get the equation from magic */
 		/* FIXME!!! I don't know how to do PCA! it hurts my brain! for now,
 		 just blindly hope that the line isn't too vertical (numerically
 		 unstable) */
-		float ml = ss_xyl / ss_xxl;
+		//float ml = ss_xyl / ss_xxl;
+		//float bl = s_yl / nl - ml * s_xl / nl;
+		float rl = s_xl * s_yl / (float)Math.sqrt(ss_xxl * ss_yyl);
+		float ml = (nl*ss_xyl - s_xl*s_yl) / (nl*ss_xxl - s_xl*s_xl);
 		float bl = s_yl / nl - ml * s_xl / nl;
 
-		float mr = ss_xyr / ss_xxr;
+		//float mr = ss_xyr / ss_xxr;
+		//float br = s_yr / nr - mr * s_xr / nr;
+		float rr = s_xr * s_yr / (float)Math.sqrt(ss_xxr * ss_yyr);
+		float mr = (nr*ss_xyr - s_xr*s_yr) / (nr*ss_xxr - s_xr*s_xr);
 		float br = s_yr / nr - mr * s_xr / nr;
 
 		/*System.err.println("ss_xx " + ss_xx + "; ss_yy + " + ss_yy + "; ss_xy " + ss_xy);*/
 		/*System.err.println("cov(xx) " + cov_xx + ", cov(yy) " + cov_yy + ", cov(xy) " + cov_xy);*/
 		/*System.err.println("" + A + "x + " + B + "y = " + C);*/
-		System.err.println("yl = " + ml + "*xl + " + bl);
-		System.err.println("yr = " + mr + "*xr + " + br);
+		System.err.println("yl = " + ml + "*xl + " + bl + " R " + rl);
+		System.err.println("yr = " + mr + "*xr + " + br + " R " + rr);
 
+		/* get the standard form */
 		/* fixme: this is stupid; if we knew how, we would just go here
 		 directly */
 		/*         y = mx + b
@@ -193,20 +201,49 @@ public class Ping {
 		System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
 		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
 
-		/* covarient basis . . . metric tensor . . . bla bla bla */
-		/* Al*x + Bl*y + Cl = 0 when normalised has direction -Bl*x + Al*y (y+)
-		   Ar*x + Br*y + Cr = 0 when normalised has direction  Br*x - Ar*y (x+)
-		   [  Br -Ar Cr ] [ 1 0 Cr ]           [  Br -Ar   ]
-		   [ -Bl  Al Cl ]=[ 0 1 Cl ]           [ -Bl  Al   ]
-		   [   0   0  1 ] [ 0 0  1 ] skew?     [         1 ]
-		 tan t = -b/a = c/d = Ar/Br = -Al/Bl */
-		/* fixme: correct code goes here; more reseach needed */
+		/* covarient basis . . . metric tensor . . . bla bla bla
+		 Al*x + Bl*y + Cl = 0 (normalised) has direction -Bl*x + Al*y (y+)
+		 Ar*x + Br*y + Cr = 0 (normalised) has direction  Br*x - Ar*y (x+)
+		 [  Br -Ar Cr ]
+		 [ -Bl  Al Cl ]
+		 [   0   0  1 ] */
+		/*float a = Br,  b = -Ar;
+		float   c = -Bl, d = Al; */
 
-		/* let's just assume there orthoganal */
+		/* compute the inverse (not needed) */
+		/*System.err.println("{{" + a + ", " + b + "}, {" + c + ", " + d + "}}");
+		float adbc = 1f / (a*d + b*c);
+		float n =  d*adbc, m = -b*adbc;
+		float o = -c*adbc, p =  a*adbc;*/
+
+		/* so we need a to spectrally decompose the matrix into a
+		 unitary (viz orthogonal) matrix (det 1) and diagonal eigenvalues (no)
+		[  Br -Ar ]    [ e1    ]
+		[ -Bl  Al ]= U [    e2 ] U^T */
+		/*float determinant = a*a + d*d - 2*a*d + 4*b*c;
+		float eigenvalue1 = (a + d - determinant) / 2f;
+		float eigenvalue2 = (a + d + determinant) / 2f;
+		System.err.println("det " + determinant + " eigenvalues {" + eigenvalue1 + ", " + eigenvalue2 + "}");*/
+
+		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
+		float x = Cl;
+		float y = Cr;
+
+		/* in the QR and QL decomposion, the Q is unitary and the angle,
+		 tan t = -b/a = Ar/Br; tan t = c/d = -Al/Bl */
 		float angler = (float)Math.atan2(Ar, Br);
 		float anglel = (float)Math.atan2(-Bl, Al);
-		System.err.println("angle + using the right " + Math.toDegrees(angler));
-		System.err.println("angle + using the left " + Math.toDegrees(anglel));
+		System.err.println("angle + using the right " + Math.toDegrees(angler) + " (" + rr + ")");
+		System.err.println("angle + using the left "  + Math.toDegrees(anglel) + " (" + rl + ")");
+
+		/* weight by the 
+		float angle = (float)Math.atan2(-b, a);
+
+		System.err.println("Add (" + x + ", " + y + " : " + Math.toDegrees(angle) + ")");
+		System.err.println("right: " + Math.toDegrees(Math.atan2(-b, a)));
+		System.err.println("left: " + Math.toDegrees(Math.atan2(c, d)));
+		System.err.println("right: " + Math.toDegrees(Math.atan2(-m, n)));
+		System.err.println("left: " + Math.toDegrees(Math.atan2(o, p)));
 
 		/* write gnuplot file */
 		PrintWriter writer = null;
