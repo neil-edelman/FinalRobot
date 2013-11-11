@@ -149,7 +149,8 @@ public class Ping {
 
 		/* get the equation from magic */
 		/* FIXME!!! I don't know how to do PCA! it hurts my brain! for now,
-		 just blindly hope that the line isn't too vertical */
+		 just blindly hope that the line isn't too vertical (numerically
+		 unstable) */
 		float ml = ss_xyl / ss_xxl;
 		float bl = s_yl / nl - ml * s_xl / nl;
 
@@ -193,12 +194,19 @@ public class Ping {
 		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
 
 		/* covarient basis . . . metric tensor . . . bla bla bla */
+		/* Al*x + Bl*y + Cl = 0 when normalised has direction -Bl*x + Al*y (y+)
+		   Ar*x + Br*y + Cr = 0 when normalised has direction  Br*x - Ar*y (x+)
+		   [  Br -Ar Cr ] [ 1 0 Cr ]           [  Br -Ar   ]
+		   [ -Bl  Al Cl ]=[ 0 1 Cl ]           [ -Bl  Al   ]
+		   [   0   0  1 ] [ 0 0  1 ] skew?     [         1 ]
+		 tan t = -b/a = c/d = Ar/Br = -Al/Bl */
+		/* fixme: correct code goes here; more reseach needed */
 
-		/* [ Ar Br Cr ] [ 0 0 Cr ] [d(Ar, Br)                ] [ Ar/sx Br/sx   ]
-		   [ Al Bl Cl ]=[ 0 0 Cl ] [             d(Al, Bl)   ] [ Al/sy Bl/sy   ]
-		   [  0  0  1 ] [ 0 0  1 ] [                       1 ] [             1 ]
-		 tan t = -Ar/Br = Al/Bl (?) */
-		/* fixme: code goes here */
+		/* let's just assume there orthoganal */
+		float angler = (float)Math.atan2(Ar, Br);
+		float anglel = (float)Math.atan2(-Bl, Al);
+		System.err.println("angle + using the right " + Math.toDegrees(angler));
+		System.err.println("angle + using the left " + Math.toDegrees(anglel));
 
 		/* write gnuplot file */
 		PrintWriter writer = null;
