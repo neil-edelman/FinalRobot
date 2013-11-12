@@ -14,9 +14,9 @@ public class Display implements TimerListener{
 
 	private Timer displayTimer = new Timer(LCD_REFRESH, this);
 	private boolean isStarted = false;
-	private Newbot robot;
+	private Robot robot;
 
-	public Display(final Newbot robot) {
+	public Display(final Robot robot) {
 		this.robot = robot;
 		displayTimer.start();
 		isStarted = true;

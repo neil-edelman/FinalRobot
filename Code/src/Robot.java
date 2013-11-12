@@ -173,6 +173,12 @@ public class Robot implements TimerListener {
 		System.err.println("no localising");
 		status = Status.IDLE;
 	}
+   protected int getFilteredDistance() {
+      return 0;
+   }
+   protected int getDistance() {
+      return 0;
+   }
 
 	/** this implements a rotation by parts */
 	private void rotate() {

@@ -1,8 +1,7 @@
 # MacOSX gcc 4.2.1
 
 TITLE := Swagbot
-FILES := AlexDriver Robot Position Odometer Controller Colour Display Swagbot Newbot
-#FILES := Driver Robot Position Odometer Controller Colour Display Locobot Ping
+FILES := AlexDriver Robot Position Odometer Controller Colour Display Locobot Ping Swagbot
 BDIR  := bin
 SDIR  := src
 OBJS  := $(patsubst %,$(BDIR)/%.class,$(FILES))
