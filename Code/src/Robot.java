@@ -20,7 +20,7 @@ class Robot implements TimerListener {
 	private static final NXTRegulatedMotor  leftMotor = Motor.A;
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
-	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING };
+	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING };
 
 	private final static String   NAME = "Sex Robot"; /* change */
 	private static final int NAV_DELAY = 100; /* ms */
@@ -28,6 +28,8 @@ class Robot implements TimerListener {
 	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
 	private static final float    ANGLE_MARGINAL_TOLERANCE = 2.0f; /* rad/s */
 	private static final float          DISTANCE_TOLERANCE = 1f; /* cm */
+
+   private float turnRate;
 
 	/* Ziegler-Nichols method was used to get close to the optimum */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f, -350, 350);
@@ -82,6 +84,10 @@ class Robot implements TimerListener {
 			case LOCALISING:
 				this.localising();
 				break;
+         case SCANNING:
+            this.constantlyTurningTo();
+            this.scanning();
+            break;
 			case IDLE:
 				break;
 		}
@@ -105,6 +111,33 @@ class Robot implements TimerListener {
 		}
 		this.setSpeeds(-rate, rate);
 	}
+   /** this sets a constant turing speed to angle (used in scanning) */
+   //position rate turns the robot left, negitive turns the robot right, to the specified angle
+   protected void turn(final float rate, final float angle) {
+      this.setSpeeds(-rate,rate);
+      target.setTheta((float)Math.toRadians(angle));
+      status = Status.SCANNING;
+      this.turnRate = rate;
+   }
+   /** used with scanning */
+   private void constantlyTurningTo() {
+      Position p = odometer.getPositionCopy();
+      //turning left
+      if(this.turnRate > 0 && target.getTheta() > p.getTheta()) {
+         status = Status.IDLE;
+         this.stop();
+      }
+      //turning right
+      if(this.turnRate < 0 && target.getTheta() < p.getTheta()) {
+         status = Status.IDLE;
+         this.stop();
+      }
+   }
+   /** overwritten for scanning */
+   protected void scanning() {
+		System.err.println("no scanning");
+      status = Status.IDLE;
+   }
 
 	/** this sets the target to a (-180,180] degree and turns */
 	public void turnTo(final float degrees) {

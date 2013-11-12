@@ -14,9 +14,9 @@ public class Display implements TimerListener{
 
 	private Timer displayTimer = new Timer(LCD_REFRESH, this);
 	private boolean isStarted = false;
-	private Robot robot;
+	private Newbot robot;
 
-	public Display(final Robot robot) {
+	public Display(final Newbot robot) {
 		this.robot = robot;
 		displayTimer.start();
 		isStarted = true;
@@ -40,6 +40,11 @@ public class Display implements TimerListener{
 		LCD.drawString("" + position, 0, 2, true);
 		LCD.drawString(drawText1, 0, 3);
 		LCD.drawString(drawText2, 0, 4);
+
+      LCD.drawString("Distance:", 0, 5);
+      LCD.drawString("MedFilter:", 0, 6);
+      LCD.drawInt(robot.getDistance(), 10, 5);
+      LCD.drawInt(robot.getFilteredDistance(), 10, 6);
 	}
 
 	/** fixme: some sort of bounds check */
