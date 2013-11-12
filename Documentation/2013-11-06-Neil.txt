@@ -1,0 +1,7 @@
+%%
+
+After talking with Ferrie, I struggled and got Bluetooth working! Omg yes, now I am free of the storage closet in the basement of Trotter. Woooo, I can sit in the library study area and work on it! with girls and sunshine. I feel like a genie. Never going back. Now how did I do that . . .
+
+Also, I got a sweet idea about how to implement modified A* with a z-buffer that will allow the robot to navigate in unknown areas. Will create a simulation.
+
+%%

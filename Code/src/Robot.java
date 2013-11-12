@@ -14,9 +14,9 @@ import lejos.nxt.Button;
 
 /* Robot */
 
-class Robot implements TimerListener {
+public class Robot implements TimerListener {
 
-	/* should be in Driver, but causes crash in nxj */
+	/* should be in Driver, but causes crash in nxj api; just hard code */
 	private static final NXTRegulatedMotor  leftMotor = Motor.A;
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
@@ -31,50 +31,40 @@ class Robot implements TimerListener {
 
    private float turnRate;
 
-	/* Ziegler-Nichols method was used to get close to the optimum */
-	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f, -350, 350);
+	private static final float    DEFAULT_LIMIT_ANGLE = 350f;
+	private static final float DEFAULT_LIMIT_DISTANCE = 250f;
+
+	/* Ziegler-Nichols method was used to get close to the optimum;
+	 the battery voltage causes some lag when low */
+	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f);
 	/* fixme!!!! this has not been optimised */
-	private Controller distancePID = new Controller(10f, 0f, 0f, -250, 250);
+	private Controller distancePID = new Controller(30f, 1f, 1f);
 
 	protected Status     status = Status.IDLE;
-	protected Odometer odometer = new Odometer(leftMotor, rightMotor);
 	protected Position   target = new Position(), delta = new Position();
+	protected Odometer odometer;
 
 	private Timer timer = new Timer(NAV_DELAY, this);
 
 	/** the constructor */
 	public Robot() {
-		/* (?) leftMotor.setAccelertion(3000);
+		odometer = new Odometer(leftMotor, rightMotor);
+		/* (this looks promising, must reseach)
+		leftMotor.setAccelertion(3000);
 		rightotor.setAccelertion(3000);*/
+		/* start the timer for updates (timedOut) */
 		timer.start();
 	}
 
-	public Position getPosition() {
-		return odometer.getPositionCopy();
-	}
-
-	/* odometer is syncronised */
-	public void setPosition(Position position) {
-		odometer.setPosition(position);
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public Position getTarget() {
-		synchronized(this) {
-			return target;
-		}
-	}
-
-	public String getName() {
-		return NAME;
+	/** this shuts down all components that have timers, etc */
+	public void shutdown() {
+		odometer.shutdown();
+		status = Status.IDLE;
 	}
 
 	/** this acts as the control; selects based on what it is doing */
 	public void timedOut() {
-		switch(status) { //idle, rotating, traveling
+		switch(status) {
 			case TRAVELLING:
 				this.travel();
 				break;
@@ -93,19 +83,20 @@ class Robot implements TimerListener {
 		}
 	}
 
-	/** this shuts down all components that have timers, etc */
-	public void shutdown() {
-		odometer.shutdown();
-		status = Status.IDLE;
-	}
+	/****************** this is what's exposed to public or protected;
+	 you should set the appropiate status and the private methods called from
+	 timedOut do the rest *****************/
 
 	/** set localising */
 	protected void localise() {
 		status = Status.LOCALISING;
 	}
 
-	/** this sets a constant turning speed (used in localising) */
+	/** this sets a constant turning speed (used in localising;) don't need to
+	 set status as it is not controlled; as usual, turn(+) is left (increasing
+	 theta) and turn(-) is right (decreasing theta) */
 	protected void turn(final float rate) {
+		/* sketchy; you should only be calling it as part of a loco routine */
 		if((status == Status.ROTATING) || (status == Status.TRAVELLING)) {
 			status = Status.IDLE;
 		}
@@ -139,12 +130,17 @@ class Robot implements TimerListener {
       status = Status.IDLE;
    }
 
-	/** this sets the target to a (-180,180] degree and turns */
+	/** this is a shorcut to just specify the DEFAULT_LIMIT_ANGLE */
 	public void turnTo(final float degrees) {
+		this.turnTo(degrees, DEFAULT_LIMIT_ANGLE);
+	}
+
+	/** this sets the target to a (-180,180] degree and the speed limit, turns */
+	public void turnTo(final float degrees, final float limit) {
 		if(degrees <= -180 || degrees > 180) throw new IllegalArgumentException();
 
 		/* anglePID, which we need, could have old values, reset it */
-		anglePID.reset();
+		anglePID.reset(limit);
 
 		/* set the target's angle and set rotate (the timedOut method will call
 		 turn until it turns or is stopped) */
@@ -156,8 +152,8 @@ class Robot implements TimerListener {
 	public void travelTo(final float x, final float y) {
 
 		/* distance and angle need to be reset (we use them) */
-		distancePID.reset();
-		anglePID.reset();
+		anglePID.reset(DEFAULT_LIMIT_ANGLE);
+		distancePID.reset(DEFAULT_LIMIT_DISTANCE);
 
 		/* fixme: we should do a thing here that sets the line perp to the
 		 dest for travelTo oscillations */
@@ -168,7 +164,11 @@ class Robot implements TimerListener {
 		status = Status.TRAVELLING;
 	}
 
-	/** the other robots' extending it will override this method */
+	/*************** this section is the private (or protected in cases where
+	 you are meant to override the method) methods used for the above; these
+	 methods are (should be) called in timedOut ******************/
+
+	/** the other robots' extending it (ie Locobot?) will override this method */
 	protected void localising() {
 		System.err.println("no localising");
 		status = Status.IDLE;
@@ -216,7 +216,8 @@ class Robot implements TimerListener {
 		float speed = distancePID.nextOutput(distance,      NAV_DELAY);
 		// haven't decided where to put this: * Math.cos(Math.toRadians(p.r));
 
-		/* tolerence on the distance */
+		/* tolerence on the distance; fixme: have a tolerance on the derivative
+		 as soon as it won't go crazy and turn 180 degrees on overshoot */
 		if(distancePID.isWithin(DISTANCE_TOLERANCE)) {
 			this.stop();
 			status = Status.IDLE;
@@ -227,10 +228,40 @@ class Robot implements TimerListener {
 		this.setSpeeds(speed - turn, speed + turn);
 	}
 
+	/**************************************/
+
+	/* accesors/modifiers */
+
+	/** pass this on to the odometer */
+	public Position getPosition() {
+		return odometer.getLastPosition();
+	}
+
+	public Status getStatus() {
+		synchronized(this) {
+			return status;
+		}
+	}
+
+	public Position getTarget() {
+		synchronized(this) {
+			return target;
+		}
+	}
+
+	/** returns conatant */
+	public String getName() {
+		return NAME;
+	}
+
 	/** what should be printed when our robot is called eg in printf */
 	public String toString() {
-		return NAME + /*this.hashCode()+*/" is " + status + " at " + odometer;
+		synchronized(this) {
+			return NAME /*+ this.hashCode()*/ + " is " + status + " at " + odometer;
+		}
 	}
+
+	/* output functions */
 
 	/** set r/l speeds indepedently */
 	protected void setSpeeds(final float l, final float r) {
@@ -252,7 +283,7 @@ class Robot implements TimerListener {
 		}
 	}
 
-	/** [emergency/idle] stop */
+	/** [emergency/idle] stop (fixme: protected?) */
 	public void stop() {
 		leftMotor.stop();
 		rightMotor.stop();

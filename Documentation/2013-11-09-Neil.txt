@@ -1,0 +1,7 @@
+%%
+
+These past few days I have been working on localising and map.
+
+Remote console works!
+
+%%

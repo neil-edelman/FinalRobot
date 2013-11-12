@@ -1,15 +1,14 @@
 # MacOSX gcc 4.2.1
 
 TITLE := Swagbot
-FILES := AlexDriver Robot Position Odometer Controller Colour Display Swagbot Newbot
-#FILES := Driver Robot Position Odometer Controller Colour Display Locobot Ping
+FILES := Ping Position
 BDIR  := bin
 SDIR  := src
 OBJS  := $(patsubst %,$(BDIR)/%.class,$(FILES))
 SRCS  := $(patsubst %,$(SDIR)/%.java,$(FILES))
 BACK  := backup
 
-CC   := nxjc
+CC   := javac #nxjc
 CF   := -g:none -O -verbose -d $(BDIR) $(SDIR)/*.java -Xlint:unchecked
 
 default: $(OBJS)

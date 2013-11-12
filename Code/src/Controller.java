@@ -9,36 +9,23 @@ public class Controller {
 	 should be < 1 */
 	private final static float FORGET = 0.99f;
 
-	/* who has time to fine tune these? */
-	private static final float kiTokpDef = 0.4f;
-	private static final float kdTokpDef = 0.2f;
-
 	float kp, ki, kd; /* proportional, intergal, derivative */
 	float e, eLast;   /* setpoint - current value */
 	float integral, derivative;
 	float min, max;   /* limits */
 	boolean isLimit, isFirst = true;
 
-	/* just give convenient values */
+	/* just p */
 	public Controller(final float p) {
 		if(p <= 0) throw new IllegalArgumentException();
 		kp = p;
-		ki = p * kiTokpDef;
-		kd = p * kdTokpDef;
+		ki = 0;
+		kd = 0;
 	}
 
-	/* with a (min,max) value */
-	public Controller(final float p, final float min, final float max) {
+	/* pid */
+	public Controller(final float p, final float i, final float d) {
 		this(p);
-		if(min > max) throw new IllegalArgumentException();
-		this.min = min;
-		this.max = max;
-		isLimit  = true;
-	}
-
-	/* with a (min,max) value */
-	public Controller(final float p, final float i, final float d, final float min, final float max) {
-		this(p, min, max);
 		ki = i;
 		kd = d;
 	}
@@ -88,9 +75,19 @@ public class Controller {
 	 be used more then once */
 	public void reset() {
 		isFirst    = true;
+		isLimit    = false;
 		integral   = 0f;
 		derivative = 0f;
 		e          = 0f;
+	}
+
+	/** resets the pid and sets [limit] on the next time you use it */
+	public void reset(final float limit) {
+		if(limit <= 0) throw new IllegalArgumentException();
+		this.reset();
+		min = -limit;
+		max =  limit;
+		isLimit = true;		
 	}
 
 	/** checking if it's w/i epsilon */
@@ -99,10 +96,10 @@ public class Controller {
 	}
 	public boolean isWithin(final float tolerance, final float derTol) {
 		if((e < -tolerance) || (e > tolerance)) return false;
-		/*if(isFirst) return true;*/
+		/*if(isFirst) return true; <- always true in the next line */
 		return (derivative >= -derTol) || (derivative >= derTol);
 	}
-	
+
 	/** print useful things */
 	public String toString() {
 		return "Cont" + this.hashCode() + "(" + (int)e + ":" + kp + "," + ki + "," + kd + ")";
