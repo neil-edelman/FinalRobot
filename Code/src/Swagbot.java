@@ -22,6 +22,12 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    public int getFilteredDistance() {
       return uListener.getFilteredDistance();
    }
+   public int getSmallestPing() {
+      return smallestPing;
+   }
+   public float getTargetTheta() {
+      return targetTheta;
+   }
 
    public void scanLeft(float angle) {
       this.smallestPing = 254;
@@ -33,11 +39,11 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    protected void scanning() {
       //while scanning get smallest ping value and corresponding theta
       int ping = uListener.getDistance();
+
       if(smallestPing > ping) {
          smallestPing = ping;
          targetTheta = this.getPosition().getTheta();
       }
    }
 
- 
 }   
