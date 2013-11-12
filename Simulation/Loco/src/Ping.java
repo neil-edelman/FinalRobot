@@ -40,6 +40,7 @@ public class Ping {
 
 		/* out */
 		for(Ping ping : pings) {
+			if(ping.cm >= 255) continue;
 			System.out.println("" + ping.x + "\t" + ping.y + "\t" + ping.colour);
 		 }
 	}
@@ -119,14 +120,12 @@ public class Ping {
 			ss_yyl += ping.y * ping.y;
 			ss_xyl += ping.x * ping.y;
 		}
+		if(nl <= 2) return false;
+		float avg_xl = s_xl / nl, avg_yl = s_yl / nl;
+		float cov_xx_n2l = ss_xxl*nl - s_xl*s_xl;
+		float cov_yy_n2l = ss_yyl*nl - s_yl*s_yl;
+		float cov_xy_n2l = ss_xyl*nl - s_xl*s_yl;
 		System.err.println("Left covarience of " + nl + " points.");
-		if(nl < 2) return false;
-		//ss_xxl -= s_xl * s_xl / nl;
-		//ss_yyl -= s_yl * s_yl / nl;
-		//ss_xyl -= s_xl * s_yl / nl;
-		/*float cov_xx = ss_xx / n;
-		 float cov_yy = ss_yy / n;
-		 float cov_xy = ss_xy / n;*/
 
 		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
 		int nr = 0;
@@ -142,37 +141,25 @@ public class Ping {
 			ss_yyr += ping.y * ping.y;
 			ss_xyr += ping.x * ping.y;
 		}
+		if(nr <= 2) return false;
+		float avg_xr = s_xr / nr, avg_yr = s_yr / nr;
+		float cov_xx_n2r = ss_xxr*nr - s_xr*s_xr;
+		float cov_yy_n2r = ss_yyr*nr - s_yr*s_yr;
+		float cov_xy_n2r = ss_xyr*nr - s_xr*s_yr;
 		System.err.println("Right covarience of " + nr + " points.");
-		if(nr < 2) return false;
-		//ss_xxr -= s_xr * s_xr / nr;
-		//ss_yyr -= s_yr * s_yr / nr;
-		//ss_xyr -= s_xr * s_yr / nr;
 
-		/* get the equation from magic */
-		/* FIXME!!! I don't know how to do PCA! it hurts my brain! for now,
-		 just blindly hope that the line isn't too vertical (numerically
-		 unstable) */
-		//float ml = ss_xyl / ss_xxl;
-		//float bl = s_yl / nl - ml * s_xl / nl;
-		float rl = s_xl * s_yl / (float)Math.sqrt(ss_xxl * ss_yyl);
-		float ml = (nl*ss_xyl - s_xl*s_yl) / (nl*ss_xxl - s_xl*s_xl);
-		float bl = s_yl / nl - ml * s_xl / nl;
+		/* get the equation from math */
+		float ml  = cov_xy_n2l / cov_xx_n2l;
+		float bl  = avg_yl - ml*avg_xl;
 
-		//float mr = ss_xyr / ss_xxr;
-		//float br = s_yr / nr - mr * s_xr / nr;
-		float rr = s_xr * s_yr / (float)Math.sqrt(ss_xxr * ss_yyr);
-		float mr = (nr*ss_xyr - s_xr*s_yr) / (nr*ss_xxr - s_xr*s_xr);
-		float br = s_yr / nr - mr * s_xr / nr;
+		float mr  = cov_xy_n2r / cov_xx_n2r;
+		float br  = avg_yr - mr*avg_xr;
 
-		/*System.err.println("ss_xx " + ss_xx + "; ss_yy + " + ss_yy + "; ss_xy " + ss_xy);*/
-		/*System.err.println("cov(xx) " + cov_xx + ", cov(yy) " + cov_yy + ", cov(xy) " + cov_xy);*/
-		/*System.err.println("" + A + "x + " + B + "y = " + C);*/
-		System.err.println("yl = " + ml + "*xl + " + bl + " R " + rl);
-		System.err.println("yr = " + mr + "*xr + " + br + " R " + rr);
+		System.err.println("yl = " + ml + "*xl + " + bl);
+		System.err.println("yr = " + mr + "*xr + " + br);
 
-		/* get the standard form */
-		/* fixme: this is stupid; if we knew how, we would just go here
-		 directly */
+		/* get the standard form; fixme: principal component analysis allows
+		 this to be numically stable, but I tried and it's hard */
 		/*         y = mx + b
 		  mx - y + b = 0
 		 (ss_xy / ss_xx) x -        y + ((s_y/n) - ss_xy / ss_xx * (s_x/n)) = 0
@@ -180,18 +167,18 @@ public class Ping {
 		 Ax + By + C = 0 */
 		float one_norm;
 
-		float Al = ss_xyl;
-		float Bl = -ss_xxl;
-		float Cl = ss_xxl * (s_yl/nl) - ss_xyl * (s_xl/nl);
+		float Al =  cov_xy_n2l;
+		float Bl = -cov_xx_n2l;
+		float Cl =  cov_xx_n2l*avg_yl - cov_xy_n2l*avg_xl;
 		one_norm = 1f / (float)Math.hypot(Al, Bl);
 		if(Cl < 0) one_norm = -one_norm;
 		Al *= one_norm;
 		Bl *= one_norm;
 		Cl *= one_norm;
 		
-		float Ar = ss_xyr;
-		float Br = -ss_xxr;
-		float Cr = ss_xxr * (s_yr/nr) - ss_xyr * (s_xr/nr);
+		float Ar =  cov_xy_n2r;
+		float Br = -cov_xx_n2r;
+		float Cr =  cov_xx_n2r*avg_yr - cov_xy_n2r*avg_xr;
 		one_norm = 1f / (float)Math.hypot(Ar, Br);
 		if(Cr < 0) one_norm = -one_norm;
 		Ar *= one_norm;
@@ -201,14 +188,15 @@ public class Ping {
 		System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
 		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
 
-		/* covarient basis . . . metric tensor . . . bla bla bla
-		 Al*x + Bl*y + Cl = 0 (normalised) has direction -Bl*x + Al*y (y+)
-		 Ar*x + Br*y + Cr = 0 (normalised) has direction  Br*x - Ar*y (x+)
+		/* covarient basis . . . metric tensor . . . bla bla bla */
+
+		/* Al*x + Bl*y + Cl = 0 (normalised) has direction -Bl*x + Al*y (y+)
+		   Ar*x + Br*y + Cr = 0 (normalised) has direction  Br*x - Ar*y (x+)
 		 [  Br -Ar Cr ]
 		 [ -Bl  Al Cl ]
-		 [   0   0  1 ] */
-		/*float a = Br,  b = -Ar;
-		float   c = -Bl, d = Al; */
+		 [   0   0  1 ] just for convenience */
+		float a = Br,  b = -Ar;
+		float c = -Bl, d = Al;
 
 		/* compute the inverse (not needed) */
 		/*System.err.println("{{" + a + ", " + b + "}, {" + c + ", " + d + "}}");
@@ -225,25 +213,45 @@ public class Ping {
 		float eigenvalue2 = (a + d + determinant) / 2f;
 		System.err.println("det " + determinant + " eigenvalues {" + eigenvalue1 + ", " + eigenvalue2 + "}");*/
 
+		/* since the metric is slanted (in general,) weight by the components
+		 by the others' error values (hand wavey, but in practice the difference
+		 is minimal) . . . I tried eigendecomposition, it hurt my brian */
+		float rms_el = 0, rms_er = 0;
+		for(int i = left + 1; ; i++) {
+			if(i >= len) i = 0;
+			if(i == mid) break;
+			ping = pings.get(i);
+			rms_el += (Al*ping.x + Bl*ping.y + Cl) * (Al*ping.x + Bl*ping.y + Cl);
+		}
+		rms_el = (float)Math.sqrt(rms_el) / nl;
+		for(int i = mid; ; i++) {
+			if(i >= len) i = 0;
+			if(i == right) break;
+			ping = pings.get(i);
+			rms_er += (Ar*ping.x + Br*ping.y + Cr) * (Ar*ping.x + Br*ping.y + Cr);
+		}
+		rms_er = (float)Math.sqrt(rms_er) / nr;
+		System.err.println("error rms l " + rms_el + "; r " + rms_er);
+
 		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
 		float x = Cl;
 		float y = Cr;
 
 		/* in the QR and QL decomposion, the Q is unitary and the angle,
-		 tan t = -b/a = Ar/Br; tan t = c/d = -Al/Bl */
-		float angler = (float)Math.atan2(Ar, Br);
-		float anglel = (float)Math.atan2(-Bl, Al);
-		System.err.println("angle + using the right " + Math.toDegrees(angler) + " (" + rr + ")");
-		System.err.println("angle + using the left "  + Math.toDegrees(anglel) + " (" + rl + ")");
+		 tan t = -b/a = Ar/Br; tan t = c/d = -Bl/Al */
+		float angler = (float)Math.atan2(-b, a);
+		float anglel = (float)Math.atan2(c,  d);
+		/* make sure we're on the same branch */
+		if     (anglel > angler + Math.PI) angler += 2f*Math.PI;
+		else if(angler > anglel + Math.PI) anglel += 2f*Math.PI;
+		float angle = (anglel*rms_er + angler*rms_el) / (rms_el + rms_er);
+		if(angle > Math.PI) angle -= 2f*Math.PI;
 
-		/* weight by the 
-		float angle = (float)Math.atan2(-b, a);
+		System.err.println("angle + using the right " + Math.toDegrees(angler));
+		System.err.println("angle + using the left "  + Math.toDegrees(anglel));
+		System.err.println("angle + using the the weighted averge " + Math.toDegrees(angle));
 
 		System.err.println("Add (" + x + ", " + y + " : " + Math.toDegrees(angle) + ")");
-		System.err.println("right: " + Math.toDegrees(Math.atan2(-b, a)));
-		System.err.println("left: " + Math.toDegrees(Math.atan2(c, d)));
-		System.err.println("right: " + Math.toDegrees(Math.atan2(-m, n)));
-		System.err.println("left: " + Math.toDegrees(Math.atan2(o, p)));
 
 		/* write gnuplot file */
 		PrintWriter writer = null;
@@ -257,8 +265,10 @@ public class Ping {
 			writer.println("#set size square");
 			writer.println("set palette maxcolors 3");
 			writer.println("set palette defined (0 '#bbbbbb', 1 '#990000', 2 '#009999')");
+			writer.println("set label \"(" + Math.round(x) + ", " +
+						   Math.round(y) + " : " +
+						   Math.round(Math.toDegrees(angle)) + ")\" at graph 0.2, graph 0.2");
 			writer.println("l(x) = " + ml + "*x + " + bl);
-			writer.println();
 			writer.println("r(x) = " + mr + "*x + " + br);
 			writer.println("set object circle at first 0,0 radius char 0.5 fillcolor rgb 'red' fillstyle solid noborder");
 			writer.println("plot \"robot.data\" using 1:2:3 title \"Robot\" with linespoints palette, \\");

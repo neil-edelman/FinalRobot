@@ -1,18 +1,18 @@
 #!/bin/sh
 if [ $# -lt 1 ]
 then
-	echo "Requires a file .data in bin/."
+	echo "Requires a data file."
 	exit 1
 else
-	if [ -r "bin/$1.data" ]
+	if [ -r "$1" ]
 	then
-		echo "Using bin/$1.data"
+		echo "Using $1"
 	else
-		echo "bin/$1.data is not readable."
+		echo "$1 is not readable."
 		exit 2
 	fi
 fi
 cd bin
-java Ping < $1.data > robot.data
+java Ping < "../$1" > robot.data
 gnuplot < robot.gnu
 open robot.eps
