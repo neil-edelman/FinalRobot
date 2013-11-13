@@ -47,7 +47,7 @@ public class Locobot extends Robot {
 		int  sonic = pingSonar();
 
 		/* record; fixme: check error out of 0 .. 255, it hasn't happened yet */
-		pings.add(new Ping(p, sonic)); /* ouch, malloc is slow . . . :[ */
+		pings.add(new Ping(p, sonic));
 
 		/* display */
 		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
@@ -58,16 +58,16 @@ public class Locobot extends Robot {
 		status = Status.IDLE;
 
 		/* send */
-		RConsole.openBluetooth(0);
-		for(Ping ping : pings) RConsole.println("" + ping.x + "\t" + ping.y + "\t" + t + "\t" + sonic);
-		RConsole.close();
+//		RConsole.openBluetooth(0);
+//		for(Ping ping : pings) RConsole.println("" + ping.x + "\t" + ping.y + "\t" + t + "\t" + sonic);
+//		RConsole.close();
 
 		/* calculate */
-		if(Ping.correct(pings)) {
-			Display.setText("loco " + odometer.getPositionCopy());
-		} else {
-			Display.setText("loco failed");
-		}
+//		if(Ping.correct(pings)) {
+//			Display.setText("loco " + odometer.getPositionCopy());
+//		} else {
+//			Display.setText("loco failed");
+//		}
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
