@@ -8,12 +8,6 @@ import java.util.ArrayList;
 
 public class Ping {
 
-	private static Odometer odometer;
-
-	/* sets the odometer used by correct */
-	public static void setOdometer(final Odometer o) {
-		odometer = o;
-	}
 
 	/********* copy/paste here ************/
 
@@ -22,6 +16,8 @@ public class Ping {
 	private static final float SONIC_FORWARD = 15;
 	private static final int   THRESHOLD     = 50;
 
+	private static Odometer odometer;
+	
 	private Position position = new Position();
 	private int      cm;
 	public  float    x, y; /* derived */
@@ -37,6 +33,11 @@ public class Ping {
 		y = p.y + (float)Math.sin(a) * b;
 	}
 
+	/* sets the odometer used by correct */
+	public static void setOdometer(final Odometer o) {
+		odometer = o;
+	}
+	
 	/* fixme: very rought */
 	/* fixme: it only localises facing out, but the same idea */
 	public static boolean correct(final ArrayList<Ping> list) {
