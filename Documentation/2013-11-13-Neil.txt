@@ -6,4 +6,6 @@ Today, I transferred the working code to the robot and got some values.
 
 The Loco simulation and the robot are in sync.
 
+Hmmm, looking at the data, once it just had sensor values that were off; maybe do loco again it's above a certain R^2?
+
 %%
