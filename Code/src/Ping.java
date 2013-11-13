@@ -62,11 +62,4 @@ public class Ping {
 		return true;
 	}
 
-	/** why they don't have unsigned compare in the Java specs is beyond me,
-	 something like <{unsigned}; I mean it's in the hardware, and I occasionally
-	 need to use it (okay, so this is the only time I've used it) */
-	private static boolean lt(final byte a, final byte b) {
-		return (a < b) ^ ((a < 0) != (b < 0));
-	}
-
 }
