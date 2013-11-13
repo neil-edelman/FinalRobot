@@ -51,7 +51,7 @@ public class Locobot extends Robot {
 
 		/* display */
 		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
-		if(t >= 0f || t <= -5f) return;
+		if(t >= 0f || t <= -25f) return;
 
 		/* code only goes though to this point on last localising */
 		this.stop();
@@ -63,11 +63,12 @@ public class Locobot extends Robot {
 //		RConsole.close();
 
 		/* calculate */
-//		if(Ping.correct(pings)) {
-//			Display.setText("loco " + odometer.getPositionCopy());
-//		} else {
-//			Display.setText("loco failed");
-//		}
+		Ping.setOdometer(odometer);
+		if(Ping.correct(pings)) {
+			Display.setText("loco " + odometer.getPositionCopy());
+		} else {
+			Display.setText("loco failed");
+		}
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
