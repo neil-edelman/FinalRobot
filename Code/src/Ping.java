@@ -1,5 +1,7 @@
 /* this is a struct to store ultrasonic sonar information, we want this to be
- as small as possible since we're storing a lot of them */
+ as small as possible since we're storing a lot of them
+ 
+ also does locolisiation */
 
 import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
