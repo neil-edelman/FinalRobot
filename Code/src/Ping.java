@@ -6,12 +6,19 @@ import java.util.ArrayList;
 
 public class Ping {
 
+	private static Odometer odometer;
+
+	/* sets the odometer used by correct */
+	public static void setOdometer(final Odometer o) {
+		odometer = o;
+	}
+
+	/********* copy/paste here ************/
+
 	/***** fixme: measure don't guess */
 	/***** fixme: have it in Robot.java? */
 	private static final float SONIC_FORWARD = 15;
 	private static final int   THRESHOLD     = 50;
-
-	private static Odometer odometer;
 
 	private Position position = new Position();
 	private int      cm;
@@ -26,11 +33,6 @@ public class Ping {
 		float b = cm + SONIC_FORWARD;
 		x = p.x + (float)Math.cos(a) * b;
 		y = p.y + (float)Math.sin(a) * b;
-	}
-
-	/* sets the odometer used by correct */
-	public static void setOdometer(final Odometer o) {
-		odometer = o;
 	}
 
 	/* fixme: very rought */
