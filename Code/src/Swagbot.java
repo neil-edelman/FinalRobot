@@ -134,7 +134,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 
       if(smallestPing > ping) {
          smallestPing = ping;
-         targetTheta = this.getPosition().getTheta();
+         targetTheta = this.getPosition().getDegrees();
       }
    }
 

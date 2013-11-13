@@ -16,8 +16,8 @@ class AlexDriver {
 
       monitorForExit();
 
-      runTests();
-
+//      runTests();
+      robot.findBlocks();
 	}
 
    private static void monitorForExit() {
@@ -40,18 +40,28 @@ class AlexDriver {
 
    /** unit tests for robot code, when you complete a function write a test method
    say what it's supposed to do and run it here, then test to make sure everything
-   functions properly */
+   functions properly.
+   localise: rotates but values are off
+      test: rotates counterclockwise and updates odometer (update not implemented yet)
+   turnTo/travelTo: works
+      test:
+         turn left, turn right
+         travel to the first cross of vertical and horizontal lines
+         face 90 (straight)
+   findBlocks: not working -- in progress
+   */
    public static void runTests() {
-      robot.localise(); 
-//      robot.turnTo(90);
-//      waitForIdle();
-//      robot.turnTo(0);
-//      waitForIdle();
-//		robot.travelTo(30.48f, 30.48f);
-//      waitForIdle();
+//      robot.localise(); 
+      robot.turnTo(90f);
+      waitForIdle();
+      robot.turnTo(0f);
+      waitForIdle();
+		robot.travelTo(30.48f, 30.48f);
+      waitForIdle();
+      robot.turnTo(90f);
 //    robot.findBlocks();
 //      waitForIdle();
-//      robot.stop();
+      robot.stop();
       boolean forever = true;
       while(forever){}
       return;
