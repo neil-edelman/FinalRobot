@@ -32,6 +32,15 @@ class Position {
 
 	/* getters */
 
+	public float getDegrees() {
+		return (float)Math.toDegrees(t);
+	}
+	
+	public float getRadians() {
+		return t;
+	}
+
+	/** phased out; do not use */
 	public float getTheta() {
 		return t;
 	}
@@ -44,6 +53,17 @@ class Position {
 		t = p.t;
 	}
 
+	public void setDegrees(final float deg) {
+		if(t <= -180 || t > 180) throw new IllegalArgumentException();
+		this.t = (float)Math.toRadians(deg);
+	}
+
+	public void setRadians(final float t) {
+		if(t <= -PI || t > PI) throw new IllegalArgumentException();
+		this.t = t;
+	}
+
+	/** phased out; do not use */
 	public void setTheta(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t = t;

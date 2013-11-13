@@ -19,6 +19,8 @@ public class Ping {
 		Position p = new Position();
 		int cm;
 
+		Ping.setOdometer(new Odometer()); /* stub */
+
 		/* read */
 		try {
 			in = new Scanner(System.in);
@@ -45,8 +47,74 @@ public class Ping {
 		 }
 	}
 
-	/***** fixme: measure don't guess */
-	private static final float SONIC_IN_ROBOT = 15;
+	/* write(left, mid, right, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle); */
+	static void write(final int left, final int mid, final int right,
+					  final int nl, final int nr,
+					  final float ml, final float bl,
+					  final float mr, final float br,
+					  final float Al, final float Bl, final float Cl,
+					  final float Ar, final float Br, final float Cr,
+					  final float rms_el, final float rms_er,
+					  final float angler, final float anglel, final float angle) {
+
+		System.err.println("left " + left + "--> " + mid + " <--" + right + " right");
+		
+		System.err.println("Left covarience of " + nl + " points.");
+		System.err.println("Right covarience of " + nr + " points.");
+		
+		System.err.println("yl = " + ml + "*xl + " + bl);
+		System.err.println("yr = " + mr + "*xr + " + br);
+		
+		System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
+		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
+		
+		/*System.err.println("{{" + a + ", " + b + "}, {" + c + ", " + d + "}}");*/
+		/*System.err.println("det " + determinant + " eigenvalues {" + eigenvalue1 + ", " + eigenvalue2 + "}");*/
+
+		System.err.println("error rms l " + rms_el + "; r " + rms_er);
+
+		System.err.println("angle + using the right " + Math.toDegrees(angler));
+		System.err.println("angle + using the left "  + Math.toDegrees(anglel));
+		System.err.println("angle + using the the weighted averge " + Math.toDegrees(angle));
+		
+		System.err.println("Add (" + Cl + ", " + Cr + " : " + Math.toDegrees(angle) + ")");
+
+		/* write gnuplot file */
+		Position p = odometer.getPositionCopy();
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter("robot.gnu", "UTF-8");
+			writer.println("set term postscript eps enhanced");
+			writer.println("set output \"robot.eps\"");
+			writer.println("set xlabel \"x\"");
+			writer.println("set ylabel \"y\"");
+			writer.println("set size ratio -1");
+			writer.println("#set size square");
+			writer.println("set palette maxcolors 3");
+			writer.println("set palette defined (0 '#bbbbbb', 1 '#990000', 2 '#009999')");
+			writer.println("set label \"(" + Math.round(p.x) + ", " +
+						   Math.round(p.y) + " : " +
+						   Math.round(p.getDegrees()) + ")\" at graph 0.2, graph 0.2");
+			writer.println("l(x) = " + ml + "*x + " + bl);
+			writer.println("r(x) = " + mr + "*x + " + br);
+			writer.println("set object circle at first 0,0 radius char 0.5 fillcolor rgb 'red' fillstyle solid noborder");
+			writer.println("plot \"robot.data\" using 1:2:3 title \"Robot\" with linespoints palette, \\");
+			writer.println("l(x) title \"left " + Al + "*x + " + Bl + "*y + " + Cl + " = 0\", \\");
+			writer.println("r(x) title\"right " + Ar + "*x + " + Br + "*y + " + Cr + " = 0\"");
+		} catch(Exception e) {
+			System.err.println("Not created: " + e.getMessage());
+		} finally {
+			writer.close();
+		}
+	}
+
+	/********* copy/paste here ************/
+
+	/***** fixme: have it in Robot.java? */
+	private static final float LIGHT_BACK    = 12.2F;
+	private static final float SONIC_FORWARD = 10.4f;
+
+	private static Odometer odometer;
 
 	private Position position = new Position();
 	private int      cm;
@@ -58,12 +126,24 @@ public class Ping {
 		cm = reading;
 		/* derive */
 		float a = p.getRadians();
-		float b = cm + SONIC_IN_ROBOT;
+		float b = cm + SONIC_FORWARD;
 		x = p.x + (float)Math.cos(a) * b;
 		y = p.y + (float)Math.sin(a) * b;
 	}
 
+	/** sets the odometer used by correct */
+	public static void setOdometer(final Odometer o) {
+		odometer = o;
+	}
+
+	/** getters for logging */
+	Position getPosition() { return position; }
+	int getCm() { return cm; }
+
 	public static boolean correct(final ArrayList<Ping> pings) {
+
+		if(odometer == null) throw new IllegalArgumentException("no odometer");
+
 		/* determine the area that is most close taking the minimum;
 		 should be the integral of all the area, but this is okay,
 		 we expect the closest thing to be the wall at the start */
@@ -98,7 +178,6 @@ public class Ping {
 		if(rEff < left) rEff += len;
 		int mid = (rEff + left) / 2;
 		if(mid >= len) mid -= len;
-		System.err.println("left " + left + "--> " + mid + " <--" + right + " right");
 
 		/*for(Ping ping : pings)
 		 if(((i > left) && (i < mid)) ^ (left > mid))
@@ -125,7 +204,6 @@ public class Ping {
 		float cov_xx_n2l = ss_xxl*nl - s_xl*s_xl;
 		float cov_yy_n2l = ss_yyl*nl - s_yl*s_yl;
 		float cov_xy_n2l = ss_xyl*nl - s_xl*s_yl;
-		System.err.println("Left covarience of " + nl + " points.");
 
 		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
 		int nr = 0;
@@ -146,7 +224,6 @@ public class Ping {
 		float cov_xx_n2r = ss_xxr*nr - s_xr*s_xr;
 		float cov_yy_n2r = ss_yyr*nr - s_yr*s_yr;
 		float cov_xy_n2r = ss_xyr*nr - s_xr*s_yr;
-		System.err.println("Right covarience of " + nr + " points.");
 
 		/* get the equation from math */
 		float ml  = cov_xy_n2l / cov_xx_n2l;
@@ -154,9 +231,6 @@ public class Ping {
 
 		float mr  = cov_xy_n2r / cov_xx_n2r;
 		float br  = avg_yr - mr*avg_xr;
-
-		System.err.println("yl = " + ml + "*xl + " + bl);
-		System.err.println("yr = " + mr + "*xr + " + br);
 
 		/* get the standard form; fixme: principal component analysis allows
 		 this to be numically stable, but I tried and it's hard */
@@ -170,7 +244,8 @@ public class Ping {
 		float Al =  cov_xy_n2l;
 		float Bl = -cov_xx_n2l;
 		float Cl =  cov_xx_n2l*avg_yl - cov_xy_n2l*avg_xl;
-		one_norm = 1f / (float)Math.hypot(Al, Bl);
+		/*one_norm = 1f / (float)Math.hypot(Al, Bl); <- no Math.hypot in nxj */
+		one_norm = 1f / (float)Math.sqrt(Al*Al + Bl*Bl);
 		if(Cl < 0) one_norm = -one_norm;
 		Al *= one_norm;
 		Bl *= one_norm;
@@ -179,15 +254,12 @@ public class Ping {
 		float Ar =  cov_xy_n2r;
 		float Br = -cov_xx_n2r;
 		float Cr =  cov_xx_n2r*avg_yr - cov_xy_n2r*avg_xr;
-		one_norm = 1f / (float)Math.hypot(Ar, Br);
+		one_norm = 1f / (float)Math.sqrt(Ar*Ar + Br*Br);
 		if(Cr < 0) one_norm = -one_norm;
 		Ar *= one_norm;
 		Br *= one_norm;
 		Cr *= one_norm;
 		
-		System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
-		System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
-
 		/* covarient basis . . . metric tensor . . . bla bla bla */
 
 		/* Al*x + Bl*y + Cl = 0 (normalised) has direction -Bl*x + Al*y (y+)
@@ -199,8 +271,7 @@ public class Ping {
 		float c = -Bl, d = Al;
 
 		/* compute the inverse (not needed) */
-		/*System.err.println("{{" + a + ", " + b + "}, {" + c + ", " + d + "}}");
-		float adbc = 1f / (a*d + b*c);
+		/*float adbc = 1f / (a*d + b*c);
 		float n =  d*adbc, m = -b*adbc;
 		float o = -c*adbc, p =  a*adbc;*/
 
@@ -210,8 +281,7 @@ public class Ping {
 		[ -Bl  Al ]= U [    e2 ] U^T */
 		/*float determinant = a*a + d*d - 2*a*d + 4*b*c;
 		float eigenvalue1 = (a + d - determinant) / 2f;
-		float eigenvalue2 = (a + d + determinant) / 2f;
-		System.err.println("det " + determinant + " eigenvalues {" + eigenvalue1 + ", " + eigenvalue2 + "}");*/
+		float eigenvalue2 = (a + d + determinant) / 2f;*/
 
 		/* since the metric is slanted (in general,) weight by the components
 		 by the others' error values (hand wavey, but in practice the difference
@@ -231,11 +301,6 @@ public class Ping {
 			rms_er += (Ar*ping.x + Br*ping.y + Cr) * (Ar*ping.x + Br*ping.y + Cr);
 		}
 		rms_er = (float)Math.sqrt(rms_er) / nr;
-		System.err.println("error rms l " + rms_el + "; r " + rms_er);
-
-		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
-		float x = Cl;
-		float y = Cr;
 
 		/* in the QR and QL decomposion, the Q is unitary and the angle,
 		 tan t = -b/a = Ar/Br; tan t = c/d = -Bl/Al */
@@ -247,38 +312,13 @@ public class Ping {
 		float angle = (anglel*rms_er + angler*rms_el) / (rms_el + rms_er);
 		if(angle > Math.PI) angle -= 2f*Math.PI;
 
-		System.err.println("angle + using the right " + Math.toDegrees(angler));
-		System.err.println("angle + using the left "  + Math.toDegrees(anglel));
-		System.err.println("angle + using the the weighted averge " + Math.toDegrees(angle));
+		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
+		odometer.setXY(Cl, Cr);
+		odometer.setRadians(angle);
 
-		System.err.println("Add (" + x + ", " + y + " : " + Math.toDegrees(angle) + ")");
-
-		/* write gnuplot file */
-		PrintWriter writer = null;
-		try {
-			writer = new PrintWriter("robot.gnu", "UTF-8");
-			writer.println("set term postscript eps enhanced");
-			writer.println("set output \"robot.eps\"");
-			writer.println("set xlabel \"x\"");
-			writer.println("set ylabel \"y\"");
-			writer.println("set size ratio -1");
-			writer.println("#set size square");
-			writer.println("set palette maxcolors 3");
-			writer.println("set palette defined (0 '#bbbbbb', 1 '#990000', 2 '#009999')");
-			writer.println("set label \"(" + Math.round(x) + ", " +
-						   Math.round(y) + " : " +
-						   Math.round(Math.toDegrees(angle)) + ")\" at graph 0.2, graph 0.2");
-			writer.println("l(x) = " + ml + "*x + " + bl);
-			writer.println("r(x) = " + mr + "*x + " + br);
-			writer.println("set object circle at first 0,0 radius char 0.5 fillcolor rgb 'red' fillstyle solid noborder");
-			writer.println("plot \"robot.data\" using 1:2:3 title \"Robot\" with linespoints palette, \\");
-			writer.println("l(x) title \"left " + Al + "*x + " + Bl + "*y + " + Cl + " = 0\", \\");
-			writer.println("r(x) title\"right " + Ar + "*x + " + Br + "*y + " + Cr + " = 0\"");
-		} catch(Exception e) {
-			System.err.println("Not created: " + e.getMessage());
-		} finally {
-			writer.close();
-		}
+		/* comment this \/ */
+		write(left, mid, right, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle);
+		/* /\ */
 
 		return true;
 	}

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 
 public class Locobot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
-	private static final int SONAR_DELAY = 20;
+	private static final int     SONAR_DELAY = 20;
+	private static final int BLUETOOTH_DELAY = 10000;
 
 	private   Colour           colour;
 	protected UltrasonicSensor sonic;
@@ -24,22 +25,19 @@ public class Locobot extends Robot {
 		colour = new Colour(colourPort);
 	}
 
-	/* temp sensing array (fixme! varible numbers) */
-	//private static final int LOCO_NO = 128;
-	//private byte locoCm[] = new byte[LOCO_NO]; /* ~76 */
-	//private float locoT[] = new float[LOCO_NO]; /* ~76 */
-	//private int locoCount;
-
 	private ArrayList<Ping> pings = new ArrayList<Ping>(128);
+	private boolean isTurned = false;
 
-	/** override this method */
+	/** this is overriden */
 	protected void localise() {
+		Display.setText("Waiting for Blue");
+		RConsole.openBluetooth(BLUETOOTH_DELAY);
+		if(!RConsole.isOpen()) Display.setText("Never mind.");
 		status = Status.LOCALISING;
-		RConsole.openBluetooth(0);
 		this.turn(100f);
 	}
 
-	/** override this method */
+	/** this is overriden */
 	protected void localising() {
 
 		Position p = odometer.getPositionCopy();
@@ -48,17 +46,34 @@ public class Locobot extends Robot {
 		int  sonic = pingSonar();
 
 		/* record; fixme: check error out of 0 .. 255, it hasn't happened yet */
-		pings.add(new Ping(p, sonic)); /* ouch, malloc is slow . . . :[ */
+		pings.add(new Ping(p, sonic));
 
 		/* display */
 		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
-		RConsole.println("" + p.x + "\t" + p.y + "\t" + t + "\t" + sonic);
-		if(t >= 0f || t <= -5f) return;
+
+		/* if it has not turned, return */
+		if(!isTurned) {
+			if(t <= -90f) {
+				isTurned = true;
+				Display.setText("turned!");
+			}
+			return;
+		} else if(t <= 0f) {
+			return;
+		}
 
 		/* code only goes though to this point on last localising */
 		this.stop();
 		status = Status.IDLE;
-		RConsole.close();
+
+		/* send? */
+		if(RConsole.isOpen()) {
+			for(Ping ping : pings) {
+				p = ping.getPosition();
+				RConsole.println("" + p.x + "\t" + p.y + "\t" + p.getDegrees() + "\t" + ping.getCm());
+			}
+			RConsole.close();
+		}
 
 		/* calculate */
 		Ping.setOdometer(odometer);
@@ -67,13 +82,6 @@ public class Locobot extends Robot {
 		} else {
 			Display.setText("loco failed");
 		}
-	}
-
-	/** why they don't have unsigned compare in the Java specs is beyond me,
-	 something like <{unsigned}; I mean it's in the hardware, and I occasionally
-	 need to use it (okay, so this is the only time I've used it) */
-	private static boolean lt(final byte a, final byte b) {
-		return (a < b) ^ ((a < 0) != (b < 0));
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
@@ -94,6 +102,7 @@ public class Locobot extends Robot {
 	}
 
 	/** returns the colour as enum Value (STYROFOAM/WOOD) */
+	/* fixme: move to swagbot? */
 	public Colour.Value getColour() {
 		return colour.getColourValue();
 	}

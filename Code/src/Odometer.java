@@ -126,6 +126,11 @@ public class Odometer implements TimerListener {
 	}
 
 	/** setters */
+	public void setRadians(final float t) {
+		synchronized(this) {
+			position.setRadians(t);
+		}
+	}
 	public void setDegrees(final float deg) {
 		synchronized(this) {
 			position.setTheta((float)Math.toRadians(deg));
