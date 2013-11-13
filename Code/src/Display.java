@@ -9,14 +9,14 @@ import lejos.util.TimerListener;
 public class Display implements TimerListener{
 	public static final int LCD_REFRESH = 500;
 
-	private static String drawText1 = "Exterminate.";
-	private static String drawText2 = "Exterminate.";
+	private static String drawText1 = "";
+	private static String drawText2 = "";
 
 	private Timer displayTimer = new Timer(LCD_REFRESH, this);
 	private boolean isStarted = false;
-	private Robot robot;
+	private Swagbot robot;
 
-	public Display(final Robot robot) {
+	public Display(final Swagbot robot) {
 		this.robot = robot;
 		displayTimer.start();
 		isStarted = true;
@@ -35,16 +35,19 @@ public class Display implements TimerListener{
 	public void timedOut() {
 		Position position = robot.getPosition();
 		LCD.clear();
-		LCD.drawString("" + robot.getName(), 0, 0, true);
-		LCD.drawString("" + robot.getStatus(), 0, 1);
-		LCD.drawString("" + position, 0, 2, true);
-		LCD.drawString(drawText1, 0, 3);
-		LCD.drawString(drawText2, 0, 4);
+//		LCD.drawString("" + robot.getName(), 0, 0, true);
+		LCD.drawString("" + robot.getStatus(), 0, 0);
+		LCD.drawString("pos: " + position, 0, 1);
+      LCD.drawString("SmPing:   " + robot.getSmallestPing(), 0, 2);
+      LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 3);
+      LCD.drawString("UDist:    " + robot.getDistance(), 0, 4);
+      LCD.drawString("UFDist:   " + robot.getFilteredDistance(), 0, 5);
+		LCD.drawString(drawText1, 0, 6);
+		LCD.drawString(drawText2, 0, 7);
 
-      LCD.drawString("Distance:", 0, 5);
-      LCD.drawString("MedFilter:", 0, 6);
-      LCD.drawInt(robot.getDistance(), 10, 5);
-      LCD.drawInt(robot.getFilteredDistance(), 10, 6);
+//      LCD.drawString("Distance:", 0, 5);
+//      LCD.drawString("MedFilter:", 0, 6);
+
 	}
 
 	/** fixme: some sort of bounds check */

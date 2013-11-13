@@ -15,7 +15,6 @@ class AlexDriver {
 		Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
       Display display = new Display(robot);
       monitorForExit();
-      robot.localise();
 //		robot.travelTo(30.48f, 30.48f);
 		while(robot.getStatus() != Robot.Status.IDLE) {
 		}
