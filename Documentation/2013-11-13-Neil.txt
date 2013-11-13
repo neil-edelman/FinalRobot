@@ -1,0 +1,9 @@
+%%
+
+The last few days I have been working on localisation with the files obtained by Bluetooth. It actually does actual localisation.
+
+Today, I transferred the working code to the robot and got some values.
+
+The Loco simulation and the robot are in sync.
+
+%%
