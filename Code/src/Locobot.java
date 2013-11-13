@@ -35,7 +35,6 @@ public class Locobot extends Robot {
 	/** override this method */
 	protected void localise() {
 		status = Status.LOCALISING;
-		RConsole.openBluetooth(0);
 		this.turn(100f);
 	}
 
@@ -52,28 +51,23 @@ public class Locobot extends Robot {
 
 		/* display */
 		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
-		RConsole.println("" + p.x + "\t" + p.y + "\t" + t + "\t" + sonic);
 		if(t >= 0f || t <= -5f) return;
 
 		/* code only goes though to this point on last localising */
 		this.stop();
 		status = Status.IDLE;
+
+		/* send */
+		RConsole.openBluetooth(0);
+		for(Ping ping : pings) RConsole.println("" + ping.x + "\t" + ping.y + "\t" + t + "\t" + sonic);
 		RConsole.close();
 
 		/* calculate */
-		Ping.setOdometer(odometer);
 		if(Ping.correct(pings)) {
 			Display.setText("loco " + odometer.getPositionCopy());
 		} else {
 			Display.setText("loco failed");
 		}
-	}
-
-	/** why they don't have unsigned compare in the Java specs is beyond me,
-	 something like <{unsigned}; I mean it's in the hardware, and I occasionally
-	 need to use it (okay, so this is the only time I've used it) */
-	private static boolean lt(final byte a, final byte b) {
-		return (a < b) ^ ((a < 0) != (b < 0));
 	}
 
 	/** "The return value is in centimeters. If no echo was detected, the
@@ -94,6 +88,7 @@ public class Locobot extends Robot {
 	}
 
 	/** returns the colour as enum Value (STYROFOAM/WOOD) */
+	/* fixme: move to swagbot? */
 	public Colour.Value getColour() {
 		return colour.getColourValue();
 	}

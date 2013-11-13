@@ -6,17 +6,26 @@ import java.util.ArrayList;
 
 public class Ping {
 
-	private static final byte THRESHOLD = 50;
-	private static final byte  MIN_LOCO = 7;
+	/***** fixme: measure don't guess */
+	/***** fixme: have it in Robot.java? */
+	private static final float SONIC_FORWARD = 15;
+	private static final int   THRESHOLD     = 50;
 
 	private static Odometer odometer;
 
-	private float angle; /* fixme later */
-	private byte  cm;
+	private Position position = new Position();
+	private int      cm;
+	public  float    x, y; /* derived */
+	public  int colour;    /* gnuplot */
 
 	public Ping(final Position p, final int reading) {
-		angle = (float)Math.toDegrees(p.getTheta());
-		cm    = (byte)reading; /* fixme: ignores errors! */
+		position.set(p);
+		cm = reading;
+		/* derive */
+		float a = p.getRadians();
+		float b = cm + SONIC_FORWARD;
+		x = p.x + (float)Math.cos(a) * b;
+		y = p.y + (float)Math.sin(a) * b;
 	}
 
 	/* sets the odometer used by correct */
@@ -36,16 +45,16 @@ public class Ping {
 		if(size < 8) return false;
 
 		/* left hit; for(left : list) oh good grief, really? */
-		for(l = 0; !lt((left = list.get(l)).cm, THRESHOLD); l++) {
+		for(l = 0; (left = list.get(l)).cm >= THRESHOLD; l++) {
 			if(l >= size) return false;
 		}
 
 		/* right hit; the list is garaunteed to have some elemnent lt by above */
-		for(r = size - 1; !lt((right = list.get(r)).cm, THRESHOLD); r--);
+		for(r = size - 1; (right = list.get(r)).cm >= THRESHOLD; r--);
 
-		float deg = 45f - (left.angle + right.angle) * 0.5f;
+		float deg = 45f - (left.position.getDegrees() + right.position.getDegrees()) * 0.5f;
 		odometer.setDegrees(deg);
-		Display.setText2(deg + ": " + (int)left.angle + "+" + (int)right.angle);
+		Display.setText2(deg + ": " + (int)left.position.getDegrees() + "+" + (int)right.position.getDegrees());
 
 		/* do some tranforms and set xy */
 		odometer.setXY(15, 15);
