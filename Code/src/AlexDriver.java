@@ -9,18 +9,19 @@ class AlexDriver {
 	private static final SensorPort  sonicPort = SensorPort.S4;
 	private static final SensorPort colourPort = SensorPort.S3;
    private static final SensorPort lightPort = SensorPort.S1;
+   private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
+   private static Display display = new Display(robot);
 
 	public static void main(String args[]) {
 
-		Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
-      Display display = new Display(robot);
       monitorForExit();
+
 //		robot.travelTo(30.48f, 30.48f);
-		while(robot.getStatus() != Robot.Status.IDLE) {
-		}
+      robot.findBlocks();
+      waitForIdle();
+      robot.stop();
       boolean twa = true;
       while(twa){}
-
 	}
 
    private static void monitorForExit() {
@@ -32,5 +33,13 @@ class AlexDriver {
          } 
       };
       exitThread.start();
+   }
+
+
+
+   public static void waitForIdle() {
+         while(robot.getStatus() != Robot.Status.IDLE && robot.getFindStatus() != Robot.FindStatus.IDLE) {
+		}
+
    }
 }

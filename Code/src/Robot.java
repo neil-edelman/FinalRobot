@@ -20,7 +20,8 @@ public class Robot implements TimerListener {
 	private static final NXTRegulatedMotor  leftMotor = Motor.A;
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
-	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING };
+	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING };
+   public enum FindStatus { IDLE, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED };
 
 	private final static String   NAME = "Sex Robot"; /* change */
 	private static final int NAV_DELAY = 100; /* ms */
@@ -41,6 +42,7 @@ public class Robot implements TimerListener {
 	private Controller distancePID = new Controller(30f, 1f, 1f);
 
 	protected Status     status = Status.IDLE;
+   protected FindStatus findStatus = FindStatus.IDLE;
 	protected Position   target = new Position(), delta = new Position();
 	protected Odometer odometer;
 
@@ -78,7 +80,12 @@ public class Robot implements TimerListener {
             this.constantlyTurningTo();
             this.scanning();
             break;
+         case FINDING:
+            this.finding();
+            break;
 			case IDLE:
+            if(findStatus != FindStatus.IDLE)
+               status = Status.FINDING;
 				break;
 		}
 	}
@@ -110,24 +117,19 @@ public class Robot implements TimerListener {
       status = Status.SCANNING;
       this.turnRate = rate;
    }
-   /** used with scanning */
+   /** used with scanning, allows the robot to constantly turn to an angle */
    private void constantlyTurningTo() {
       Position p = odometer.getPositionCopy();
-      //turning left
-      if(this.turnRate > 0 && target.getTheta() > p.getTheta()) {
-         status = Status.IDLE;
-         this.stop();
-      }
       //turning right
-      if(this.turnRate < 0 && target.getTheta() < p.getTheta()) {
+      if(this.turnRate < 0 && target.getTheta() > p.getTheta()) {
          status = Status.IDLE;
          this.stop();
       }
-   }
-   /** overwritten for scanning */
-   protected void scanning() {
-		System.err.println("no scanning");
-      status = Status.IDLE;
+      //turning left
+      if(this.turnRate > 0 && target.getTheta() < p.getTheta()) {
+         status = Status.IDLE;
+         this.stop();
+      }
    }
 
 	/** this is a shorcut to just specify the DEFAULT_LIMIT_ANGLE */
@@ -173,12 +175,6 @@ public class Robot implements TimerListener {
 		System.err.println("no localising");
 		status = Status.IDLE;
 	}
-   protected int getFilteredDistance() {
-      return 0;
-   }
-   protected int getDistance() {
-      return 0;
-   }
 
 	/** this implements a rotation by parts */
 	private void rotate() {
@@ -234,6 +230,34 @@ public class Robot implements TimerListener {
 		this.setSpeeds(speed - turn, speed + turn);
 	}
 
+   /************Overwritten Subsection**********
+         the following methods are called in timedout
+         and need to be overwritten to function */
+
+   /** overwritten for scanning */
+   protected void scanning() {
+		System.err.println("no scanning");
+      status = Status.IDLE;
+   }
+   /** overwritten for finding blocks */
+   protected void finding() {
+      System.err.println("no finding blocks");
+      status = Status.IDLE;
+   }
+
+
+
+	/**************************************/
+
+   /** overwritten for display */
+
+   protected int getFilteredDistance() {
+      return 0;
+   }
+   protected int getDistance() {
+      return 0;
+   }
+
 	/**************************************/
 
 	/* accesors/modifiers */
@@ -242,13 +266,18 @@ public class Robot implements TimerListener {
 	public Position getPosition() {
 		return odometer.getLastPosition();
 	}
-
+   /** returns the robot's status */
 	public Status getStatus() {
 		synchronized(this) {
 			return status;
 		}
 	}
-
+   public FindStatus getFindStatus() {
+      synchronized(this) {
+         return findStatus;
+      }
+   }
+   /** returns the target position */
 	public Position getTarget() {
 		synchronized(this) {
 			return target;
