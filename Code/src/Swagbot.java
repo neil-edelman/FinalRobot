@@ -67,9 +67,10 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          }
          adjust_y += 30f;
 
-         if(first)
+         if(first) {
             findingFirst = false; //false after the first iteration of the loop     
             scanLeft(90f); //turns left and scans to 90 degrees, disables the p error correction so the robot can ping at a constant speed
+         }
          //if it is not the first iteration, the robot has moved to the center of the field and now turns the full 180 degrees
          //to search for blocks
          if(!first)

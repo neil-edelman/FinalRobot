@@ -16,11 +16,11 @@ class AlexDriver {
 
       monitorForExit();
 
-//      runTests();
-      runAbridgedTests();
-
-      robot.findBlocks();
-
+      runTests();
+//      runAbridgedTests();
+//      robot.scanLeft(90f);
+//      robot.findBlocks();
+//      robot.localise();
       boolean forever = true;
       while(forever){}
 
@@ -57,16 +57,17 @@ class AlexDriver {
    findBlocks: not working -- in progress
    */
    public static void runTests() {
-//      robot.localise(); 
+      robot.localise(); 
+      waitForIdle();
       robot.turnTo(90f);
       waitForIdle();
       robot.turnTo(0f);
       waitForIdle();
-		robot.travelTo(30.48f, 30.48f);
+      robot.travelTo(60.96f,60.96f);
       waitForIdle();
       robot.turnTo(90f);
       waitForIdle();
-      robot.travelTo(0f,0f);
+		robot.travelTo(30.48f, 30.48f);
       waitForIdle();
 //    robot.findBlocks();
 //      waitForIdle();
