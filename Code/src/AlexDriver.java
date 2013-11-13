@@ -16,12 +16,8 @@ class AlexDriver {
 
       monitorForExit();
 
-//		robot.travelTo(30.48f, 30.48f);
-      robot.findBlocks();
-      waitForIdle();
-      robot.stop();
-      boolean twa = true;
-      while(twa){}
+      runTests();
+
 	}
 
    private static void monitorForExit() {
@@ -38,8 +34,26 @@ class AlexDriver {
 
 
    public static void waitForIdle() {
-         while(robot.getStatus() != Robot.Status.IDLE && robot.getFindStatus() != Robot.FindStatus.IDLE) {
+         while(robot.getStatus() != Robot.Status.IDLE || robot.getFindStatus() != Robot.FindStatus.IDLE) {
 		}
+   }
 
+   /** unit tests for robot code, when you complete a function write a test method
+   say what it's supposed to do and run it here, then test to make sure everything
+   functions properly */
+   public static void runTests() {
+      robot.localise(); 
+//      robot.turnTo(90);
+//      waitForIdle();
+//      robot.turnTo(0);
+//      waitForIdle();
+//		robot.travelTo(30.48f, 30.48f);
+//      waitForIdle();
+//    robot.findBlocks();
+//      waitForIdle();
+//      robot.stop();
+      boolean forever = true;
+      while(forever){}
+      return;
    }
 }

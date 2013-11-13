@@ -36,7 +36,7 @@ public class Display implements TimerListener{
 		Position position = robot.getPosition();
 		LCD.clear();
 //		LCD.drawString("" + robot.getName(), 0, 0, true);
-		LCD.drawString("" + robot.getStatus(), 0, 0);
+		LCD.drawString("" + robot.getStatus() + " | " + robot.getFindStatus(), 0, 0);
 		LCD.drawString("pos: " + position, 0, 1);
       LCD.drawString("SmPing:   " + robot.getSmallestPing(), 0, 2);
       LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 3);
