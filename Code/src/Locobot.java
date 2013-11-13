@@ -11,7 +11,8 @@ import java.util.ArrayList;
 
 public class Locobot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
-	private static final int SONAR_DELAY = 20;
+	private static final int     SONAR_DELAY = 20;
+	private static final int BLUETOOTH_DELAY = 10000;
 
 	private   Colour           colour;
 	protected UltrasonicSensor sonic;
@@ -24,21 +25,19 @@ public class Locobot extends Robot {
 		colour = new Colour(colourPort);
 	}
 
-	/* temp sensing array (fixme! varible numbers) */
-	//private static final int LOCO_NO = 128;
-	//private byte locoCm[] = new byte[LOCO_NO]; /* ~76 */
-	//private float locoT[] = new float[LOCO_NO]; /* ~76 */
-	//private int locoCount;
-
 	private ArrayList<Ping> pings = new ArrayList<Ping>(128);
+	private boolean isTurned = false;
 
-	/** override this method */
+	/** this is overriden */
 	protected void localise() {
+		Display.setText("Waiting for Blue");
+		RConsole.openBluetooth(BLUETOOTH_DELAY);
+		if(!RConsole.isOpen()) Display.setText("Never mind.");
 		status = Status.LOCALISING;
 		this.turn(100f);
 	}
 
-	/** override this method */
+	/** this is overriden */
 	protected void localising() {
 
 		Position p = odometer.getPositionCopy();
@@ -51,16 +50,30 @@ public class Locobot extends Robot {
 
 		/* display */
 		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
-		if(t >= 0f || t <= -25f) return;
+
+		/* if it has not turned, return */
+		if(!isTurned) {
+			if(t <= -90f) {
+				isTurned = true;
+				Display.setText("turned!");
+			}
+			return;
+		} else if(t <= 0f) {
+			return;
+		}
 
 		/* code only goes though to this point on last localising */
 		this.stop();
 		status = Status.IDLE;
 
-		/* send */
-//		RConsole.openBluetooth(0);
-//		for(Ping ping : pings) RConsole.println("" + ping.x + "\t" + ping.y + "\t" + t + "\t" + sonic);
-//		RConsole.close();
+		/* send? */
+		if(RConsole.isOpen()) {
+			for(Ping ping : pings) {
+				p = ping.getPosition();
+				RConsole.println("" + p.x + "\t" + p.y + "\t" + p.getDegrees() + "\t" + ping.getCm());
+			}
+			RConsole.close();
+		}
 
 		/* calculate */
 		Ping.setOdometer(odometer);

@@ -7,13 +7,11 @@ import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
 
 public class Ping {
-
-
 	/********* copy/paste here ************/
-
-	/***** fixme: measure don't guess */
+	
 	/***** fixme: have it in Robot.java? */
-	private static final float SONIC_FORWARD = 15;
+	private static final float LIGHT_BACK    = 12.2F;
+	private static final float SONIC_FORWARD = 10.4f;
 	
 	private static Odometer odometer;
 	
@@ -32,14 +30,17 @@ public class Ping {
 		y = p.y + (float)Math.sin(a) * b;
 	}
 	
-	/* sets the odometer used by correct */
+	/** sets the odometer used by correct */
 	public static void setOdometer(final Odometer o) {
 		odometer = o;
 	}
 	
+	/** getters for logging */
+	Position getPosition() { return position; }
+	int getCm() { return cm; }
+	
 	public static boolean correct(final ArrayList<Ping> pings) {
 		
-		/* uncomment */
 		if(odometer == null) throw new IllegalArgumentException("no odometer");
 		
 		/* determine the area that is most close taking the minimum;
@@ -76,7 +77,6 @@ public class Ping {
 		if(rEff < left) rEff += len;
 		int mid = (rEff + left) / 2;
 		if(mid >= len) mid -= len;
-		//System.err.println("left " + left + "--> " + mid + " <--" + right + " right");
 		
 		/*for(Ping ping : pings)
 		 if(((i > left) && (i < mid)) ^ (left > mid))
@@ -103,7 +103,6 @@ public class Ping {
 		float cov_xx_n2l = ss_xxl*nl - s_xl*s_xl;
 		float cov_yy_n2l = ss_yyl*nl - s_yl*s_yl;
 		float cov_xy_n2l = ss_xyl*nl - s_xl*s_yl;
-		//System.err.println("Left covarience of " + nl + " points.");
 		
 		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
 		int nr = 0;
@@ -124,7 +123,6 @@ public class Ping {
 		float cov_xx_n2r = ss_xxr*nr - s_xr*s_xr;
 		float cov_yy_n2r = ss_yyr*nr - s_yr*s_yr;
 		float cov_xy_n2r = ss_xyr*nr - s_xr*s_yr;
-		//System.err.println("Right covarience of " + nr + " points.");
 		
 		/* get the equation from math */
 		float ml  = cov_xy_n2l / cov_xx_n2l;
@@ -132,9 +130,6 @@ public class Ping {
 		
 		float mr  = cov_xy_n2r / cov_xx_n2r;
 		float br  = avg_yr - mr*avg_xr;
-		
-		//System.err.println("yl = " + ml + "*xl + " + bl);
-		//System.err.println("yr = " + mr + "*xr + " + br);
 		
 		/* get the standard form; fixme: principal component analysis allows
 		 this to be numically stable, but I tried and it's hard */
@@ -164,9 +159,6 @@ public class Ping {
 		Br *= one_norm;
 		Cr *= one_norm;
 		
-		//System.err.println("" + Al + "*xl + " + Bl + "*yl + " + Cl + " = 0");
-		//System.err.println("" + Ar + "*xr + " + Br + "*yr + " + Cr + " = 0");
-		
 		/* covarient basis . . . metric tensor . . . bla bla bla */
 		
 		/* Al*x + Bl*y + Cl = 0 (normalised) has direction -Bl*x + Al*y (y+)
@@ -178,8 +170,7 @@ public class Ping {
 		float c = -Bl, d = Al;
 		
 		/* compute the inverse (not needed) */
-		/*System.err.println("{{" + a + ", " + b + "}, {" + c + ", " + d + "}}");
-		 float adbc = 1f / (a*d + b*c);
+		/*float adbc = 1f / (a*d + b*c);
 		 float n =  d*adbc, m = -b*adbc;
 		 float o = -c*adbc, p =  a*adbc;*/
 		
@@ -189,8 +180,7 @@ public class Ping {
 		 [ -Bl  Al ]= U [    e2 ] U^T */
 		/*float determinant = a*a + d*d - 2*a*d + 4*b*c;
 		 float eigenvalue1 = (a + d - determinant) / 2f;
-		 float eigenvalue2 = (a + d + determinant) / 2f;
-		 System.err.println("det " + determinant + " eigenvalues {" + eigenvalue1 + ", " + eigenvalue2 + "}");*/
+		 float eigenvalue2 = (a + d + determinant) / 2f;*/
 		
 		/* since the metric is slanted (in general,) weight by the components
 		 by the others' error values (hand wavey, but in practice the difference
@@ -210,11 +200,6 @@ public class Ping {
 			rms_er += (Ar*ping.x + Br*ping.y + Cr) * (Ar*ping.x + Br*ping.y + Cr);
 		}
 		rms_er = (float)Math.sqrt(rms_er) / nr;
-		//System.err.println("error rms l " + rms_el + "; r " + rms_er);
-		
-		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
-		float x = Cl;
-		float y = Cr;
 		
 		/* in the QR and QL decomposion, the Q is unitary and the angle,
 		 tan t = -b/a = Ar/Br; tan t = c/d = -Bl/Al */
@@ -226,9 +211,14 @@ public class Ping {
 		float angle = (anglel*rms_er + angler*rms_el) / (rms_el + rms_er);
 		if(angle > Math.PI) angle -= 2f*Math.PI;
 		
-		odometer.setXY(x, y);
+		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
+		odometer.setXY(Cl, Cr);
 		odometer.setRadians(angle);
-
+		
+		/* comment this \/ */
+		//write(left, mid, right, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle);
+		/* /\ */
+		
 		return true;
 	}
 	
