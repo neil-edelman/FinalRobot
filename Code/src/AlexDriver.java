@@ -17,7 +17,13 @@ class AlexDriver {
       monitorForExit();
 
 //      runTests();
+      runAbridgedTests();
+
       robot.findBlocks();
+
+      boolean forever = true;
+      while(forever){}
+
 	}
 
    private static void monitorForExit() {
@@ -59,11 +65,26 @@ class AlexDriver {
 		robot.travelTo(30.48f, 30.48f);
       waitForIdle();
       robot.turnTo(90f);
+      waitForIdle();
+      robot.travelTo(0f,0f);
+      waitForIdle();
 //    robot.findBlocks();
 //      waitForIdle();
       robot.stop();
-      boolean forever = true;
-      while(forever){}
       return;
    }
+   /** quick test -- turns left 30 degrees and back, spin/travels to -5,-5 and returns */
+   public static void runAbridgedTests() {
+      robot.turnTo(30f);
+      waitForIdle();
+      robot.turnTo(0f);
+      waitForIdle();
+		robot.travelTo(-5f, -5f);
+      waitForIdle();
+      robot.travelTo(0f,0f);
+      waitForIdle();
+      robot.stop();
+      return;
+   }
+
 }

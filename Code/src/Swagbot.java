@@ -45,16 +45,21 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          set's the robot status to finding and the finding status to scanning.*/
    public void findBlocks() {
       this.status = Status.FINDING;
-      this.findStatus = FindStatus.SCANNING;
+      this.findStatus = FindStatus.TURNING;
       findingFirst = true;
    }
 
    /** overridden from Robot: contains the code for finding blocks and placing them in the destination */
    protected void finding() {
-
-      //FindStatus is idle if the find loop is just starting
+         
+      //find blocks from search point (starts in corner and progresses along board)
+      if(this.findStatus == FindStatus.TURNING) {
+         this.findStatus = FindStatus.SCANNING;
+	      this.turnTo(0f);
+      }
+      //on the first iteration the robot is in the corner and only turns ninty degrees
       //findloop: scan -> if block: travel to destination -> travel to scan point and repeat
-      if(this.findStatus == FindStatus.SCANNING) { //SCAN
+      else if(this.findStatus == FindStatus.SCANNING) { //SCAN
          boolean first = findingFirst;
          //update x and y
          if(first) {
@@ -62,9 +67,6 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          }
          adjust_y += 30f;
 
-	      //find blocks from search point (starts in corner and progresses along board)
-         //on the first iteration the robot is in the corner and only turns ninty degrees
-         this.turnTo(0f);
          if(first)
             findingFirst = false; //false after the first iteration of the loop     
             scanLeft(90f); //turns left and scans to 90 degrees, disables the p error correction so the robot can ping at a constant speed
@@ -106,8 +108,10 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       }
       else if(this.findStatus == FindStatus.FOUND) {
          this.findStatus = FindStatus.FINISHED;
+         //need to make it go to the destination
       }
       else if(this.findStatus == FindStatus.RELOCATING) {
+         this.findStatus = FindStatus.TURNING;
          this.travelTo(adjust_x,adjust_y); //TRAVEL TO NEXT SCAN POINT
       }
          

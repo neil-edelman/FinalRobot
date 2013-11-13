@@ -21,7 +21,7 @@ public class Robot implements TimerListener {
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING };
-   public enum FindStatus { IDLE, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED };
+   public enum FindStatus { IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED };
 
 	private final static String   NAME = "Sex Robot"; /* change */
 	private static final int NAV_DELAY = 100; /* ms */
