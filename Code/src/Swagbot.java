@@ -87,8 +87,9 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          }
          //if it is not the first iteration, the robot has moved to the center of the field and now turns the full 180 degrees
          //to search for blocks
-         if(!first)
+         if(!first) {
             scanLeft(180f);
+         }
          this.findStatus = FindStatus.SCANNED;
       }
       else if(this.findStatus == FindStatus.SCANNED) {
@@ -112,7 +113,6 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          //if styroform go to destination!
          if(this.getColour() == Colour.Value.STYROFOAM) { //is styrofoam, grab and move
             Sound.beep();
-            this.status = Status.IDLE;
             this.findStatus = FindStatus.FOUND;
             //travel with avoidance, go to the destination
             //this.travelTo(DESTINATION_X,DESTINATION_Y,250,250); //TRAVEL TO DESTINATION
@@ -126,7 +126,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       }
       else if(this.findStatus == FindStatus.FOUND) {
          this.findStatus = FindStatus.FINISHED;
-         //need to make it go to the destination
+         travelTo(DESTINATION_X,DESTINATION_Y,250,250);
+         //then it stops
       }
       else if(this.findStatus == FindStatus.RELOCATING) {
          this.findStatus = FindStatus.TURNING;
