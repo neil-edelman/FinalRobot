@@ -10,6 +10,8 @@
 /* import javax.vecmath.Vector3f; <- does not have this, write our own :[ */
 /* import java.lang.Comparable; */
 
+import java.lang.IllegalArgumentException;
+
 import lejos.nxt.LCD;
 import lejos.nxt.Button;
 import lejos.nxt.ColorSensor;
@@ -26,21 +28,26 @@ public class Colour {
 	Vector3f     colour = new Vector3f();
 	Vector3f colourDiff = new Vector3f();
 
+	/** constructor
+	 @author Neil
+	 @param port The port the colour sensor is plugged into */
 	public Colour(final SensorPort port) {
 		cs = new ColorSensor(port);
-	}
-
-	public Value getColourValue() {
-		ColorSensor.Color c;
-		Vector3f          colour;
-		float             s, w;
-		int               percent;
-
 		/* the normalisation projects the HSL values onto L = 0.5 so it isn't
 		 affected by natural light (3d -> 2d;) barycentric coordinates are the
 		 square of the normalised values */
 		styrofoam.normalize();
 		woodblock.normalize();
+	}
+
+	/** senses the colour at the current location
+	 @author Neil
+	 @return The most likely colour as a Value enum. (fixme: uncertainty) */
+	public Value getColourValue() {
+		ColorSensor.Color c;
+		Vector3f          colour;
+		float             s, w;
+		int               percent;
 
 		/* store it in useless "Color" then transfer it to useful class */
 		c      = cs.getColor(); /* 0 - 255 */
@@ -85,33 +92,50 @@ public class Colour {
 class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	public float r, g, b;
 	
-	/** empty constructor */
+	/** empty constructor
+	 @author Neil */
 	public Vector3f() {
 	}
 	
-	/** fill constructor */
+	/** fill constructor
+	 @author Neil
+	 @param r
+	 @param g
+	 @param b The colour values in [0..1]. */
 	public Vector3f(final float r, final float g, final float b) {
 		set(r, g, b);
 	}
 	
-	/** fill */
+	/** fill
+	 @author Neil
+	 @param r
+	 @param g
+	 @param b The colour values in [0..1]. */
 	public final void set(final float r, final float g, final float b) {
+		if(r < 0 || r > 1 || g < 0 || g > 1 || b < 0 || b > 1)
+			throw new IllegalArgumentException("colour value");
 		this.r = r;
 		this.g = g;
 		this.b = b;
 	}
 	
-	/** returns the length squared */
+	/** returns the length squared
+	 @author Neil
+	 @return length squared */
 	public float lengthSquared() {
 		return r*r + g*g + b*b;
 	}
 	
-	/** returns the length */
+	/** returns the length, computes the lenght squared so make sure it's
+	 "small"
+	 @author Neil
+	 @return length */
 	public float length() {
 		return (float)Math.sqrt(this.lengthSquared());
 	}
-	
-	/** normalises this vector in place */
+
+	/** normalises this vector in place
+	 @author Neil */
 	public void normalize() {
 		float d = length();
 		
@@ -124,17 +148,23 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 		b *= e;
 	}
 	
-	/** subtract */
+	/** subtract a Vector3f
+	 @author Neil
+	 @param x The variable to subatact. */
 	public void sub(final Vector3f x) {
 		r -= x.r;
 		g -= x.g;
 		b -= x.g;
 	}
 	
-	/** subtract */
+	/** set the varible to the subtraction x - y
+	 @author Neil
+	 @param x +
+	 @param y - */
 	public void sub(final Vector3f x, final Vector3f y) {
 		r = x.r - y.r;
 		g = x.g - y.g;
 		b = x.g - y.b;
 	}
+
 }
