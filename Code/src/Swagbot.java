@@ -6,14 +6,19 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 
    private UltrasonicListener uListener;
    private Timer uTimer;
-   private float targetTheta = -1;
+   private float targetTheta = -1f;
    private int smallestPing = 254;
    private boolean findingFirst = true;
-   private static final float DESTINATION_X = 0;
-   private static final float DESTINATION_Y = 50;
+   private static final float DESTINATION_X = 0f;
+   private static final float DESTINATION_Y = 50f;
    private static final int   SCAN_THRESHOLD = 70; 
-   private float adjust_x = 0; //designates the point on the field to be searched from
-   private float adjust_y = 0; //values are (0,0);(30,30);(30,60);(30,90)...etc
+   private static final float FRONT_EXTENSION_LENGTH = 22.5f; //bumper length from wheel base
+   private static final float X_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //used as mins and maxes in determining target
+   private static final float Y_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //origin in corner
+   private static final float X_HIGH_BOUND = 121.92f - FRONT_EXTENSION_LENGTH; //4 tiles by
+   private static final float Y_HIGH_BOUND = 243.84f - FRONT_EXTENSION_LENGTH; //8 tiles
+   private float adjust_x = 0f; //designates the point on the field to be searched from
+   private float adjust_y = 0f; //values are (0,0);(30,30);(30,60);(30,90)...etc
    private float targetX,targetY;
 
 	/** the constructor */
@@ -22,7 +27,16 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       uListener = new UltrasonicListener(this.sonic);
       uTimer = new Timer(10/*round-up to int 9.375*/,uListener); //timeout value in ms
       uTimer.start();
+      Sound.setVolume(100);
    }
+
+   //**********************************
+   //override color hack -- for demo, color in locobot not working -- TODO:can remove this when we get it working
+   Colour colour = new Colour(SensorPort.S3); 
+   public Colour.Value getColour() {
+      return colour.getColourValue();
+   }
+   //**********************************
 
    /** returns the ultrasonic sensor's unfiltered distance */
    public int getDistance() {
@@ -55,7 +69,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       //find blocks from search point (starts in corner and progresses along board)
       if(this.findStatus == FindStatus.TURNING) {
          this.findStatus = FindStatus.SCANNING;
-	      this.turnTo(0f);
+	      this.turnTo(0f,250);
       }
       //on the first iteration the robot is in the corner and only turns ninty degrees
       //findloop: scan -> if block: travel to destination -> travel to scan point and repeat
@@ -84,9 +98,10 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
             //when the robot encounters a block, the position of the block is calculated using the measured distance
             //the robot then move near that position and gets a colour reading of the block
             Position position = this.getPosition();
-            targetX = position.y + (smallestPing-2)*(float)Math.cos(Math.toRadians(targetTheta+3));
-            targetY = position.x + (smallestPing-2)*(float)Math.sin(Math.toRadians(targetTheta+3));
-            this.travelTo(targetX,targetY); //move near test object
+            targetX = position.x + (smallestPing-2)*(float)Math.cos(Math.toRadians(targetTheta+3));
+            targetY = position.y + (smallestPing-2)*(float)Math.sin(Math.toRadians(targetTheta+3));
+            checkTargetBounds();
+            this.travelTo(targetX,targetY,250,250); //move near test object
          }
          else
             Sound.buzz(); //no blocks found
@@ -99,12 +114,13 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
             this.status = Status.IDLE;
             this.findStatus = FindStatus.FOUND;
             //travel with avoidance, go to the destination
-            this.travelTo(DESTINATION_X,DESTINATION_Y); //TRAVEL TO DESTIONATION
+            //this.travelTo(DESTINATION_X,DESTINATION_Y,250,250); //TRAVEL TO DESTIONATION
          }
          else { //is wood move on
-            this.findStatus = FindStatus.RELOCATING;
             Sound.buzz();
-            this.travelTo(targetX-15,targetY-15); //backup
+            this.findStatus = FindStatus.RELOCATING;
+            //checkTargetBounds();
+            //this.travelTo(targetX-15,targetY-15,250,250); //backup
          }
       }
       else if(this.findStatus == FindStatus.FOUND) {
@@ -113,9 +129,15 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       }
       else if(this.findStatus == FindStatus.RELOCATING) {
          this.findStatus = FindStatus.TURNING;
-         this.travelTo(adjust_x,adjust_y); //TRAVEL TO NEXT SCAN POINT
+         this.travelTo(adjust_x,adjust_y,250,250); //TRAVEL TO NEXT SCAN POINT
       }
          
+   }
+   private void checkTargetBounds() {
+      if(     targetX < X_LOW_BOUND ) targetX = X_LOW_BOUND; //bounds check
+      else if(targetX > X_HIGH_BOUND) targetX = X_HIGH_BOUND;
+      if(     targetY < Y_LOW_BOUND ) targetY = Y_LOW_BOUND;
+      else if(targetY > Y_HIGH_BOUND) targetY = Y_HIGH_BOUND;
    }
    /** robot scans left to the given angle, and records the smallest distance and corresponding theta */
    public void scanLeft(float angle) {

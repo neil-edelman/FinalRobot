@@ -120,15 +120,21 @@ public class Robot implements TimerListener {
    /** used with scanning, allows the robot to constantly turn to an angle */
    private void constantlyTurningTo() {
       Position p = odometer.getPositionCopy();
+      float angle = p.getDegrees();
       //turning right
-      if(this.turnRate < 0 && target.getTheta() > p.getTheta()) {
+      if(this.turnRate < 0f && target.getDegrees() > angle) {
          status = Status.IDLE;
          this.stop();
       }
       //turning left
-      if(this.turnRate > 0 && target.getTheta() < p.getTheta()) {
-         status = Status.IDLE;
-         this.stop();
+      if(this.turnRate > 0f) {
+         float right = target.getTheta() + 45f;
+         if(right > 180f)
+            right -= 360f;
+         if( (angle > target.getDegrees() || angle < 0) && (angle < right || angle > 0) ) {
+            status = Status.IDLE;
+            this.stop();
+         }
       }
    }
 
@@ -156,6 +162,22 @@ public class Robot implements TimerListener {
 		/* distance and angle need to be reset (we use them) */
 		anglePID.reset(DEFAULT_LIMIT_ANGLE);
 		distancePID.reset(DEFAULT_LIMIT_DISTANCE);
+
+		/* fixme: we should do a thing here that sets the line perp to the
+		 dest for travelTo oscillations */
+
+		/* we set distance, TRAVELLING, and let timedOut's travel do the rest */
+		target.x = x;
+		target.y = y;
+		status = Status.TRAVELLING;
+	}
+
+	/** this sets the target to (x, y) and the travel and turn limits and travels */
+	public void travelTo(final float x, final float y, final float travelLimit, final float turnLimit) {
+
+		/* distance and angle need to be reset (we use them) */
+		anglePID.reset(turnLimit);
+		distancePID.reset(travelLimit);
 
 		/* fixme: we should do a thing here that sets the line perp to the
 		 dest for travelTo oscillations */
