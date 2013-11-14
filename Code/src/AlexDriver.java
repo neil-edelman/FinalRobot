@@ -16,6 +16,7 @@ class AlexDriver {
 
       monitorForExit();
 
+		/* Neil: loco, travel to the 2nd square, and turn to 90 */
 		robot.localise();
 		waitForIdle();
 		robot.travelTo(60.96f, 60.96f/*30.48f,30.48f*/);
