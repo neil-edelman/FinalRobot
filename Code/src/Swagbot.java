@@ -103,9 +103,10 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
             checkTargetBounds();
             this.travelTo(targetX,targetY,250,250); //move near test object
          }
-         else
+         else {
             Sound.buzz(); //no blocks found
             this.findStatus = FindStatus.RELOCATING;
+         }
       }
       else if(this.findStatus == FindStatus.ID) { //ID BLOCK
          //if styroform go to destination!
@@ -114,13 +115,13 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
             this.status = Status.IDLE;
             this.findStatus = FindStatus.FOUND;
             //travel with avoidance, go to the destination
-            //this.travelTo(DESTINATION_X,DESTINATION_Y,250,250); //TRAVEL TO DESTIONATION
+            //this.travelTo(DESTINATION_X,DESTINATION_Y,250,250); //TRAVEL TO DESTINATION
          }
          else { //is wood move on
             Sound.buzz();
             this.findStatus = FindStatus.RELOCATING;
-            //checkTargetBounds();
-            //this.travelTo(targetX-15,targetY-15,250,250); //backup
+            checkTargetBounds();
+            this.travelTo(targetX-15,targetY-15,250,250); //backup
          }
       }
       else if(this.findStatus == FindStatus.FOUND) {
