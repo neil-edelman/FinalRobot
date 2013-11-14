@@ -88,10 +88,10 @@ class Position {
 	}
 
 	/** phased out; do not use (too confusing) */
-	public void setTheta(final float t) {
+	/*public void setTheta(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t = t;
-	}
+	}*/
 
 	/** set the x, y, overrides the old
 	 @author Neil
