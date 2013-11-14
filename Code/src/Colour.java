@@ -40,14 +40,12 @@ public class Colour {
 		woodblock.normalize();
 	}
 
-	/** senses the colour at the current location
+	/** gets the colour from the sensor right now
 	 @author Neil
-	 @return The most likely colour as a Value enum. (fixme: uncertainty) */
-	public Value getColourValue() {
+	 @return the colour as and rgb [0..1] */
+	private Vector3f getColour() {
 		ColorSensor.Color c;
 		Vector3f          colour;
-		float             s, w;
-		int               percent;
 
 		/* store it in useless "Color" then transfer it to useful class */
 		c      = cs.getColor(); /* 0 - 255 */
@@ -55,6 +53,19 @@ public class Colour {
 							  c.getGreen() / 255f,
 							  c.getBlue() / 255f);
 		colour.normalize();
+
+		return colour;
+	}
+
+	/** senses the colour at the current location
+	 @author Neil
+	 @return The most likely colour as a Value enum. (fixme: uncertainty) */
+	public Value getColourValue() {
+		Vector3f          colour;
+		float             s, w;
+		int               percent;
+
+		colour = this.getColour();
 
 		/* compare with styrofoam and wood; I think technically, we should
 		 convert to a quaternion to get the great circle distance, but
@@ -83,9 +94,33 @@ public class Colour {
 			return Value.UNKNOWN;
 		}
 	}
+
+	/** how certain we are that the object in front of colour sensor is styrofoam
+	 @author Neil
+	 @return The probability [0..1] */
+	public Value getStyrofoamProbability() {
+		Vector3f          colour;
+		float             s, w;
+		int               percent;
+
+		colour = this.getColour();
+
+		/* compare with styrofoam and wood */
+		colourDiff.sub(colour, styrofoam);
+		s = colourDiff.lengthSquared();
+		colourDiff.sub(colour, woodblock);
+		w = colourDiff.lengthSquared();
+
+		return w / (s + w);
+	}
+
 }
 
+
+
+/* helper class */
 /* package javax.vecmath does not exist; aaaaauuuuuuggghht wtf */
+
 /* this is a normalised colour on 19:13 bit fixed point
  3*255^2 = 195 075 (18 bit) */
 /* no, that's complicated, just use floats */
