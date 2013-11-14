@@ -10,11 +10,11 @@ class AlexDriver {
 	private static final SensorPort colourPort = SensorPort.S3;
    private static final SensorPort lightPort = SensorPort.S1;
    private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
-   private static Display display = new Display(robot);
+   //private static Display display = new Display(robot);
 
 	public static void main(String args[]) {
 
-      monitorForExit();
+/*      monitorForExit();
 
 //      runTests();
       runAbridgedTests();
@@ -23,7 +23,15 @@ class AlexDriver {
 
       boolean forever = true;
       while(forever){}
-
+*/
+		int press;
+		Colour colour = new Colour(colourPort);
+		for( ; ; ) {
+			System.out.print("press: ");
+            press = Button.waitForAnyPress();
+			if((press & Button.ID_ESCAPE) != 0) break;
+			System.out.println((int)(colour.getStyrofoamProbability() * 100f) + "% styrofoam");
+		}
 	}
 
    private static void monitorForExit() {

@@ -7,7 +7,7 @@
  by the eigenvalues of their sensitivety like CIE colour model, but we don't
  know this. */
 
-/* import javax.vecmath.Vector3f; <- does not have this, write our own :[ */
+/* import javax.vecmath.Vector3f; <- nxj does not have this, write our own :[ */
 /* import java.lang.Comparable; */
 
 import java.lang.IllegalArgumentException;
@@ -16,6 +16,8 @@ import lejos.nxt.LCD;
 import lejos.nxt.Button;
 import lejos.nxt.ColorSensor;
 import lejos.nxt.SensorPort;
+
+//import lejos.robotics.Color;
 
 public class Colour {
 	enum Value { UNKNOWN, STYROFOAM, WOOD };
@@ -32,7 +34,9 @@ public class Colour {
 	 @author Neil
 	 @param port The port the colour sensor is plugged into */
 	public Colour(final SensorPort port) {
+
 		cs = new ColorSensor(port);
+
 		/* the normalisation projects the HSL values onto L = 0.5 so it isn't
 		 affected by natural light (3d -> 2d;) barycentric coordinates are the
 		 square of the normalised values */
@@ -48,10 +52,15 @@ public class Colour {
 		Vector3f          colour;
 
 		/* store it in useless "Color" then transfer it to useful class */
+		//cs.setFloodlight(true);
+		/*cs.setFloodlight(Color.RED);
+		cs.setFloodlight(Color.GREEN);
+		cs.setFloodlight(Color.BLUE); oh good grief */
 		c      = cs.getColor(); /* 0 - 255 */
-		colour = new Vector3f(c.getRed() / 255f,
+		//cs.setFloodlight(false);
+		colour = new Vector3f(c.getRed()   / 255f,
 							  c.getGreen() / 255f,
-							  c.getBlue() / 255f);
+							  c.getBlue()  / 255f);
 		colour.normalize();
 
 		return colour;
@@ -98,7 +107,7 @@ public class Colour {
 	/** how certain we are that the object in front of colour sensor is styrofoam
 	 @author Neil
 	 @return The probability [0..1] */
-	public Value getStyrofoamProbability() {
+	public float getStyrofoamProbability() {
 		Vector3f          colour;
 		float             s, w;
 		int               percent;
@@ -200,6 +209,10 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 		r = x.r - y.r;
 		g = x.g - y.g;
 		b = x.g - y.b;
+	}
+
+	public String toString() {
+		return "(" + r + ", " + g + ", " + b + ")";
 	}
 
 }
