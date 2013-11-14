@@ -1,0 +1,3 @@
+An algorithm for exploring unknown areas on the map close to already explored areas and the position of the robot right now.
+
+(not implemented)

@@ -1,0 +1,3 @@
+A more accurate odometer using the Taylor series of (sin\theta, cos\theta - 1) and matrix transformations.
+
+(implemented)

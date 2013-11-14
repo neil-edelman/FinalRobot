@@ -113,7 +113,7 @@ public class Robot implements TimerListener {
    //position rate turns the robot left, negitive turns the robot right, to the specified angle
    protected void turn(final float rate, final float angle) {
       this.setSpeeds(-rate,rate);
-      target.setTheta((float)Math.toRadians(angle));
+      target.setDegrees(angle);
       status = Status.SCANNING;
       this.turnRate = rate;
    }
@@ -152,7 +152,7 @@ public class Robot implements TimerListener {
 
 		/* set the target's angle and set rotate (the timedOut method will call
 		 turn until it turns or is stopped) */
-		target.setTheta((float)Math.toRadians(degrees));
+		target.setDegrees(degrees);
 		status = Status.ROTATING;
 	}
 
@@ -228,7 +228,7 @@ public class Robot implements TimerListener {
 		 signed distance (but that opens up a whole can of worms) */
 		Position current = odometer.getPositionCopy();
 		delta.subXY(target, current);
-		target.setTheta((float)Math.atan2(delta.y, delta.x));
+		target.setRadians((float)Math.atan2(delta.y, delta.x));
 		delta.subTheta(target, current);
 		/* test: (forget it, I'll just use sqrt) excessively slow on some
 		 machines, we are going no where near overflow */

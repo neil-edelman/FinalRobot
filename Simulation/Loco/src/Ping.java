@@ -313,8 +313,8 @@ public class Ping {
 		if(angle > Math.PI) angle -= 2f*Math.PI;
 
 		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
-		odometer.setXY(Cl, Cr);
-		odometer.setRadians(angle);
+		odometer.addXY(Cl, Cr);
+		odometer.addRadians(angle);
 
 		/* comment this \/ */
 		write(left, mid, right, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle);

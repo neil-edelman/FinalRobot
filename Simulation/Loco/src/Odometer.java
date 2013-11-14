@@ -37,5 +37,11 @@ public class Odometer {
 	public void setXY(final float x, final float y) {
 		p.setXY(x, y);
 	}
+	public void addRadians(final float t) {
+		p.addRadians(t);
+	}
+	public void addXY(final float x, final float y) {
+		p.addXY(x, y);
+	}
 
 }

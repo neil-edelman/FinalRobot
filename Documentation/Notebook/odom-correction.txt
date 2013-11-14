@@ -1,0 +1,3 @@
+Rough idea for odometry correction using the light sensor; store a bunch of points and as soon as the maximal concave shape (simplex) gets a certain area, correct. Discard the earliest point.
+
+(not implemented)
