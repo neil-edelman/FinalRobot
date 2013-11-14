@@ -126,7 +126,7 @@ public class Odometer implements TimerListener {
 	}
 
 	/** setters */
-	public void setRadians(final float t) {
+	/*public void setRadians(final float t) {
 		synchronized(this) {
 			position.setRadians(t);
 		}
@@ -139,6 +139,16 @@ public class Odometer implements TimerListener {
 	public void setXY(final float x, final float y) {
 		synchronized(this) {
 			position.setXY(x, y);
+		}
+	}*/
+	public void addRadians(final float t) {
+		synchronized(this) {
+			position.addRadians(t);
+		}
+	}
+	public void addXY(final float x, final float y) {
+		synchronized(this) {
+			position.addXY(x, y);
 		}
 	}
 

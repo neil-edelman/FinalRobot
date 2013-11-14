@@ -76,9 +76,21 @@ class Position {
 
 	/* operators */
 
+	public void addXY(final float x, final float y) {
+		this.x += x;
+		this.y += y;
+	}
+
 	public void subXY(final Position a, final Position b) {
 		x = a.x - b.x;
 		y = a.y - b.y;
+	}
+
+	public void addRadians(final float t) {
+		if(t <= -PI || t > PI) throw new IllegalArgumentException();
+		this.t += t;
+		if(this.t <= -PI)    this.t += TWO_PI;
+		else if(this.t > PI) this.t -= TWO_PI;
 	}
 
 	public void subTheta(final Position a, final Position b) {
