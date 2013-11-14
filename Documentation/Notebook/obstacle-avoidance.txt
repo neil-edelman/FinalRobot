@@ -1,0 +1,3 @@
+Idea for fixed-width obstacle avoidance with map.
+
+(not implemented)
