@@ -106,5 +106,9 @@ public class Locobot extends Robot {
 	public Colour.Value getColour() {
 		return colour.getColourValue();
 	}
+	
+	public float getStyrofoam() {
+		return colour.getStyrofoamProbability();
+	}
 
 }

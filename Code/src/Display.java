@@ -42,8 +42,8 @@ public class Display implements TimerListener{
       LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 3);
       LCD.drawString("UDist:    " + robot.getDistance(), 0, 4);
       LCD.drawString("UFDist:   " + robot.getFilteredDistance(), 0, 5);
-		LCD.drawString(drawText1, 0, 6);
-		LCD.drawString(drawText2, 0, 7);
+		LCD.drawString(drawText1, 0, 6, true);
+		LCD.drawString(drawText2, 0, 7, true);
 
 //      LCD.drawString("Distance:", 0, 5);
 //      LCD.drawString("MedFilter:", 0, 6);
