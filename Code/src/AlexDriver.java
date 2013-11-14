@@ -16,21 +16,23 @@ class AlexDriver {
 
       monitorForExit();
 
-//      robot.localise();
-//      waitForIdle();
-//      robot.travelTo(30.48f,30.48f);
-//      waitForIdle();
+		robot.localise();
+		waitForIdle();
+		robot.travelTo(60.96f, 60.96f/*30.48f,30.48f*/);
+		waitForIdle();
+		robot.turnTo(90f);
+		waitForIdle();
 //      robot.turnTo(90f);
 //      waitForIdle();
 
 //      runTests();
 //      runAbridgedTests();
 //      robot.scanLeft(90f);
-      robot.findBlocks();
-      waitForIdle();
+//      robot.findBlocks();
+//      waitForIdle();
 //      robot.localise();
-      boolean forever = true;
-      while(forever){}
+//      boolean forever = true;
+//      while(forever){} lol
 
 //
 //		int press;
