@@ -15,8 +15,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private static final float FRONT_EXTENSION_LENGTH = 22.5f; //bumper length from wheel base
    private static final float X_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //used as mins and maxes in determining target
    private static final float Y_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //origin in corner
-   private static final float X_HIGH_BOUND = 121.92f - FRONT_EXTENSION_LENGTH; //4 tiles by
-   private static final float Y_HIGH_BOUND = 243.84f - FRONT_EXTENSION_LENGTH; //8 tiles
+   private static final float X_HIGH_BOUND = 8*30.48f - FRONT_EXTENSION_LENGTH; //4 tiles by
+   private static final float Y_HIGH_BOUND = 8*30.48f - FRONT_EXTENSION_LENGTH; //8 tiles
    private float adjust_x = 30.48f; //designates the point on the field to be searched from
    private float adjust_y = 30.48f; //values are (0,0);(30,30);(30,60);(30,90)...etc
    private float targetX,targetY;

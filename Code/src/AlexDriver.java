@@ -42,18 +42,24 @@ class AlexDriver {
 			destination_x = (float)(greenZone[0] + greenZone[2])/2 - 1;
 			destination_y = (float)(greenZone[1] + greenZone[3])/2 - 1;
 
+         //flip coordinates to robot's localise position
 			if (corner == StartCorner.BOTTOM_LEFT) {
 			}
 			else if (corner == StartCorner.BOTTOM_RIGHT) {
-				destination_x = 8 - destination_x;
+            float hold = destination_y;
+				destination_y = 8 - destination_x;
+            destination_x = hold;
 			}
 			else if (corner == StartCorner.TOP_LEFT) {
-				destination_y = 8 - destination_y;
+            float hold = destination_x;
+				destination_x = 8 - destination_y;
+            destination_y = hold;
 			}
 			else if (corner == StartCorner.TOP_RIGHT) {
 				destination_x = 8 - destination_x;
 				destination_y = 8 - destination_y;
 			}
+         //convert coordinates from tiles to cm
 			destination_x = destination_x * 30.48f;
 			destination_y = destination_y * 30.48f;
 
@@ -70,8 +76,8 @@ class AlexDriver {
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
 		//robot.localise();
 		//waitForIdle();
-		//robot.travelTo(60.96f, 60.96f/*30.48f,30.48f*/);
-		//waitForIdle();
+		robot.travelTo(destination_x, destination_y/*30.48f,30.48f*/);
+		waitForIdle();
 		//robot.turnTo(90f);
 		//waitForIdle();
 
@@ -80,14 +86,14 @@ class AlexDriver {
 //      robot.scanLeft(90f);
 //      robot.localise();
 //      waitForIdle();
-		if(doLoco) {
-			robot.localise();
-			waitForIdle();
-		} else {
-			robot.setPosition(new Position(30.48f,30.48f,0f));
-		}
-		robot.findBlocks();
-		waitForIdle();
+//		if(doLoco) {
+//			robot.localise();
+//			waitForIdle();
+//		} else {
+//			robot.setPosition(new Position(30.48f,30.48f,0f));
+//		}
+//		robot.findBlocks();
+//		waitForIdle();
 
 //		int press;
 //		Colour colour = new Colour(colourPort);
