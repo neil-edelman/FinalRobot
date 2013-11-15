@@ -213,7 +213,7 @@ public class Ping {
 		
 		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
 		odometer.addXY(Cl, Cr);
-		odometer.addRadians(Math.toRadians(angle));
+		odometer.addRadians((float)Math.toRadians(angle));
 		
 		/* comment this \/ */
 		/*write(left, mid, right, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle);*/
