@@ -17,8 +17,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private static final float Y_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //origin in corner
    private static final float X_HIGH_BOUND = 121.92f - FRONT_EXTENSION_LENGTH; //4 tiles by
    private static final float Y_HIGH_BOUND = 243.84f - FRONT_EXTENSION_LENGTH; //8 tiles
-   private float adjust_x = 0f; //designates the point on the field to be searched from
-   private float adjust_y = 0f; //values are (0,0);(30,30);(30,60);(30,90)...etc
+   private float adjust_x = 30.48f; //designates the point on the field to be searched from
+   private float adjust_y = 30.48f; //values are (0,0);(30,30);(30,60);(30,90)...etc
    private float targetX,targetY;
 
 	/** the constructor */
@@ -114,8 +114,6 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          if(this.getColour() == Colour.Value.STYROFOAM) { //is styrofoam, grab and move
             Sound.beep();
             this.findStatus = FindStatus.FOUND;
-            //travel with avoidance, go to the destination
-            //this.travelTo(DESTINATION_X,DESTINATION_Y,250,250); //TRAVEL TO DESTINATION
          }
          else { //is wood move on
             Sound.buzz();
@@ -126,11 +124,13 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       }
       else if(this.findStatus == FindStatus.FOUND) {
          this.findStatus = FindStatus.FINISHED;
+         checkTargetBounds();
          travelTo(DESTINATION_X,DESTINATION_Y,250,250);
          //then it stops
       }
       else if(this.findStatus == FindStatus.RELOCATING) {
          this.findStatus = FindStatus.TURNING;
+         checkTargetBounds();
          this.travelTo(adjust_x,adjust_y,250,250); //TRAVEL TO NEXT SCAN POINT
       }
          
@@ -165,6 +165,9 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          smallestPing = ping;
          targetTheta = this.getPosition().getDegrees();
       }
+   }
+   protected void avoidance() {
+
    }
 
 }   

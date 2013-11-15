@@ -17,23 +17,25 @@ class AlexDriver {
       monitorForExit();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
-		robot.localise();
-		waitForIdle();
-		robot.travelTo(60.96f, 60.96f/*30.48f,30.48f*/);
-		waitForIdle();
-		robot.turnTo(90f);
-		waitForIdle();
+//		robot.localise();
+//		waitForIdle();
+//		robot.travelTo(60.96f, 60.96f/*30.48f,30.48f*/);
+//		waitForIdle();
+//		robot.turnTo(90f);
+//		waitForIdle();
 //      robot.turnTo(90f);
 //      waitForIdle();
 
 //      runTests();
 //      runAbridgedTests();
 //      robot.scanLeft(90f);
-//      robot.findBlocks();
-//      waitForIdle();
+      robot.localise();
+      waitForIdle();
+      robot.findBlocks();
+      waitForIdle();
 //      robot.localise();
-//      boolean forever = true;
-//      while(forever){} lol
+      boolean forever = true;
+      while(forever){}
 
 //
 //		int press;
@@ -81,16 +83,17 @@ class AlexDriver {
    public static void runTests() {
       robot.localise(); 
       waitForIdle();
-      robot.turnTo(90f);
+      robot.turnTo(0f,250);
       waitForIdle();
-      robot.turnTo(0f);
+      robot.turnTo(90f,250);
       waitForIdle();
-      robot.travelTo(60.96f,60.96f);
+      robot.turnTo(0f,250);
       waitForIdle();
-      robot.turnTo(90f);
+      robot.travelTo(60.96f,60.96f,250,250);
       waitForIdle();
-		robot.travelTo(30.48f, 30.48f);
+      robot.turnTo(90f,250);
       waitForIdle();
+		robot.travelTo(30.48f, 30.48f,250,250);
 //    robot.findBlocks();
 //      waitForIdle();
       robot.stop();
@@ -98,13 +101,13 @@ class AlexDriver {
    }
    /** quick test -- turns left 30 degrees and back, spin/travels to -5,-5 and returns */
    public static void runAbridgedTests() {
-      robot.turnTo(30f);
+      robot.turnTo(30f,250);
       waitForIdle();
-      robot.turnTo(0f);
+      robot.turnTo(0f,250);
       waitForIdle();
-		robot.travelTo(-5f, -5f);
+		robot.travelTo(-5f, -5f,250,250);
       waitForIdle();
-      robot.travelTo(0f,0f);
+      robot.travelTo(0f,0f,250,250);
       waitForIdle();
       robot.stop();
       return;
