@@ -1,23 +1,19 @@
-/* Lab 5 A, Group 51 -- Alex Bhandari-Young and Neil Edelman */
-
-/* This method is O(2^{n-1}), but n is 2, so it's okay. We normalise our
+/** This method is O(2^{n-1}), but n is 2, so it's okay. We normalise our
  colours to make it lighting-independent. Compare with experimetal value for
  the different substances, and pick the closest (Cartesan distance to
- normalised colour values.) I better model would be to multiply the components
+ normalised colour values.) A better model would be to multiply the components
  by the eigenvalues of their sensitivety like CIE colour model, but we don't
  know this. */
 
 /* import javax.vecmath.Vector3f; <- nxj does not have this, write our own :[ */
 /* import java.lang.Comparable; */
 
-import java.lang.IllegalArgumentException;
+//import java.lang.IllegalArgumentException;
 
 import lejos.nxt.LCD;
 import lejos.nxt.Button;
 import lejos.nxt.ColorSensor;
 import lejos.nxt.SensorPort;
-
-//import lejos.robotics.Color;
 
 public class Colour {
 	enum Value { UNKNOWN, STYROFOAM, WOOD };
@@ -68,7 +64,7 @@ public class Colour {
 
 	/** senses the colour at the current location
 	 @author Neil
-	 @return The most likely colour as a Value enum. (fixme: uncertainty) */
+	 @return The most likely colour as a Value enum. */
 	public Value getColourValue() {
 		Vector3f          colour;
 		float             s, w;
@@ -104,7 +100,8 @@ public class Colour {
 		}
 	}
 
-	/** how certain we are that the object in front of colour sensor is styrofoam
+	/** how certain we are that the object in front of colour sensor is
+	 styrofoam?
 	 @author Neil
 	 @return The probability [0..1] */
 	public float getStyrofoamProbability() {
@@ -156,8 +153,9 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	 @param g
 	 @param b The colour values in [0..1]. */
 	public final void set(final float r, final float g, final float b) {
+		/* this is a general vector class,
 		if(r < 0 || r > 1 || g < 0 || g > 1 || b < 0 || b > 1)
-			throw new IllegalArgumentException("colour value");
+			throw new IllegalArgumentException("colour value");*/
 		this.r = r;
 		this.g = g;
 		this.b = b;
@@ -200,7 +198,7 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 		g -= x.g;
 		b -= x.g;
 	}
-	
+
 	/** set the varible to the subtraction x - y
 	 @author Neil
 	 @param x +
@@ -211,6 +209,9 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 		b = x.g - y.b;
 	}
 
+	/** to string
+	 @author Neil
+	 @return The printed value as a string. */
 	public String toString() {
 		return "(" + r + ", " + g + ", " + b + ")";
 	}

@@ -23,8 +23,8 @@ public class Robot implements TimerListener {
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING };
    public enum FindStatus { IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED, AVOIDING };
 
-	private final static String   NAME = "Sex Robot"; /* change */
-	private static final int NAV_DELAY = 100; /* ms */
+	private   final static String   NAME = "Locobot";
+	protected static final int NAV_DELAY = 100; /* ms */
 
 	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
 	private static final float    ANGLE_MARGINAL_TOLERANCE = 2.0f; /* rad/s */
@@ -33,13 +33,13 @@ public class Robot implements TimerListener {
    private float turnRate;
 
 	private static final float    DEFAULT_LIMIT_ANGLE = 350f;
-	private static final float DEFAULT_LIMIT_DISTANCE = 250f;
+	private static final float DEFAULT_LIMIT_DISTANCE = 350f;
 
 	/* Ziegler-Nichols method was used to get close to the optimum;
 	 the battery voltage causes some lag when low */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f);
 	/* fixme!!!! this has not been optimised */
-	private Controller distancePID = new Controller(30f, 1f, 1f);
+	private Controller distancePID = new Controller(30f, 2f, 1f);
 
 	protected Status     status = Status.IDLE;
    protected FindStatus findStatus = FindStatus.IDLE;
@@ -64,8 +64,12 @@ public class Robot implements TimerListener {
 		status = Status.IDLE;
 	}
 
-	/** this acts as the control; selects based on what it is doing */
+	/** this acts as the control; selects based on what it is doing as a state
+	 machine */
 	public void timedOut() {
+		/* get the latest from the odometer */
+		odometer.positionSnapshot();
+		/* state machine */
 		switch(status) {
 			case TRAVELLING:
             //avoidance when relocating to next scan point or when taking a block to the destination (i.e. not when moving to block or scanning)
@@ -127,7 +131,7 @@ public class Robot implements TimerListener {
    }
    /** used with scanning, allows the robot to constantly turn to an angle */
    private void constantlyTurningTo() {
-      Position p = odometer.getPositionCopy();
+      Position p = odometer.getPosition();
       float angle = p.getDegrees();
       //turning right
       if(this.turnRate < 0f && target.getDegrees() > angle) {
@@ -209,7 +213,7 @@ public class Robot implements TimerListener {
 	/** this implements a rotation by parts */
 	private void rotate() {
 		/* calculate the delta beteen the target and the current */
-		Position current = odometer.getPositionCopy();
+		Position current = odometer.getPosition();
 		delta.subTheta(target, current);
 
 		/* apply magic (PID control, input the error and the time, output what
@@ -234,7 +238,7 @@ public class Robot implements TimerListener {
 		/* calculate the angle from the current heading to the desired heading
 		 and the speed; fixme: if it goes over, it has to come at it again:
 		 signed distance (but that opens up a whole can of worms) */
-		Position current = odometer.getPositionCopy();
+		Position current = odometer.getPosition();
 		delta.subXY(target, current);
 		target.setRadians((float)Math.atan2(delta.y, delta.x));
 		delta.subTheta(target, current);
@@ -297,7 +301,7 @@ public class Robot implements TimerListener {
 
 	/** pass this on to the odometer */
 	public Position getPosition() {
-		return odometer.getLastPosition();
+		return odometer.getPosition();
 	}
    /** returns the robot's status */
 	public Status getStatus() {
