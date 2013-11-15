@@ -27,7 +27,7 @@ class AlexDriver {
 		// example usage of Tranmission class
 		Transmission t = conn.getTransmission();
 		if (t == null) {
-			LCD.drawString("Failed to read transmission", 0, 5);
+//			LCD.drawString("Failed to read transmission", 0, 5);
 			destination_x = 0;
 			destination_y = 0;
 		} else {
@@ -38,8 +38,8 @@ class AlexDriver {
 			// red zone is defined by these (bottom-left and top-right) corners:
 			int[] redZone = t.redZone;
 			
-			destination_x = (greenZone[0] + greenZone[2])/2 - 1;
-			destination_y = (greenZone[1] + greenZone[3])/2 - 1;
+			destination_x = (float)(greenZone[0] + greenZone[2])/2 - 1;
+			destination_y = (float)(greenZone[1] + greenZone[3])/2 - 1;
 
 			if (corner == StartCorner.BOTTOM_LEFT) {
 			}
@@ -53,8 +53,8 @@ class AlexDriver {
 				destination_x = 8 - destination_x;
 				destination_y = 8 - destination_y;
 			}
-			destination_x = destination_x * 30.48;
-			destination_y = destination_y * 30.48;
+			destination_x = destination_x * 30.48f;
+			destination_y = destination_y * 30.48f;
 
 			// print out the transmission information to the LCD
 			conn.printTransmission();
