@@ -15,7 +15,6 @@ class AlexDriver {
    private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
    private static Display display;
 
-	@SuppressWarnings("unused")
 	private static final boolean doLoco = true;
 	
 	public static void main(String args[]) {
