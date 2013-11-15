@@ -1,6 +1,8 @@
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
 
+import bluetooth.*;
+
 
 /* this is a driver that instantaties a Robot and makes it do stuff */
 
@@ -12,7 +14,53 @@ class AlexDriver {
    private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
    private static Display display = new Display(robot);
 
+	@SuppressWarnings("unused")
 	public static void main(String args[]) {
+      
+      float destination_x, destination_y;
+
+		BluetoothConnection conn = new BluetoothConnection();
+		// as of this point the bluetooth connection is closed again, and you can pair to another NXT (or PC) if you wish
+		
+		// example usage of Tranmission class
+		Transmission t = conn.getTransmission();
+		if (t == null) {
+			LCD.drawString("Failed to read transmission", 0, 5);
+         destination_x = 0;
+         destination_y = 0;
+		} else {
+			StartCorner corner = t.startingCorner;
+			PlayerRole role = t.role;
+			// green zone is defined by these (bottom-left and top-right) corners:
+			int[] greenZone = t.greenZone;
+			// red zone is defined by these (bottom-left and top-right) corners:
+			int[] redZone = t.redZone;
+			
+         destination_x = (greenZone[0] + greenZone[2])/2 - 1;
+         destination_y = (greenZone[1] + greenZone[3])/2 - 1;
+
+         if (corner == StartCorner.BOTTOM_LEFT) {
+         }
+         else if (corner == StartCorner.BOTTOM_RIGHT) {
+            destination_x = 8 - destination_x;
+         }
+         else if (corner == StartCorner.TOP_LEFT) {
+         }
+            destination_y = 8 - destination_y;
+         else if (corner == StartCorner.TOP_RIGHT) {
+            destination_x = 8 - destination_x;
+            destination_y = 8 - destination_y;
+         }
+         destination_x = destination_x * 30.48;
+         destination_y = destination_y * 30.48;
+
+
+			// print out the transmission information to the LCD
+			conn.printTransmission();
+		}
+		// stall until user decides to end program
+		Button.waitForAnyPress();
+
 
       robot.setPosition(new Position(30.48f,30.48f,0f));
 
