@@ -12,15 +12,16 @@ class AlexDriver {
 	private static final SensorPort  sonicPort = SensorPort.S4;
 	private static final SensorPort colourPort = SensorPort.S3;
    private static final SensorPort lightPort = SensorPort.S1;
-   private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
+   private static Swagbot robot;
    private static Display display;
 
 	private static final boolean doLoco = true;
 	
 	public static void main(String args[]) {
       
-		/*
-		float destination_x, destination_y;
+
+		float destination_x = 50f;
+      float destination_y = 50f;
 
 		BluetoothConnection conn = new BluetoothConnection();
 		// as of this point the bluetooth connection is closed again, and you can pair to another NXT (or PC) if you wish
@@ -39,10 +40,42 @@ class AlexDriver {
 			// red zone is defined by these (bottom-left and top-right) corners:
 			int[] redZone = t.redZone;
 			
-			destination_x = (float)(greenZone[0] + greenZone[2])/2 - 1;
-			destination_y = (float)(greenZone[1] + greenZone[3])/2 - 1;
+         //convert to cm, unrotated
+         float x1 = 30.48f * (float)greenZone[0] + 30.48f;
+			float y1 = 30.48f * (float)greenZone[1] + 30.48f;
+         float x2 = 30.48f * (float)greenZone[2] + 30.48f;
+			float y2 = 30.48f * (float)greenZone[3] + 30.48f;
 
-         //flip coordinates to robot's localise position
+         //[cos -sin]-1
+         //[sin  cos]
+         float a = 1f,b = 0f,c = 0f,d = 1f;
+         //rotate coordinates to robot's localise position
+         switch(corner) {
+            case StateCorner.BOTTOM_LEFT: //0 degrees
+               break;
+            case StateCorner.BOTTOM_RIGHT: //-90 degrees
+               a = 0;
+               b = -1;
+               c = 1;
+               d = 0;
+               break;
+            case StateCorner.TOP_LEFT: //90 degrees
+               a = 0;
+               b = 1;
+               c = -1;
+               d = 0;
+               break;
+            case StateCorner.TOP_RIGHT: // 180 degrees
+               a = -1f;
+               d = -1f;
+               break;
+         }
+         
+         greenZone_x1 = a*x1 + b*y1;
+         greenZone_y1 = c*x1 + d*y1;
+         greenZone_x2 = a*x2 + b*y2;
+         greenZone_y2 = c*x2 + d*y2;
+
 			if (corner == StartCorner.BOTTOM_LEFT) {
 			}
 			else if (corner == StartCorner.BOTTOM_RIGHT) {
@@ -59,43 +92,39 @@ class AlexDriver {
 				destination_x = 8 - destination_x;
 				destination_y = 8 - destination_y;
 			}
-         //convert coordinates from tiles to cm
-			destination_x = destination_x * 30.48f;
-			destination_y = destination_y * 30.48f;
 
 			// print out the transmission information to the LCD
 			conn.printTransmission();
 		}
 		// stall until user decides to end program
 		//Button.waitForAnyPress();
-		 /\ what is this shit?
-		 */
 
+
+      robot = new Swagbot(sonicPort,colourPort,lightPort,destination_x,destination_y);
       display = new Display(robot);
-
 		monitorForExit();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
 		//robot.localise();
 		//waitForIdle();
-		robot.travelTo(destination_x, destination_y/*30.48f,30.48f*/);
-		waitForIdle();
+//		robot.travelTo(destination_x, destination_y/*30.48f,30.48f*/);
+//		waitForIdle();
 		//robot.turnTo(90f);
 		//waitForIdle();
 
 //      runTests();
 //      runAbridgedTests();
 //      robot.scanLeft(90f);
-//      robot.localise();
-//      waitForIdle();
+      robot.localise();
+      waitForIdle();
 //		if(doLoco) {
 //			robot.localise();
 //			waitForIdle();
 //		} else {
 //			robot.setPosition(new Position(30.48f,30.48f,0f));
 //		}
-//		robot.findBlocks();
-//		waitForIdle();
+		robot.findBlocks();
+		waitForIdle();
 
 //		int press;
 //		Colour colour = new Colour(colourPort);
