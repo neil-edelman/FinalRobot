@@ -4,9 +4,9 @@
 /* the odometer runs in standard co-ordinates (ISO 80000-2:2009)
  with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
  approxomations about zero) eg counter-clockwise radians; this is the same used
- in Math.atan2. The travelTo (and turnTo) take degrees and convert them to
- radians (it's much faster converting them once vs converting atan2 10 times a
- second) */
+ in Math.atan2 and all trig and what you shouldh've learnt in grade school. The
+ travelTo (and turnTo) take degrees and convert them to radians (it's much
+ faster converting them once vs converting atan2 10 times a second) */
 
 /* from TA:
 Coordinate System:
@@ -16,8 +16,8 @@ Coordinate System:
       positive theta       |      positive theta        
                            |                            
                            |                            
-180 Deg: -x axis __________|__________ 0 Deg: x axis    
-                           |                            
+180 Deg: -x axis __________|__________ 0 Deg: x axis
+ branch cut (-180, 180]    |                            
                            |                            
                            |                            
       negative theta       |      negative theta        
@@ -34,10 +34,7 @@ to divide by two until the final calculation.
 The x and y orientation is identical to that used in the labs. However, theta=0 starts at the x-axis instead of
 the y-axis, and increments counterclockwise and opposed to clockwise. 
 The conversion is old_theta = -new_theta + 90 
-and conversly new_theta = -old_theta + 90.
-
-*/
-
+and conversly new_theta = -old_theta + 90. */
 
 import lejos.util.Timer;
 import lejos.util.TimerListener;
@@ -65,23 +62,35 @@ public class Odometer implements TimerListener {
 	Position position = new Position();
 	Position    pCopy = new Position();
 
-	/** constructor */
+	/** constructor
+	 @author Neil
+	 @param leftMotor
+	 @param rightMotor NXTRegulated motors that are attached to wheels that are
+	 RADIUS and WHEELBASE apart (potentially calibrated using
+	 CalibrateRadius/Wheelbase) */
 	public Odometer(final NXTRegulatedMotor leftMotor, final NXTRegulatedMotor rightMotor) {
 		this.leftMotor  = leftMotor;
 		this.rightMotor = rightMotor;
 		timer.start();
 	}
 
+	/** shuts down the odometer so it isn't taking data (it currently has no
+	 method to start it again)
+	 @author Neil */
 	public void shutdown() {
 		timer.stop();
 	}
 
+	/** this goes every ODO_DELAY ms until it is shutdown(); just adds the
+	 little bit to the odometer
+	 @author Neil */
 	public void timedOut() {
-		/* get tach values */
+
+		/* get tach values (cm*360) */
 		int  left = leftMotor.getTachoCount();
 		int right = rightMotor.getTachoCount();
 
-		/* translate into traveled and turned (in some units) */
+		/* translate into traveled and turned (in some int units) */
 		int delTraveled = right + left;
 		int delTurn     = right - left;
 
@@ -105,51 +114,49 @@ public class Odometer implements TimerListener {
 		this.intTurn     += delTurn;
 	}
 
-	/** this gets a position copy so we can save the position for real-time
-	 updates (position copy is assumed to be accessed one time) */
-	public Position getPositionCopy() {
+	/** this stores a copy of the actal position (which is volitale) in pCopy;
+	 pCopy is called when reading position . . . viz you must call this to
+	 update position used in getPosition, but only once per movement
+	 @author Neil */
+	public void positionSnapshot() {
 		synchronized(this) {
 			pCopy.set(position);
 		}
+	}
+
+	/** returns the last position when positionSnapshot was taken
+	 @author Neil
+	 @return The position when the last snapshot was taken. */
+	public Position getPosition() {
 		return pCopy;
 	}
 
-	/** for info methods */
-	public Position getLastPosition() {
-		return pCopy;
-	}
+	/* setters */
 
-	public String toString() {
-		synchronized(this) {
-			return "Odo" + position;
-		}
-	}
-
-	/** setters */
-	/*public void setRadians(final float t) {
-		synchronized(this) {
-			position.setRadians(t);
-		}
-	}
-	public void setDegrees(final float deg) {
-		synchronized(this) {
-			position.setTheta((float)Math.toRadians(deg));
-		}
-	}
-	public void setXY(final float x, final float y) {
-		synchronized(this) {
-			position.setXY(x, y);
-		}
-	}*/
+	/** adds the radians directly to the current value
+	 @author Neil
+	 @param t [-PI, PI) */
 	public void addRadians(final float t) {
 		synchronized(this) {
 			position.addRadians(t);
 		}
 	}
+
+	/** adds (x, y) directly to the current value
+	 @author Neil
+	 @param x
+	 @param y The values to add. */
 	public void addXY(final float x, final float y) {
 		synchronized(this) {
 			position.addXY(x, y);
 		}
+	}
+
+	/** prints the postion when the last snapshot was taken
+	 @author Neil
+	 @return string */
+	public String toString() {
+		return "Odo" + pCopy;
 	}
 
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class Locobot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
 	private static final int     SONAR_DELAY = 20;
+	private static final int      LOCO_DELAY = 30; /* SONAR_DELAY + processing */
 	private static final int BLUETOOTH_DELAY = 10000;
 
 	private   Colour           colour;
@@ -28,28 +29,35 @@ public class Locobot extends Robot {
 	private ArrayList<Ping> pings = new ArrayList<Ping>(128);
 	private boolean isTurned = false;
 
-	/** this is overriden */
+	/** overrides localise in Robot */
 	protected void localise() {
 		Display.setText("Waiting for Blue");
+		/* fixme: disable the timer? */
 		RConsole.openBluetooth(BLUETOOTH_DELAY);
 		if(!RConsole.isOpen()) Display.setText("Never mind.");
 		status = Status.LOCALISING;
 		this.turn(100f);
+		/* timer.setDelay(LOCO_DELAY)? */
 	}
 
-	/** this is overriden */
+	/** overrides localising in Robot */
 	protected void localising() {
 
-		Position p = odometer.getPositionCopy();
+		Position p = odometer.getPosition();
 		float    t = (float)Math.toDegrees(p.getTheta());
 		/* sonic is after odometer.getPositionCopy() because it moved */
 		int  sonic = pingSonar();
-
-		/* record; fixme: check error out of 0 .. 255, it hasn't happened yet */
-		pings.add(new Ping(p, sonic));
-
-		/* display */
-		Display.setText("" + (int)t + ": #" + pings.size() + ",us" + sonic);
+		/* check error: out of 0 .. 255 (it hasn't happened yet, but it's in
+		 the docs) */
+		if(sonic < 0 || sonic > 255) {
+			Display.setText("err sonic " + sonic);
+		} else {
+			/* record */
+			pings.add(new Ping(p, sonic));
+			
+			/* display */
+			Display.setText2("" + (int)t + ": #" + pings.size() + ",us" + sonic);
+		}
 
 		/* if it has not turned, return */
 		if(!isTurned) {
@@ -61,10 +69,12 @@ public class Locobot extends Robot {
 		} else if(t <= 0f) {
 			return;
 		}
+		isTurned = false;
 
 		/* code only goes though to this point on last localising */
 		this.stop();
 		status = Status.IDLE;
+		/* timer.setDelay(NAV_DELAY)? */
 
 		/* send? */
 		if(RConsole.isOpen()) {
@@ -78,7 +88,7 @@ public class Locobot extends Robot {
 		/* calculate */
 		Ping.setOdometer(odometer);
 		if(Ping.correct(pings)) {
-			Display.setText("loco " + odometer.getPositionCopy());
+			Display.setText("loco " + odometer.getPosition());
 		} else {
 			Display.setText("loco failed");
 		}
@@ -101,12 +111,13 @@ public class Locobot extends Robot {
 		return sonic.getDistance();
 	}
 
-	/** returns the colour as enum Value (STYROFOAM/WOOD) */
+	/** @return the colour as enum Value (STYROFOAM/WOOD) */
 	/* fixme: move to swagbot? */
 	public Colour.Value getColour() {
 		return colour.getColourValue();
 	}
-	
+	/** @return a range that indicates our certaitanty that it's styrofoam
+	 in [0, 1] */
 	public float getStyrofoam() {
 		return colour.getStyrofoamProbability();
 	}
