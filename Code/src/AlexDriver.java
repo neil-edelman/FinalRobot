@@ -20,6 +20,7 @@ class AlexDriver {
 	
 	public static void main(String args[]) {
       
+		/*
 		float destination_x, destination_y;
 
 		BluetoothConnection conn = new BluetoothConnection();
@@ -62,6 +63,8 @@ class AlexDriver {
 		}
 		// stall until user decides to end program
 		Button.waitForAnyPress();
+		 /\ what is this shit?
+		 */
 
       display = new Display(robot);
 
