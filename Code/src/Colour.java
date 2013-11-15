@@ -1,9 +1,7 @@
-/* Lab 5 A, Group 51 -- Alex Bhandari-Young and Neil Edelman */
-
-/* This method is O(2^{n-1}), but n is 2, so it's okay. We normalise our
+/** This method is O(2^{n-1}), but n is 2, so it's okay. We normalise our
  colours to make it lighting-independent. Compare with experimetal value for
  the different substances, and pick the closest (Cartesan distance to
- normalised colour values.) I better model would be to multiply the components
+ normalised colour values.) A better model would be to multiply the components
  by the eigenvalues of their sensitivety like CIE colour model, but we don't
  know this. */
 
