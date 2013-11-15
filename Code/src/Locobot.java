@@ -13,7 +13,7 @@ public class Locobot extends Robot {
 	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
 	private static final int     SONAR_DELAY = 20;
 	private static final int      LOCO_DELAY = 30; /* SONAR_DELAY + processing */
-	private static final int BLUETOOTH_DELAY = 10000;
+	private static final int BLUETOOTH_DELAY = 0/*10000*/;
 
 	private   Colour           colour;
 	protected UltrasonicSensor sonic;
@@ -31,10 +31,10 @@ public class Locobot extends Robot {
 
 	/** overrides localise in Robot */
 	protected void localise() {
-		Display.setText("Waiting for Blue");
+		Display.setText("Bluetooth " + RConsole.isOpen());
 		/* fixme: disable the timer? */
-		RConsole.openBluetooth(BLUETOOTH_DELAY);
-		if(!RConsole.isOpen()) Display.setText("Never mind.");
+		//RConsole.openBluetooth(BLUETOOTH_DELAY);
+		//if(!RConsole.isOpen()) Display.setText("Never mind.");
 		status = Status.LOCALISING;
 		this.turn(100f);
 		/* timer.setDelay(LOCO_DELAY)? */
