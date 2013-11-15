@@ -21,7 +21,7 @@ public class Robot implements TimerListener {
 	private static final NXTRegulatedMotor rightMotor = Motor.B;
 
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING };
-   public enum FindStatus { IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED };
+   public enum FindStatus { IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED, AVOIDING };
 
 	private final static String   NAME = "Sex Robot"; /* change */
 	private static final int NAV_DELAY = 100; /* ms */
@@ -68,6 +68,14 @@ public class Robot implements TimerListener {
 	public void timedOut() {
 		switch(status) {
 			case TRAVELLING:
+            //avoidance when relocating to next scan point or when taking a block to the destination (i.e. not when moving to block or scanning)
+            if( findStatus == FindStatus.RELOCATING || findStatus == FindStatus.FINISHED || findStatus == FindStatus.TURNING) {
+//               this.avoidance(30); 
+            }
+            //assuming its ID'ing and set lower limit
+            else {
+//               this.avoidance(15);
+            }
 				this.travel();
 				break;
 			case ROTATING:
@@ -266,7 +274,10 @@ public class Robot implements TimerListener {
       System.err.println("no finding blocks");
       status = Status.IDLE;
    }
-
+   /** complementary method: runs in parallel with travel */
+   protected void avoidance(int threshold) {
+      System.err.println("no avoidance");
+   }
 
 
 	/**************************************/
@@ -319,6 +330,10 @@ public class Robot implements TimerListener {
 	}
 
 	/* output functions */
+
+   public void setPosition(Position pos) {
+      odometer.setPosition(pos);
+   }
 
 	/** set r/l speeds indepedently */
 	protected void setSpeeds(final float l, final float r) {

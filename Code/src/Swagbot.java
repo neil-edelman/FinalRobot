@@ -10,7 +10,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private int smallestPing = 254;
    private boolean findingFirst = true;
    private static final float DESTINATION_X = 0f;
-   private static final float DESTINATION_Y = 50f;
+   private static final float DESTINATION_Y = 30f;
    private static final int   SCAN_THRESHOLD = 70; 
    private static final float FRONT_EXTENSION_LENGTH = 22.5f; //bumper length from wheel base
    private static final float X_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //used as mins and maxes in determining target
@@ -20,6 +20,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private float adjust_x = 30.48f; //designates the point on the field to be searched from
    private float adjust_y = 30.48f; //values are (0,0);(30,30);(30,60);(30,90)...etc
    private float targetX,targetY;
+   private Position storeTarget;
+   private FindStatus storeFindStatus;
 
 	/** the constructor */
    public Swagbot(final SensorPort sonicPort, final SensorPort colourPort, final SensorPort lightPort) {
@@ -133,6 +135,9 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          checkTargetBounds();
          this.travelTo(adjust_x,adjust_y,250,250); //TRAVEL TO NEXT SCAN POINT
       }
+      else if(this.findStatus == FindStatus.AVOIDING) {
+         //do nothing
+      }
          
    }
    private void checkTargetBounds() {
@@ -166,8 +171,40 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          targetTheta = this.getPosition().getDegrees();
       }
    }
-   protected void avoidance() {
+   /** overwritten from Robot, avoidance maneuver runs when uDistance less than threshold */
+   protected void avoidance(int threshold) {
+      int ping = uListener.getDistance();
+      if(ping < threshold) {
+         //need to remember where the robot was going
+         storeTarget = this.getTarget();  
+         storeFindStatus = this.findStatus;
+         //determine obstacle position
+         Position pos = this.getPosition();
+         //turn avoidance on
+         this.findStatus = FindStatus.AVOIDING;
+         this.status = Status.FINDING;
+         //blocks while avoiding
+         //determines alternate point by shifting angle to obstacle by 45 left or right depending on orientation in the field and resumes
+/*         if((int)pos.x < X_LOW_BOUND/2) {
+            this.travelTo(pos.x,pos.y);
+         }
+         else {
+            this.travelTo(pos.x,pos.y);
+         }
+*/ 
+         float avoidAngleAdjust = 30f;
+         float avoidX = pos.x + (ping)/2*(float)Math.cos(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
+         float avoidY = pos.y + (ping)/2*(float)Math.sin(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
+         backup();
+         this.travelTo(avoidX,avoidY);
+         //revert back to old state
+         this.findStatus = storeFindStatus;
+         travelTo(storeTarget.x,storeTarget.y);
+      }
+   }
+   public void backup() {
+      this.setSpeeds(-100,-100);
 
    }
 
-}   
+} 

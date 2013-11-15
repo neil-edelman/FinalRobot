@@ -30,9 +30,9 @@ public class Locobot extends Robot {
 
 	/** this is overriden */
 	protected void localise() {
-		Display.setText("Waiting for Blue");
-		RConsole.openBluetooth(BLUETOOTH_DELAY);
-		if(!RConsole.isOpen()) Display.setText("Never mind.");
+//		Display.setText("Waiting for Blue");
+//		RConsole.openBluetooth(BLUETOOTH_DELAY);
+//		if(!RConsole.isOpen()) Display.setText("Never mind.");
 		status = Status.LOCALISING;
 		this.turn(100f);
 	}
