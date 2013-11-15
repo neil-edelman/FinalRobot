@@ -34,7 +34,7 @@ public class Locobot extends Robot {
 		Display.setText("Bluetooth " + RConsole.isOpen());
 		/* fixme: disable the timer? */
 		//RConsole.openBluetooth(BLUETOOTH_DELAY);
-		//if(!RConsole.isOpen()) Display.setText("Never mind.");
+		if(!RConsole.isOpen()) Display.setText("Never mind.");
 		status = Status.LOCALISING;
 		this.turn(100f);
 		/* timer.setDelay(LOCO_DELAY)? */
@@ -56,7 +56,7 @@ public class Locobot extends Robot {
 			pings.add(new Ping(p, sonic));
 			
 			/* display */
-			Display.setText2("" + (int)t + ": #" + pings.size() + ",us" + sonic);
+			//Display.setText2("" + (int)t + ": #" + pings.size() + ",us" + sonic);
 		}
 
 		/* if it has not turned, return */

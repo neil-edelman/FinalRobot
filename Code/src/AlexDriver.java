@@ -15,11 +15,11 @@ class AlexDriver {
    private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
    private static Display display;
 
-	@SuppressWarnings("unused")
 	private static final boolean doLoco = true;
 	
 	public static void main(String args[]) {
       
+		/*
 		float destination_x, destination_y;
 
 		BluetoothConnection conn = new BluetoothConnection();
@@ -68,6 +68,8 @@ class AlexDriver {
 		}
 		// stall until user decides to end program
 		//Button.waitForAnyPress();
+		 /\ what is this shit?
+		 */
 
       display = new Display(robot);
 
