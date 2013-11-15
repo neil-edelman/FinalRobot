@@ -1,5 +1,6 @@
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
+import lejos.nxt.LCD;
 
 import bluetooth.*;
 
@@ -12,7 +13,7 @@ class AlexDriver {
 	private static final SensorPort colourPort = SensorPort.S3;
    private static final SensorPort lightPort = SensorPort.S1;
    private static Swagbot robot = new Swagbot(sonicPort,colourPort,lightPort);
-   private static Display display = new Display(robot);
+   private static Display display;
 
 	@SuppressWarnings("unused")
 	private static final boolean doLoco = true;
@@ -27,7 +28,7 @@ class AlexDriver {
 		// example usage of Tranmission class
 		Transmission t = conn.getTransmission();
 		if (t == null) {
-//			LCD.drawString("Failed to read transmission", 0, 5);
+			LCD.drawString("Failed to read transmission", 0, 5);
 			destination_x = 0;
 			destination_y = 0;
 		} else {
@@ -62,7 +63,7 @@ class AlexDriver {
 		// stall until user decides to end program
 		Button.waitForAnyPress();
 
-
+      display = new Display(robot);
 
 		monitorForExit();
 
