@@ -62,7 +62,7 @@ class AlexDriver {
 			conn.printTransmission();
 		}
 		// stall until user decides to end program
-		Button.waitForAnyPress();
+		//Button.waitForAnyPress();
 		 /\ what is this shit?
 		 */
 
