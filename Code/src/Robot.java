@@ -29,6 +29,7 @@ public class Robot implements TimerListener {
 	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
 	private static final float    ANGLE_MARGINAL_TOLERANCE = 2.0f; /* rad/s */
 	private static final float          DISTANCE_TOLERANCE = 1f; /* cm */
+   private static final boolean  avoid = true;
 
    private float turnRate;
 
@@ -72,13 +73,15 @@ public class Robot implements TimerListener {
 		/* state machine */
 		switch(status) {
 			case TRAVELLING:
-            //avoidance when relocating to next scan point or when taking a block to the destination (i.e. not when moving to block or scanning)
-            if( findStatus == FindStatus.RELOCATING || findStatus == FindStatus.FINISHED || findStatus == FindStatus.TURNING) {
-//               this.avoidance(30); 
-            }
-            //assuming its ID'ing and set lower limit
-            else {
-//               this.avoidance(15);
+            if(avoid) {
+                //avoidance when relocating to next scan point or when taking a block to the destination (i.e. not when moving to block or scanning)
+                if( findStatus == FindStatus.RELOCATING || findStatus == FindStatus.FINISHED ) {
+                   this.avoidance(30); 
+                }
+                //assuming its ID'ing and set lower limit
+                else {
+                   //this.avoidance(15);
+                }
             }
 				this.travel();
 				break;

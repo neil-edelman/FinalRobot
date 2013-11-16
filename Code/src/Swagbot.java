@@ -9,14 +9,14 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private float targetTheta = -1f;
    private int smallestPing = 254;
    private boolean findingFirst = true;
-   private static final float DESTINATION_X = 0f;
-   private static final float DESTINATION_Y = 30f;
+   private float DESTINATION_X;
+   private float DESTINATION_Y;
    private static final int   SCAN_THRESHOLD = 70; 
    private static final float FRONT_EXTENSION_LENGTH = 22.5f; //bumper length from wheel base
    private static final float X_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //used as mins and maxes in determining target
    private static final float Y_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //origin in corner
-   private static final float X_HIGH_BOUND = 121.92f - FRONT_EXTENSION_LENGTH; //4 tiles by
-   private static final float Y_HIGH_BOUND = 243.84f - FRONT_EXTENSION_LENGTH; //8 tiles
+   private static final float X_HIGH_BOUND = 8*30.48f - FRONT_EXTENSION_LENGTH; //4 tiles by
+   private static final float Y_HIGH_BOUND = 8*30.48f - FRONT_EXTENSION_LENGTH; //8 tiles
    private float adjust_x = 30.48f; //designates the point on the field to be searched from
    private float adjust_y = 30.48f; //values are (0,0);(30,30);(30,60);(30,90)...etc
    private float targetX,targetY;
@@ -24,12 +24,14 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private FindStatus storeFindStatus;
 
 	/** the constructor */
-   public Swagbot(final SensorPort sonicPort, final SensorPort colourPort, final SensorPort lightPort) {
+   public Swagbot(final SensorPort sonicPort, final SensorPort colourPort, final SensorPort lightPort, final float x, final float y) {
       super(sonicPort,colourPort,lightPort);
       uListener = new UltrasonicListener(this.sonic);
       uTimer = new Timer(10/*round-up to int 9.375*/,uListener); //timeout value in ms
       uTimer.start();
       Sound.setVolume(100);
+      this.DESTINATION_X = x;
+      this.DESTINATION_Y = y;
    }
 
    //**********************************
@@ -121,7 +123,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
             Sound.buzz();
             this.findStatus = FindStatus.RELOCATING;
             checkTargetBounds();
-            this.travelTo(targetX-15,targetY-15,250,250); //backup
+            backup();
+            //this.travelTo(targetX-15,targetY-15,250,250); //backup
          }
       }
       else if(this.findStatus == FindStatus.FOUND) {
@@ -175,6 +178,10 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    protected void avoidance(int threshold) {
       int ping = uListener.getDistance();
       if(ping < threshold) {
+         if(this.getColour() == Colour.Value.STYROFOAM) { //is styrofoam, grab and move
+         }
+         else {
+         Sound.beep();
          //need to remember where the robot was going
          storeTarget = this.getTarget();  
          storeFindStatus = this.findStatus;
@@ -191,20 +198,27 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          else {
             this.travelTo(pos.x,pos.y);
          }
-*/ 
+*/       
          float avoidAngleAdjust = 30f;
+         if(pos.x < 30.48*4 && pos.getDegrees() > 45 && pos.getDegrees() < 180) avoidAngleAdjust = -30f; 
          float avoidX = pos.x + (ping)/2*(float)Math.cos(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
          float avoidY = pos.y + (ping)/2*(float)Math.sin(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
          backup();
          this.travelTo(avoidX,avoidY);
          //revert back to old state
          this.findStatus = storeFindStatus;
-         travelTo(storeTarget.x,storeTarget.y);
+         if(this.findStatus != FindStatus.ID) travelTo(storeTarget.x,storeTarget.y);
+         }
       }
    }
    public void backup() {
-      this.setSpeeds(-100,-100);
-
+      this.setSpeeds(-200,-200);
+      try {
+         Thread.sleep(1000);
+      } catch(InterruptedException ex) {
+         Thread.currentThread().interrupt();
+      }
+      this.stop();
    }
 
 } 
