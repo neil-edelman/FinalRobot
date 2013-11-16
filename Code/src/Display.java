@@ -23,7 +23,7 @@ public class Display implements TimerListener{
 	public Display(final Swagbot robot) {
 		//if(owner != null) throw new IllegalArgumentException("already a display");
 		this.robot = robot;
-		if(owner != null) {
+		if(owner == null) {
 			owner = this;
 			displayTimer.start();
 		}
