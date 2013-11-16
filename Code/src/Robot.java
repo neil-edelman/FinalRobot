@@ -47,7 +47,7 @@ public class Robot implements TimerListener {
 	protected Position   target = new Position(), delta = new Position();
 	protected Odometer odometer;
 
-	private Timer timer = new Timer(NAV_DELAY, this);
+	protected Timer timer = new Timer(NAV_DELAY, this);
 
 	/** the constructor */
 	public Robot() {

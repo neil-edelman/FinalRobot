@@ -23,23 +23,44 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private Position storeTarget;
    private FindStatus storeFindStatus;
 
+	private Colour colour;
+
+	/**
+	 @author Neil
+	 @return the colour as enum Value (STYROFOAM/WOOD) */
+	public Colour.Value getColour() {
+		return colour.getColourValue();
+	}
+
+	/** works reliably to about 10cm
+	 @author Neil, Alex
+	 @return a range that indicates our certaitanty that it's styrofoam
+	 in [0, 1] */
+	public float getStyrofoam() {
+		return colour.getStyrofoamProbability();
+	}
+
 	/** the constructor */
    public Swagbot(final SensorPort sonicPort, final SensorPort colourPort, final SensorPort lightPort, final float x, final float y) {
-      super(sonicPort,colourPort,lightPort);
+      super(sonicPort,/*colourPort,*/lightPort); /* <- it's the other way around -Neil */
       uListener = new UltrasonicListener(this.sonic);
       uTimer = new Timer(10/*round-up to int 9.375*/,uListener); //timeout value in ms
       uTimer.start();
       Sound.setVolume(100);
       this.DESTINATION_X = x;
       this.DESTINATION_Y = y;
+	   colour = new Colour(colourPort);
    }
 
    //**********************************
    //override color hack -- for demo, color in locobot not working -- TODO:can remove this when we get it working
-   Colour colour = new Colour(SensorPort.S3); 
+	/* Neil: you were calling super() with the parameter order reversed; trying
+	 to read colour from a light sensor . . . I have stuck the colour in here
+	 instead of in Locobot so it's all Good */
+/*   Colour colour = new Colour(SensorPort.S3); 
    public Colour.Value getColour() {
       return colour.getColourValue();
-   }
+   }*/
    //**********************************
 
    /** returns the ultrasonic sensor's unfiltered distance */

@@ -1,25 +1,29 @@
-/* this is a struct to store ultrasonic sonar information, we want this to be
+/** this is a struct to store ultrasonic sonar information, we want this to be
  as small as possible since we're storing a lot of them
  
- also does locolisiation */
+ also does the details of localisiation */
 
 import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
 
 public class Ping {
 	/********* copy/paste here ************/
-	
+
 	/***** fixme: have it in Robot.java? */
-	private static final float LIGHT_BACK    = 12.2F;
+	private static final float LIGHT_BACK    = 12.2f;
 	private static final float SONIC_FORWARD = 10.4f;
-	
-	private static Odometer odometer;
-	
+
+	//private static Odometer odometer;
+
 	private Position position = new Position();
 	private int      cm;
 	private float    x, y; /* derived */
 	private int colour;    /* gnuplot */
-	
+
+	/** records a ping as a new object
+	 @author Neil
+	 @param final Position p  the postion from where we got this ping
+	 @param final int reading the ping in cm */
 	public Ping(final Position p, final int reading) {
 		position.set(p);
 		cm = reading;
@@ -30,53 +34,65 @@ public class Ping {
 		y = p.y + (float)Math.sin(a) * b;
 	}
 	
-	/** sets the odometer used by correct */
-	public static void setOdometer(final Odometer o) {
-		odometer = o;
-	}
-	
+	/** sets the odometer used by correct -- just pass it to correct */
+	//public static void setOdometer(final Odometer o) {
+	//	odometer = o;
+	//}
+
 	/** getters for logging */
 	Position getPosition() { return position; }
 	int getCm() { return cm; }
-	
-	public static boolean correct(final ArrayList<Ping> pings) {
-		
-		if(odometer == null) throw new IllegalArgumentException("no odometer");
-		
+
+	/** corrects the odometer heading and distances based on pings from
+	 localisation; assumes (1) the robot is placed in a corner, the new
+	 (x ,y) will be aligned with the corner; (2) the thing with the smallest
+	 distance are the walls (could fix this, but we're gaurateed this;) (3) the
+	 pings has sufficent pings to be useful (linear regression is taken of the
+	 two sides, so we'll need at least four pings; realistically more)
+	 fixme: I think this should be in Locobot
+	 @param pings    an ArrayList<Ping> of pings
+	 @param odometer an odometer to correct
+	 @return wheter the odometer was successfully localised */
+	public static boolean correct(final ArrayList<Ping> pings, final Odometer odometer) {
+
+		//if(odometer == null) throw new IllegalArgumentException("no odometer");
+
 		/* determine the area that is most close taking the minimum;
 		 should be the integral of all the area, but this is okay,
 		 we expect the closest thing to be the wall at the start */
-		int closest = 255, cm;
-		int index = 0, left, right, len = pings.size();
-		for(int i = 0; i < len; i++) {
+		int cmClosest = 255, cm;
+		int closest = 0, left, right, size = pings.size();
+		for(int i = 0; i < size; i++) {
 			cm = pings.get(i).cm;
-			if(cm < closest) {
-				closest = cm;
-				index   = i;
+			if(cm < cmClosest) {
+				cmClosest = cm;
+				closest   = i;
 			}
 		}
-		if(closest >= 255) return false; /* in a big room? */
-		
+		if(cmClosest >= 255) return false; /* in a big room? */
+
 		/* now go to the 255's at either end (we assume that 255's exist) */
 		/* FIXME: more! what if the block is against the wall? this is where
 		 we'd weed it out (easily! just check the radial derivative) */
-		for(left = index - 1; ; left--) {
-			if(left < 0) left = len - 1;
-			if(left == index) return false;
+		for(left = closest - 1; ; left--) {
+			if(left < 0) left = size - 1;
+			if(left == closest) return false;
 			if(pings.get(left).cm >= 255) break;
 		}
-		for(right = index + 1; ; right++) {
-			if(right >= len) right = 0;
+		for(right = closest + 1; ; right++) {
+			if(right >= size) right = 0;
 			/* if(r == index) return false; is never going to happen */
 			if(pings.get(right).cm >= 255) break;
 		}
-		
+		int delta = right - left + 1;
+		if(delta < 0) delta += size;
+
 		/* hand-wavey say that this has been constantly sampled for conveniece */
 		/* FIXME: check to make sure it's the middle, adjust */
 		int rEff = right;
-		if(rEff < left) rEff += len;
+		if(rEff < left) rEff += size;
 		int mid = (rEff + left) / 2;
-		if(mid >= len) mid -= len;
+		if(mid >= size) mid  -= size;
 		
 		/*for(Ping ping : pings)
 		 if(((i > left) && (i < mid)) ^ (left > mid))
@@ -87,7 +103,7 @@ public class Ping {
 		float s_xl = 0, s_yl = 0, ss_xxl = 0, ss_yyl = 0, ss_xyl = 0;
 		int nl = 0;
 		for(int i = left + 1; ; i++) {
-			if(i >= len) i = 0;
+			if(i >= size) i = 0;
 			if(i == mid) break;
 			ping = pings.get(i);
 			ping.colour = 1;
@@ -107,7 +123,7 @@ public class Ping {
 		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
 		int nr = 0;
 		for(int i = mid; ; i++) {
-			if(i >= len) i = 0;
+			if(i >= size) i = 0;
 			if(i == right) break;
 			ping = pings.get(i);
 			ping.colour = 2;
@@ -187,14 +203,14 @@ public class Ping {
 		 is minimal) . . . I tried eigendecomposition, it hurt my brian */
 		float rms_el = 0, rms_er = 0;
 		for(int i = left + 1; ; i++) {
-			if(i >= len) i = 0;
+			if(i >= size) i = 0;
 			if(i == mid) break;
 			ping = pings.get(i);
 			rms_el += (Al*ping.x + Bl*ping.y + Cl) * (Al*ping.x + Bl*ping.y + Cl);
 		}
 		rms_el = (float)Math.sqrt(rms_el) / nl;
 		for(int i = mid; ; i++) {
-			if(i >= len) i = 0;
+			if(i >= size) i = 0;
 			if(i == right) break;
 			ping = pings.get(i);
 			rms_er += (Ar*ping.x + Br*ping.y + Cr) * (Ar*ping.x + Br*ping.y + Cr);
@@ -222,5 +238,37 @@ public class Ping {
 		
 		return true;
 	}
-	
+
+	/** working on it
+	 @author Neil */
+	private static void straightishLine(final ArrayList<Ping> pings, final int about) {
+		boolean isLeft = true, isRight = true;
+		int left, right;
+		float angle = 0;
+		int candidate;
+		Ping value;
+
+		left = right = about;
+		for( ; ; ) {
+			if(isLeft) {
+				candidate = left - 1;
+				value = pings.get(candidate);
+				if(value.cm >= 255) {
+					isLeft = false;
+				} else {
+					// do sth smrt
+				}
+			} if(isRight) {
+				candidate = right + 1;
+				value = pings.get(candidate);
+				if(value.cm >= 255) {
+					isRight = false;
+				} else {
+					/* devivative . . . */
+				}
+			} else {
+				break;
+			}
+		}
+	}
 }

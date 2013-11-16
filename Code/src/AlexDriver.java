@@ -1,13 +1,16 @@
+/** this is a driver that instantaties a Robot and makes it do stuff */
+
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
 import lejos.nxt.LCD;
+import lejos.nxt.comm.RConsole;
 
 import bluetooth.*;
 
-
-/* this is a driver that instantaties a Robot and makes it do stuff */
-
 class AlexDriver {
+
+	private static final int   BLUETOOTH_DELAY = 0;  /* 10000 is to short */
+	private static final boolean BLUETOOTH_USE = false;
 
 	private static final SensorPort  sonicPort = SensorPort.S4;
 	private static final SensorPort colourPort = SensorPort.S3;
@@ -16,7 +19,10 @@ class AlexDriver {
    private static Display display;
 
 	private static final boolean doLoco = true;
-	
+
+	/** the entry-point where we create our robot
+	 @param args[] ignored
+	 @author Alex, Neil */
 	public static void main(String args[]) {
       
 
@@ -50,7 +56,8 @@ class AlexDriver {
          //[sin  cos]
          float a = 1f,b = 0f,c = 0f,d = 1f;
          //rotate coordinates to robot's localise position
-         switch(corner) {
+			// what is StateCorner? FIXME!
+         /*switch(corner) {
             case StateCorner.BOTTOM_LEFT: //0 degrees
                break;
             case StateCorner.BOTTOM_RIGHT: //-90 degrees
@@ -69,12 +76,12 @@ class AlexDriver {
                a = -1f;
                d = -1f;
                break;
-         }
+         }*/
          
-         greenZone_x1 = a*x1 + b*y1;
-         greenZone_y1 = c*x1 + d*y1;
-         greenZone_x2 = a*x2 + b*y2;
-         greenZone_y2 = c*x2 + d*y2;
+         float greenZone_x1 = a*x1 + b*y1;
+         float greenZone_y1 = c*x1 + d*y1;
+         float greenZone_x2 = a*x2 + b*y2;
+         float greenZone_y2 = c*x2 + d*y2;
 
 			if (corner == StartCorner.BOTTOM_LEFT) {
 			}
@@ -99,6 +106,11 @@ class AlexDriver {
 		// stall until user decides to end program
 		//Button.waitForAnyPress();
 
+		if(BLUETOOTH_USE) {
+			Display.setText("Bluetooth...");
+			RConsole.openBluetooth(BLUETOOTH_DELAY);
+			if(!RConsole.isOpen()) Display.setText("Never mind.");
+		}
 
       robot = new Swagbot(sonicPort,colourPort,lightPort,destination_x,destination_y);
       display = new Display(robot);
@@ -135,8 +147,10 @@ class AlexDriver {
 //			System.out.println((int)(colour.getStyrofoamProbability() * 100f) + "% styrofoam");
 //         System.out.println(colour.getColourValue() == Colour.Value.STYROFOAM);
 //		}
+		
+		/* close bt connection */
+		if(RConsole.isOpen()) RConsole.close();
 	}
-
 
    private static void monitorForExit() {
       //spawn thread for exit

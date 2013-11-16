@@ -26,7 +26,7 @@ public class Colour {
 	Vector3f     colour = new Vector3f();
 	Vector3f colourDiff = new Vector3f();
 
-	/** constructor
+	/** constructs a new styrofoam/wood colour-reconising class
 	 @author Neil
 	 @param port The port the colour sensor is plugged into */
 	public Colour(final SensorPort port) {

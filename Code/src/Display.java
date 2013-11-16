@@ -9,29 +9,42 @@ import lejos.util.TimerListener;
 public class Display implements TimerListener{
 	public static final int LCD_REFRESH = 500;
 
-	private static String drawText1 = "";
-	private static String drawText2 = "";
+	private static String  drawText1 = "";
+	private static String  drawText2 = "";
+
+	private static Display owner = null;
 
 	private Timer displayTimer = new Timer(LCD_REFRESH, this);
-	private boolean isStarted = false;
 	private Swagbot robot;
 
+	/** displays some relevant information on the robot; only one Display can
+	 be active; if no display is using it, it starts the automatically
+	 @param robot a robot to associate with the display */
 	public Display(final Swagbot robot) {
+		//if(owner != null) throw new IllegalArgumentException("already a display");
 		this.robot = robot;
-		displayTimer.start();
-		isStarted = true;
+		if(owner != null) {
+			owner = this;
+			displayTimer.start();
+		}
 	}
 
-	public void start() {
-		if(isStarted) return;
-		displayTimer.start();
-	}
-
+	/** stops the TimerListener, freeing the display */
 	public void stop() {
-		if(!isStarted) return;
+		if(owner != this) return;
 		displayTimer.stop();
+		owner = null;
 	}
 
+	/** restarts the TimerListener if nothing is using the display */
+	public void start() {
+		if(owner != null) return;
+		displayTimer.start();
+		owner = this;
+	}
+
+	/** TimerListener function that updates the text
+	 @author Alex */
 	public void timedOut() {
 		Position position = robot.getPosition();
 		LCD.clear();
@@ -50,13 +63,19 @@ public class Display implements TimerListener{
 
 	}
 
-	/** fixme: some sort of bounds check */
+	/* fixme: some sort of bounds check? */
+	/** sets the user-specified text string
+	 @author Neil
+	 @param text text string */
 	public static void setText(String text) {
 		drawText1 = text; 
 	}
 
-	/** fixme: some sort of bounds check */
+	/** sets the 2nd user specified text string
+	 @author Neil
+	 @param text text string */
 	public static void setText2(String text) {
 		drawText2 = text; 
 	}
+
 }
