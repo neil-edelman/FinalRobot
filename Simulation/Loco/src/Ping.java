@@ -91,7 +91,7 @@ public class Ping {
 			writer.println("set size ratio -1");
 			writer.println("#set size square");
 			writer.println("set palette maxcolors 3");
-			writer.println("set palette defined (0 '#bbbbbb', 1 '#990000', 2 '#009999')");
+			writer.println("set palette defined (0 '#bbbbbb', 1 '#990000', 2 '#009999', 3 '#90ff99')");
 			writer.println("set label \"(" + Math.round(p.x) + ", " +
 						   Math.round(p.y) + " : " +
 						   Math.round(p.getDegrees()) + ")\" at graph 0.2, graph 0.2");
@@ -111,10 +111,13 @@ public class Ping {
 	/********* copy/paste here ************/
 
 	/***** fixme: have it in Robot.java? */
-	private static final float LIGHT_BACK    = 12.2F;
+	private static final float LIGHT_BACK    = 12.2f;
 	private static final float SONIC_FORWARD = 10.4f;
+	//	private static final float  CUTOFF_ANGLE = (float)Math.toRadians(50.0);
+	private static final float  CUTOFF_ANGLE = (float)Math.toRadians(60.0);
 
 	private static Odometer odometer;
+	private static int rangeLower, rangeHigher;
 
 	private Position position = new Position();
 	private int      cm;
@@ -179,6 +182,21 @@ public class Ping {
 		int mid = (rEff + left) / 2;
 		if(mid >= len) mid -= len;
 
+		rEff = right;
+		if(rEff < left) rEff += len;
+		int yAxis = left + (rEff - left) * 1 / 4;
+		if(yAxis >= len) yAxis -= len;
+		int xAxis = left + (rEff - left) * 3 / 4;
+		if(xAxis >= len) xAxis -= len;
+
+		System.err.println("["+right+": x "+xAxis+" / y "+yAxis+" :"+left+"]");
+		straightishLine(pings, yAxis);
+		int yl = rangeLower;
+		int yh = rangeHigher;
+		straightishLine(pings, xAxis);
+		int xl = rangeLower;
+		int xh = rangeHigher;
+
 		/*for(Ping ping : pings)
 		 if(((i > left) && (i < mid)) ^ (left > mid))
 		 else if(((i > mid) && (i < right)) ^ (mid > right))*/
@@ -187,17 +205,17 @@ public class Ping {
 		Ping ping;
 		float s_xl = 0, s_yl = 0, ss_xxl = 0, ss_yyl = 0, ss_xyl = 0;
 		int nl = 0;
-		for(int i = left + 1; ; i++) {
-			if(i >= len) i = 0;
-			if(i == mid) break;
+		for(int i = yl; ; i++) {
+			if(i > len) i = 0;
 			ping = pings.get(i);
-			ping.colour = 1;
+			ping.colour += 1;
 			nl++;
 			s_xl   += ping.x;
 			s_yl   += ping.y;
 			ss_xxl += ping.x * ping.x;
 			ss_yyl += ping.y * ping.y;
 			ss_xyl += ping.x * ping.y;
+			if(i == yh) break;
 		}
 		if(nl <= 2) return false;
 		float avg_xl = s_xl / nl, avg_yl = s_yl / nl;
@@ -207,17 +225,17 @@ public class Ping {
 
 		float s_xr = 0, s_yr = 0, ss_xxr = 0, ss_yyr = 0, ss_xyr = 0;
 		int nr = 0;
-		for(int i = mid; ; i++) {
+		for(int i = xl; ; i++) {
 			if(i >= len) i = 0;
-			if(i == right) break;
 			ping = pings.get(i);
-			ping.colour = 2;
+			ping.colour += 2;
 			nr++;
 			s_xr   += ping.x;
 			s_yr   += ping.y;
 			ss_xxr += ping.x * ping.x;
 			ss_yyr += ping.y * ping.y;
 			ss_xyr += ping.x * ping.y;
+			if(i == xh) break;
 		}
 		if(nr <= 2) return false;
 		float avg_xr = s_xr / nr, avg_yr = s_yr / nr;
@@ -271,7 +289,10 @@ public class Ping {
 		float c = -Bl, d = Al;
 
 		/* compute the inverse (not needed) */
-		/*float adbc = 1f / (a*d + b*c);
+		float det = a*d - b*c;
+		/* fixme: if the det is too far from one, we're skewed and should loco
+		 again */
+		/*float adbc = 1f / (a*d - b*c);
 		float n =  d*adbc, m = -b*adbc;
 		float o = -c*adbc, p =  a*adbc;*/
 
@@ -313,6 +334,7 @@ public class Ping {
 		if(angle > Math.PI) angle -= 2f*Math.PI;
 
 		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
+		/* fixme: check that it's w/i bounds */
 		odometer.addXY(Cl, Cr);
 		odometer.addRadians(angle);
 
@@ -321,6 +343,90 @@ public class Ping {
 		/* /\ */
 
 		return true;
+	}
+
+	/** expands a strightish line (within CUTOFF_ANGLE) and places the restults
+	 in rangeLower and rangeHigher; this was determined to be worse than blind
+	 picking the middle but gets rid of objects on the walls
+	 @author Neil */
+	private static void straightishLine(final ArrayList<Ping> pings, final int about) {
+		final int size = pings.size();
+		if(about < 0 || about >= size) throw new IndexOutOfBoundsException("ping " + about);
+		boolean isLeftBlocked = false, isRightBlocked = false;
+		/*boolean isLeftFishy = false, isRightFishy = false;*/
+		boolean chooseLeft = false;
+		float dx, dy, angle = 0, angleComp = 0, da = 0, ada = 0;
+		int candidate;
+		int left, right;
+		Ping ping, leftPing, rightPing;
+
+		left = right = about;
+		for( ; ; ) {
+			/* choose left and right until there are none,
+			 like Doctor Who: Turn Left */
+			if(isLeftBlocked) {
+				if(isRightBlocked) break;
+				chooseLeft = false;
+			} else {
+				if(isRightBlocked) {
+					chooseLeft = true;
+				} else {
+					chooseLeft = !chooseLeft;
+				}
+			}
+			/* move one over */
+			if(chooseLeft) {
+				candidate = left - 1;
+				if(candidate  < 0)    candidate = size - 1;
+			} else {
+				candidate = right + 1;
+				if(candidate >= size) candidate = 0;
+			}
+			ping = pings.get(candidate);
+			/* if it's 255, stop */
+			if(ping.cm >= 255) {
+				if(chooseLeft) isLeftBlocked  = true;
+				else           isRightBlocked = true;
+				continue;
+			}
+			/* the angle */
+			if(left != right) {
+				leftPing  = pings.get(left);
+				rightPing = pings.get(right);
+				dx    = leftPing.x - rightPing.x;
+				dy    = leftPing.y - rightPing.y;
+				angle = (float)Math.atan2(dy, dx);
+				if(chooseLeft) {
+					dx = ping.x - leftPing.x;
+					dy = ping.y - leftPing.y;
+				} else {
+					dx = rightPing.x - ping.x;
+					dy = rightPing.y - ping.y;
+				}
+				angleComp = (float)Math.atan2(dy, dx);
+				da = angleComp - angle;
+				ada = (da > 0) ? (da) : (-da);
+				if(ada > CUTOFF_ANGLE) {
+					if(chooseLeft) isLeftBlocked  = true;
+					else           isRightBlocked = true;
+					continue;
+					/*if(chooseLeft) isLeftFishy  = true;
+					else           isRightFishy = true;
+					if(isLeftFishy && isRightFishy) break;
+					continue;
+				} else {
+					if(chooseLeft) isLeftFishy  = false;
+					else           isRightFishy = false;*/
+				}
+			}
+			/* passed */
+			if(chooseLeft) left = candidate;
+			else          right = candidate;
+			System.err.print(candidate + "("+Math.round(Math.toDegrees(ada))+");");
+		}
+		System.err.println("(" + left + ", " + right + ")");
+		rangeLower  = left;
+		rangeHigher = right;
 	}
 
 }
