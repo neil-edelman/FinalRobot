@@ -71,7 +71,9 @@ public class Robot implements TimerListener {
 	 machine */
 	public void timedOut() {
 		/* get the latest from the odometer */
-		odometer.positionSnapshot();
+		/*odometer.positionSnapshot();*/
+		/* forget that, our robot can predict the future */
+		odometer.premonitionUpdate();
 		/* state machine */
 		switch(status) {
 			case TRAVELLING:

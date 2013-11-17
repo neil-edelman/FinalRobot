@@ -63,6 +63,7 @@ public class Odometer implements TimerListener {
 	private int intTraveled, intTurn;
 
 	Position position = new Position();
+	Position      old = new Position();
 	Position    pCopy = new Position();
 
 	/** constructor
@@ -110,6 +111,7 @@ public class Odometer implements TimerListener {
 		/* add it to the position at which the robot thinks it is */
 		synchronized(this) {
 			position.arc(r, d);
+			old.set(position);
 		}
 
 		/* add it to the class variable */
@@ -119,11 +121,26 @@ public class Odometer implements TimerListener {
 
 	/** this stores a copy of the actal position (which is volitale) in pCopy;
 	 pCopy is called when reading position . . . viz you must call this to
-	 update position used in getPosition, but only once per movement
+	 update position used in getPosition, but only once per movement; you will
+	 probably want to call premonitionUpdate() instead to get rid of one-sided
+	 errors
+	 <p>
+	 deprecaited
 	 @author Neil */
 	public void positionSnapshot() {
 		synchronized(this) {
 			pCopy.set(position);
+		}
+	}
+
+	/** this eliminates one-sided errors by predicting the future; also
+	 this stores a copy of the actal position (which is volitale) in pCopy;
+	 pCopy is called when reading position . . . you must call this instead
+	 of positionSnapshot
+	 @author Neil */
+	public void premonitionUpdate() {
+		synchronized(this) {
+			pCopy.expectition(position, old);
 		}
 	}
 
@@ -137,11 +154,12 @@ public class Odometer implements TimerListener {
 	/* setters */
 
 	/** setters */
-   public void setPosition(final Position pos) {
-      synchronized(this) {
-         position.set(pos); 
-      }
-   }
+	public void setPosition(final Position pos) {
+		synchronized(this) {
+			position.set(pos);
+			old.set(pos);
+		}
+	}
 	/*public void setRadians(final float t) {
 		synchronized(this) {
 			position.setRadians(t);
@@ -163,6 +181,7 @@ public class Odometer implements TimerListener {
 	public void addRadians(final float t) {
 		synchronized(this) {
 			position.addRadians(t);
+			old.addRadians(t);
 		}
 	}
 
@@ -173,6 +192,7 @@ public class Odometer implements TimerListener {
 	public void addXY(final float x, final float y) {
 		synchronized(this) {
 			position.addXY(x, y);
+			old.addXY(x, y);
 		}
 	}
 

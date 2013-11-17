@@ -177,6 +177,30 @@ class Position {
 		else if(t > PI) t -= TWO_PI;
 	}
 
+	/** sets this to the prediction of the O(1) future
+	 @author Neil
+	 @param final Position p  the current position
+	 @param final Position o  the old position (assumes you take approimately
+	 equal time steps) */
+	public void expectition(final Position p, final Position o) {
+		float dt1, dt2, dt;
+		x = 1.5f*p.x - 0.5f*o.x;
+		y = 1.5f*p.y - 0.5f*o.y;
+		/* selects the minimum angle */
+		if(p.t >= o.t) {
+			dt1 = p.t - o.t;
+			dt2 = o.t - p.t + TWO_PI;
+		} else {
+			dt1 = o.t - p.t;
+			dt2 = p.t - o.t + TWO_PI;
+		}
+		dt = (dt1 >= dt2) ? dt2 : dt1;
+		/* add it to t */
+		t = p.t + 0.5f*dt;
+		if(t <= -PI)    t += TWO_PI;
+		else if(t > PI) t -= TWO_PI;
+	}
+
 	/**
 	 @author Neil
 	 @return string */
