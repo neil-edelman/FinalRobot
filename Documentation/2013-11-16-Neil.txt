@@ -1,0 +1,7 @@
+%%
+
+So setAcceleration doesn't do what it sounds like or what is documented in the code. Near as I can tell, it causes the robot to move in a random pattern all over the board like a crazy deranged person.
+
+%%
+
+The robot now has future sight.
