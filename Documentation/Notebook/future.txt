@@ -1,0 +1,3 @@
+O(1) prediction of the 1/2 frame future
+
+(implemented)
