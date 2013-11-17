@@ -142,14 +142,16 @@ class Position {
 		else if(t > PI) t -= TWO_PI;
 	}
 
-	/** behold the awesome power of math! given a distance and an angle which
-	 is divided up along the distance evenly (an arc,) compute the next
-	 distance, angle using the affine transformations and the calculus of
-	 rectification (this results in a heart, if you draw it out for parametric
-	 const dist) (this is used in odometer)
+	/** add to the position an arc specified by a distance and an angle which
+	 is divided up along the distance evenly; uses affine transformations and
+	 the calculus of rectification; the Taylor expansion is O(3)
+	 <p>
+	 this results in a heart, if you draw it out for parametric const dist
+	 <p>
+	 this is used in odometer
 	 @author Neil
 	 @param angle (-PI, PI]
-	 @param dist A distance. */
+	 @param dist  A distance. */
 	public void arc(final float angle, final float dist) {
 
 		/* the exact answer ran ten times slower then the separated code; I
