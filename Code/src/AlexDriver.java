@@ -1,10 +1,11 @@
+/** this is a driver that instantaties a Robot and makes it do stuff */
+
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
 import lejos.nxt.LCD;
 import lejos.nxt.comm.RConsole;
 
 import bluetooth.*;
-
 
 /** this is a driver that instantaties a Robot and makes it do stuff */
 
@@ -21,8 +22,6 @@ class AlexDriver {
    private static Swagbot robot;
    private static Display display;
 
-	private static final boolean doLoco = true;
-	
 	/** the entry-point where we create our robot
 	 @param args[] ignored
 	 @author Alex, Neil */
@@ -107,56 +106,55 @@ class AlexDriver {
 				conn.printTransmission();
 			}
 		}
-		
+
 		if(BLUETOOTH_USE) {
 			Display.setText("Bluetooth...");
 			RConsole.openBluetooth(BLUETOOTH_DELAY);
 			if(!RConsole.isOpen()) Display.setText("Never mind.");
 		}
-		
+
 		robot   = new Swagbot(sonicPort,colourPort,lightPort,destination_x,destination_y);
 		display = new Display(robot);
 		monitorForExit();
-		
+
 		if(LOCO_USE) {
 			robot.localise();
 		} else {
 			robot.setPosition(new Position(30.48f,30.48f,0f));
 		}
 		waitForIdle();
-		
+
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
 		robot.travelTo(60.96f, 60.96f);
 		waitForIdle();
 		robot.turnTo(90f);
 		waitForIdle();
-		
+
 		//robot.travelTo(destination_x, destination_y);
 		//runTests();
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
-		
+
 		//robot.findBlocks();
 		//waitForIdle();
-		
+
 		// stall until user decides to end program
 		//Button.waitForAnyPress();
-		
+
 		/* colour test */
-		//		int press;
-		//		Colour colour = new Colour(colourPort);
-		//		for( ; ; ) {
-		//			System.out.print("press: ");
-		//            press = Button.waitForAnyPress();
-		//			if((press & Button.ID_ESCAPE) != 0) break;
-		//			System.out.println((int)(colour.getStyrofoamProbability() * 100f) + "% styrofoam");
-		//         System.out.println(colour.getColourValue() == Colour.Value.STYROFOAM);
-		//		}
+//		int press;
+//		Colour colour = new Colour(colourPort);
+//		for( ; ; ) {
+//			System.out.print("press: ");
+//            press = Button.waitForAnyPress();
+//			if((press & Button.ID_ESCAPE) != 0) break;
+//			System.out.println((int)(colour.getStyrofoamProbability() * 100f) + "% styrofoam");
+//         System.out.println(colour.getColourValue() == Colour.Value.STYROFOAM);
+//		}
 		
 		/* close bt connection */
 		if(RConsole.isOpen()) RConsole.close();
 	}
-
 
    private static void monitorForExit() {
       //spawn thread for exit
