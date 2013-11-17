@@ -52,9 +52,11 @@ public class Robot implements TimerListener {
 	/** the constructor */
 	public Robot() {
 		odometer = new Odometer(leftMotor, rightMotor);
-		/* (this looks promising, must reseach)
-		leftMotor.setAccelertion(3000);
-		rightotor.setAccelertion(3000);*/
+		/* set smooth -- DO NOT DO THIS IT MAKES IT LOCO; figure-8's, crashing
+		 on walls, etc; who know what it does, but it's NOT a accelertion
+		 limiter */
+		/*leftMotor.setAcceleration(500);
+		rightMotor.setAcceleration(500);*/
 		/* start the timer for updates (timedOut) */
 		timer.start();
 	}
@@ -253,7 +255,11 @@ public class Robot implements TimerListener {
 		/* apply magic */
 		float turn  = anglePID.nextOutput(delta.getTheta(), NAV_DELAY);
 		float speed = distancePID.nextOutput(distance,      NAV_DELAY);
-		// haven't decided where to put this: * Math.cos(Math.toRadians(p.r));
+
+		/* was going to put Math.cos(delta.getRadians()) to get lightning fast
+		 turns when starting away from the destiantion; a glaring bug with the
+		 firmwear causes the 2nd motor, when swiching signs, to stop, but the
+		 report back to the odometer that it's kept going */
 
 		/* tolerence on the distance; fixme: have a tolerance on the derivative
 		 as soon as it won't go crazy and turn 180 degrees on overshoot */
