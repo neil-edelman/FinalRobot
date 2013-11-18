@@ -11,7 +11,8 @@ public class Ping {
 
 	/***** fixme: have it in Robot.java? */
 	private static final float LIGHT_BACK    = 12.2f;
-	private static final float SONIC_FORWARD = 10.4f;
+	private static final float SONIC_FORWARD = 10.4f; //sex robot (version 1)
+//	private static final float SONIC_FORWARD = 8f;    //swagbot (version 2) tested: y value is off (doesn't work)
 
 	//private static Odometer odometer;
 

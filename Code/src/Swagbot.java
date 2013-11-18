@@ -81,6 +81,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    }
 
    /** Causes the robot to search the entire field for blocks and return them to the destination.
+	 @author Alex
+	 @return void
          set's the robot status to finding and the finding status to scanning.*/
    public void findBlocks() {
       this.status = Status.FINDING;
@@ -88,7 +90,9 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       findingFirst = true;
    }
 
-   /** overridden from Robot: contains the code for finding blocks and placing them in the destination */
+   /** overridden from Robot: contains the code for finding blocks and placing them in the destination
+	 @author Alex
+	 @return void */
    protected void finding() {
          
       //find blocks from search point (starts in corner and progresses along board)
