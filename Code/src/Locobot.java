@@ -3,8 +3,9 @@
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
-import lejos.nxt.Sound;         /* pause */
+import lejos.nxt.Sound;
 import lejos.nxt.comm.RConsole;
+import lejos.util.Delay;
 
 import java.util.ArrayList;
 
@@ -83,6 +84,7 @@ public class Locobot extends Robot {
 			Ping.correct(pings, odometer);
 		} catch(Exception e) {
 			Display.setText(e.getMessage());
+			Sound.beep();
 			/* fixme: try again!!! */
 		}
 
@@ -117,7 +119,7 @@ public class Locobot extends Robot {
 	 @return The cm distance (unless some error.) */
 	public int pingSonar() {
 		sonic.ping();
-		Sound.pause(SONAR_DELAY);
+		Delay.msDelay(SONAR_DELAY);
 		return sonic.getDistance();
 	}
 
