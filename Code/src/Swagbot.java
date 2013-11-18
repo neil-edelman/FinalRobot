@@ -2,6 +2,8 @@ import lejos.nxt.SensorPort;
 import lejos.util.Timer;
 import lejos.nxt.Sound;
 
+import java.util.ArrayList;
+
 public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 
    private UltrasonicListener uListener;
@@ -22,6 +24,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private float targetX,targetY;
    private Position storeTarget;
    private FindStatus storeFindStatus;
+	private ArrayList<Ping> pingsList = new ArrayList<Ping>(128);
 
 	private Colour colour;
 
@@ -174,68 +177,104 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       if(     targetY < Y_LOW_BOUND ) targetY = Y_LOW_BOUND;
       else if(targetY > Y_HIGH_BOUND) targetY = Y_HIGH_BOUND;
    }
-   /** robot scans left to the given angle, and records the smallest distance and corresponding theta */
+   /** robot scans left to the given angle, and records the smallest distance and corresponding theta
+	 @author Alex
+	 @return void */
    public void scanLeft(float angle) {
+      this.pingsList.clear();
       this.smallestPing = 254;
       this.targetTheta = 45;
       this.turn(100f,angle); //turn constantly (left when rate positive) to angle
       this.status = Status.SCANNING;
    }
-   /** robot scans right to the given angle, and records the smallest distance and corresponding theta */
+   /** robot scans right to the given angle, and records the smallest distance and corresponding theta
+	 @author Alex
+	 @return void */
    public void scanRight(float angle) {
+      this.pingsList.clear();
       this.smallestPing = 254;
       this.targetTheta = 45;
-      this.turn(-100f,-angle); //turn constantly (left when rate positive) to angle
+      this.turn(-100f,angle); //turn constantly (left when rate positive) to angle
       this.status = Status.SCANNING;
    }
 
-   /**overridden from Robot: contains the code for scanning */
-   protected void scanning() {
+   /**overridden from Robot: contains the code for scanning
+    @author Alex
+	 @return void */
+protected void scanning() {
       //while scanning get smallest ping value and corresponding theta
       int ping = uListener.getDistance();
+      Position pos = this.getPosition();
 
       if(smallestPing > ping) {
          smallestPing = ping;
-         targetTheta = this.getPosition().getDegrees();
+         targetTheta = pos.getDegrees();
       }
+      //record pings
+		if(ping < 0 || ping > 255) { //check out of bounds
+			Display.setText("Ping value out of bounds" + ping);
+		} else {
+			// record
+         pingsList.add(new Ping(pos,ping));
+		}
+
+
    }
-   /** overwritten from Robot, avoidance maneuver runs when uDistance less than threshold */
+   /** overwritten from Robot, avoidance maneuver runs when uDistance less than threshold
+	 @author Alex
+	 @return void */
    protected void avoidance(int threshold) {
       int ping = uListener.getDistance();
       if(ping < threshold) {
          if(this.getColour() == Colour.Value.STYROFOAM) { //is styrofoam, grab and move
          }
          else {
-         Sound.beep();
-         //need to remember where the robot was going
-         storeTarget = this.getTarget();  
-         storeFindStatus = this.findStatus;
-         //determine obstacle position
-         Position pos = this.getPosition();
-         //turn avoidance on
-         this.findStatus = FindStatus.AVOIDING;
-         this.status = Status.FINDING;
-         //blocks while avoiding
-         //determines alternate point by shifting angle to obstacle by 45 left or right depending on orientation in the field and resumes
-/*         if((int)pos.x < X_LOW_BOUND/2) {
-            this.travelTo(pos.x,pos.y);
-         }
-         else {
-            this.travelTo(pos.x,pos.y);
-         }
-*/       
-         float avoidAngleAdjust = 30f;
-         if(pos.x < 30.48*4 && pos.getDegrees() > 45 && pos.getDegrees() < 180) avoidAngleAdjust = -30f; 
-         float avoidX = pos.x + (ping)/2*(float)Math.cos(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
-         float avoidY = pos.y + (ping)/2*(float)Math.sin(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
-         backup();
-         this.travelTo(avoidX,avoidY);
-         //revert back to old state
-         this.findStatus = storeFindStatus;
-         if(this.findStatus != FindStatus.ID) travelTo(storeTarget.x,storeTarget.y);
+            Sound.beep();
+            //need to remember where the robot was going
+            storeTarget = this.getTarget();  
+            storeFindStatus = this.findStatus;
+            //determine obstacle position
+            Position pos = this.getPosition();
+            //turn avoidance on
+            this.findStatus = FindStatus.AVOIDING;
+            this.status = Status.FINDING;
+            backup();
+            //blocks while avoiding
+            //determines alternate point by shifting angle to obstacle by 45 left or right depending on orientation in the field and resumes
+            turnTo(pos.getDegrees() + 45f); //turn left 45 deg
+            while(this.status == Status.ROTATING) {}
+            int leftDistance = uListener.getDistance();
+            float avoidAngleAdjust = 0f;
+            int pingDiv = 1;
+            if( leftDistance > threshold + 10 ) {
+               //go left
+            }
+            else { //turn right 45 past obsticle
+               turnTo(pos.getDegrees() - 90f);
+               while(this.status == Status.ROTATING) {}
+               if ( leftDistance > uListener.getDistance() ) {
+                  //TODO:fucked, preliminary avoid angle to avoid walls
+                  turnTo(pos.getDegrees() + 45f);
+                  while(this.status == Status.ROTATING) {}
+                  avoidAngleAdjust = 30f;
+                  pingDiv = 2;
+                  if(pos.x < 30.48*4 && pos.getDegrees() > 45 && pos.getDegrees() < 180) avoidAngleAdjust = -30f; 
+               }
+            }
+
+            float avoidX = pos.x + (ping)/pingDiv*(float)Math.cos(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
+            float avoidY = pos.y + (ping)/pingDiv*(float)Math.sin(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
+            this.travelTo(avoidX,avoidY);
+            while(this.status == Status.ROTATING || this.status == Status.TRAVELLING) {}
+            //revert back to old state
+            this.findStatus = storeFindStatus;
+            if(this.findStatus != FindStatus.ID) travelTo(storeTarget.x,storeTarget.y);
          }
       }
    }
+   /** robot backs up at a constant speed for a constant time, used in avoidance
+	 @author Alex
+	 @return void */
    public void backup() {
       this.setSpeeds(-200,-200);
       try {
@@ -245,5 +284,4 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       }
       this.stop();
    }
-
 } 
