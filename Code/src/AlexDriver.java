@@ -19,8 +19,10 @@ class AlexDriver {
 	 @author Alex, Neil */
 	public static void main(String args[]) {
 
-		/* copy the profile */
-		Hardware.locobot();
+		/* the hardware profile for the robot */
+		Hardware.swagbotV2();
+		Hardware.useBluetooth = true;
+		Hardware.useServer    = false;
 
 		float destination_x = 50f;
 		float destination_y = 50f;

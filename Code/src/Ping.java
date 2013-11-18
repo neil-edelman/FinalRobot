@@ -9,18 +9,10 @@ import java.util.ArrayList;
 
 public class Ping {
 	/********* copy/paste here ************/
-	
+
 	private static final float TWO_PI = (float)(2*Math.PI);
 	private static final float     PI = (float)(Math.PI);
-	/***** fixme: have it in Robot.java? */
-	private static final float    LIGHT_BACK = 12.2f;
-	private static final float SONIC_FORWARD = 10.4f;
-	//	private static final float SONIC_FORWARD = 8f;    //swagbot (version 2) tested: y value is off (doesn't work)
-	private static final float  CUTOFF_ANGLE = (float)Math.toRadians(60.0);
-	private static final float       DET_MIN = 0.8f;
-	private static final float     MAX_ERROR = 2.0f;
-	private static final float     CLEARANCE = 10.0f;
-	
+
 	/* return values from strightish */
 	private static int rangeLower, rangeHigher;
 	
@@ -39,7 +31,7 @@ public class Ping {
 		cm = reading;
 		/* derive */
 		float a = p.getRadians();
-		float b = cm + SONIC_FORWARD;
+		float b = cm + Hardware.sonicForward;
 		x = p.x + (float)Math.cos(a) * b;
 		y = p.y + (float)Math.sin(a) * b;
 	}
@@ -231,7 +223,7 @@ public class Ping {
 			Br *= one_norm;
 			Cr *= one_norm;
 		}
-		if(Cl < CLEARANCE || Cr < CLEARANCE) {
+		if(Cl < Hardware.clearance || Cr < Hardware.clearance) {
 			throw new Exception("" + Math.round(Cl) + "," + Math.round(Cr) +
 								" unfeasible");
 		}
@@ -252,8 +244,8 @@ public class Ping {
 		 float adbc = 1f / det;
 		 float n =  d*adbc, m = -b*adbc;
 		 float o = -c*adbc, p =  a*adbc;*/
-		if(det < DET_MIN) throw new Exception("det " + det + " :(");
-		
+		if(det < Hardware.detMin) throw new Exception("det " + det + " :(");
+
 		/* so we need a to spectrally decompose the matrix into a
 		 unitary (viz orthogonal) matrix (det 1) and diagonal eigenvalues by
 		 eigendecomposition (not a good route)
@@ -286,7 +278,7 @@ public class Ping {
 			rms_er = (float)Math.sqrt(rms_er) / nr;
 		}
 		/* there's not much chance of this given strightishLine */
-		if(rms_el > MAX_ERROR || rms_er > MAX_ERROR) {
+		if(rms_el > Hardware.maxR2Error || rms_er > Hardware.maxR2Error) {
 			throw new Exception("too noisy "+rms_er+","+rms_el);
 		}
 		
@@ -295,10 +287,10 @@ public class Ping {
 		float angler = (float)Math.atan2(-b, a);
 		float anglel = (float)Math.atan2(c,  d);
 		/* make sure we're on the same branch */
-		if     (anglel > angler + Math.PI) angler += 2f*Math.PI;
-		else if(angler > anglel + Math.PI) anglel += 2f*Math.PI;
+		if     (anglel > angler + PI) angler += TWO_PI;
+		else if(angler > anglel + PI) anglel += TWO_PI;
 		float angle = (anglel*rms_er + angler*rms_el) / (rms_el + rms_er);
-		if(angle > Math.PI) angle -= 2f*Math.PI;
+		if(angle > PI) angle -= TWO_PI;
 		
 		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
 		/* fixme: check that it's w/i bounds */
@@ -382,7 +374,7 @@ public class Ping {
 				 Math.round(Math.toDegrees(angleComp))+
 				 "="+
 				 Math.round(Math.toDegrees(abs_da))+";");*/
-				if(abs_da > CUTOFF_ANGLE) {
+				if(abs_da > Hardware.cutoffAngle) {
 					/*System.err.print("stop("+chooseLeft+");");*/
 					if(chooseLeft) isLeftBlocked  = true;
 					else           isRightBlocked = true;
