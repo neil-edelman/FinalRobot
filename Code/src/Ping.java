@@ -306,7 +306,7 @@ public class Ping {
 		odometer.addRadians(angle);
 		
 		/* choose appropriate comment \/ */
-		Display.setText2("loco ("+Cl+", "+Cr+":"+Math.toDegrees(angle)+")");
+		Display.setText("Ping ("+Cl+", "+Cr+":"+Math.toDegrees(angle)+")");
 		//write(isYFlipped, isXFlipped, left255, yAxis, xAxis, right255, yl, yh, xl, xh, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, det, rms_el, rms_er, angler, anglel, angle);
 	}
 	

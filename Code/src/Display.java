@@ -9,8 +9,7 @@ import lejos.util.TimerListener;
 public class Display implements TimerListener{
 	public static final int LCD_REFRESH = 500;
 
-	private static String  drawText1 = "";
-	private static String  drawText2 = "";
+	private static String  drawText = "exterminate";
 
 	private static Display owner = null;
 
@@ -48,15 +47,14 @@ public class Display implements TimerListener{
 	public void timedOut() {
 		Position position = robot.getPosition();
 		LCD.clear();
-//		LCD.drawString("" + robot.getName(), 0, 0, true);
-		LCD.drawString("" + robot.getStatus() + " | " + robot.getFindStatus(), 0, 0);
-		LCD.drawString("pos: " + position, 0, 1);
-      LCD.drawString("SmPing:   " + robot.getSmallestPing(), 0, 2);
-      LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 3);
-      LCD.drawString("UDist:    " + robot.getDistance(), 0, 4);
-      LCD.drawString("UFDist:   " + robot.getFilteredDistance(), 0, 5);
-		LCD.drawString(drawText1, 0, 6, true);
-		LCD.drawString(drawText2, 0, 7, true);
+		LCD.drawString("" + robot.getName(), 0, 0, true);
+		LCD.drawString("" + robot.getStatus() + " | " + robot.getFindStatus(), 0, 1);
+		LCD.drawString("pos: " + position, 0, 2);
+		LCD.drawString(drawText, 0, 3, true);
+      LCD.drawString("SmPing:   " + robot.getSmallestPing(), 0, 4);
+      LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 5);
+      LCD.drawString("UDist:    " + robot.getDistance(), 0, 6);
+      LCD.drawString("UFDist:   " + robot.getFilteredDistance(), 0, 7);
 
 //      LCD.drawString("Distance:", 0, 5);
 //      LCD.drawString("MedFilter:", 0, 6);
@@ -68,14 +66,7 @@ public class Display implements TimerListener{
 	 @author Neil
 	 @param text text string */
 	public static void setText(String text) {
-		drawText1 = text; 
-	}
-
-	/** sets the 2nd user specified text string
-	 @author Neil
-	 @param text text string */
-	public static void setText2(String text) {
-		drawText2 = text; 
+		drawText = text; 
 	}
 
 }

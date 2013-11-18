@@ -44,15 +44,15 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 	}
 
 	/** the constructor */
-   public Swagbot(final SensorPort sonicPort, final SensorPort colourPort, final SensorPort lightPort, final float x, final float y) {
-      super(sonicPort,/*colourPort,*/lightPort); /* <- it's the other way around -Neil */
+   public Swagbot(final float x, final float y) {
+      super();
       uListener = new UltrasonicListener(this.sonic);
       uTimer = new Timer(10/*round-up to int 9.375*/,uListener); //timeout value in ms
       uTimer.start();
       Sound.setVolume(100);
       this.DESTINATION_X = x;
       this.DESTINATION_Y = y;
-	   colour = new Colour(colourPort);
+	   colour = new Colour(Hardware.colourPort);
    }
 
    //**********************************
