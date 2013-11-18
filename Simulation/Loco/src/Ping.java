@@ -12,6 +12,12 @@ import java.io.PrintWriter;
 
 public class Ping {
 
+	private static final int   GNU_XR = 80;
+	private static final int   GNU_YR = 60;
+	private static final float GNU_TX = 0.12f;
+	private static final float GNU_TY = 0.4f;
+	private static final String GNU_LE= "0 '#999999', 1 '#ff0000', 2 '#0000ff', 3 '#ff00ff'";
+
 	private static Odometer odometer = new Odometer(); /* stub */
 
 	public static void main(String args[]) {
@@ -56,7 +62,8 @@ public class Ping {
 	}
 
 	/* write(left, yAxis, xAxis, right, yl, yh, xl, xh, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle); */
-	static void write(final int left, final int yAxis, final int xAxis, final int right,
+	static void write(final boolean isYFlipped, final boolean isXFlipped,
+					  final int left, final int yAxis, final int xAxis, final int right,
 					  final int yl, final int yh, final int xl, final int xh,
 					  final int nl, final int nr,
 					  final float ml, final float bl,
@@ -73,8 +80,25 @@ public class Ping {
 
 		System.err.println("covarience of: y " + nl + "; x " + nr + " points");
 
-		System.err.println("y regression: y = " + ml + "*x + " + bl);
-		System.err.println("x regression: y = " + mr + "*x + " + br);
+		float xy_ml, xy_bl, xy_mr, xy_br;
+		if(!isYFlipped) {
+			System.err.println("y regression: y = " + ml + "*x + " + bl);
+			xy_ml = ml;
+			xy_bl = bl;
+		} else {
+			System.err.println("y regression: x = " + ml + "*y + " + bl);
+			xy_ml = 1f / ml;
+			xy_bl = -bl / ml;
+		}
+		if(!isXFlipped) {
+			System.err.println("x regression: y = " + mr + "*x + " + br);
+			xy_mr = mr;
+			xy_br = br;
+		} else {
+			System.err.println("x regression: x = " + mr + "*y + " + br);
+			xy_mr = 1f / mr;
+			xy_br = -br / mr;
+		}
 
 		System.err.println("y std: " + Al + "*x + " + Bl + "*y + " + Cl + " = 0");
 		System.err.println("x std: " + Ar + "*x + " + Br + "*y + " + Cr + " = 0");
@@ -99,31 +123,32 @@ public class Ping {
 			writer.println("set output \"robot.eps\"");
 			writer.println("set xlabel \"x\"");
 			writer.println("set ylabel \"y\"");
+			writer.println("set xrange [-" + GNU_XR + ":" + GNU_XR + "]");
+			writer.println("set yrange [-" + GNU_YR + ":" + GNU_YR + "]");
 			writer.println("set size ratio -1");
-			writer.println("#set size square");
 			writer.println("set palette maxcolors 4");
-			writer.println("set palette defined (0 '#999999', 1 '#ff0000', 2 '#0000ff', 3 '#ff00ff')");
+			writer.println("set palette defined ("+GNU_LE+")");
 			writer.println("set label \"covarience of: y ["+yl+", "+xl+"] ("+nl+
 						   "); x ["+xl+", "+xh+"] ("+nr+
-						   ")\" at screen 0.02, screen 0.36");
+						   ")\" at screen "+GNU_TX+", screen "+(GNU_TY-0.00f));
 			writer.println("set label \"determinate " + det +
-						   "\" at screen 0.02, screen 0.32");
+						   "\" at screen "+GNU_TX+", screen "+(GNU_TY-0.04));
 			writer.println("set label \"error rms: y " + rms_el + "; x " + rms_er +
-						   "\" at screen 0.02, screen 0.28");
+						   "\" at screen "+GNU_TX+", screen "+(GNU_TY-0.08));
 			writer.println("set label \"angle: y "
 						   + (float)Math.toDegrees(angler) + "; x " +
 						   (float)Math.toDegrees(anglel) +
-						   "\" at screen 0.02, screen 0.24");
+						   "\" at screen "+GNU_TX+", screen "+(GNU_TY-0.12));
 			writer.println("set label \"rms weighted average "
 						   + (float)Math.toDegrees(angle) +
-						   "\" at screen 0.02, screen 0.2");
+						   "\" at screen "+GNU_TX+", screen "+(GNU_TY-0.16));
 			writer.println("set label \"you appear to be at (" +
 						   Math.round(p.x) + ", " +
 						   Math.round(p.y) + " : " +
 						   Math.round(p.getDegrees()) +
-						   ")\" at screen 0.02, screen 0.16");
-			writer.println("l(x) = " + ml + "*x + " + bl);
-			writer.println("r(x) = " + mr + "*x + " + br);
+						   ")\" at screen "+GNU_TX+", screen "+(GNU_TY-0.20));
+			writer.println("l(y) = " + xy_ml + "*y + " + xy_bl);
+			writer.println("r(x) = " + xy_mr + "*x + " + xy_br);
 			writer.println("set object circle at first 0,0 radius char 0.5 fillcolor rgb 'red' fillstyle solid noborder");
 			writer.println("plot \"robot.data\" using 1:2:3 title \"Robot\" with points palette, \\");
 			writer.println("l(x) title \"left " + Al + "*x + " + Bl + "*y + " + Cl + " = 0\", \\");
@@ -141,14 +166,16 @@ public class Ping {
 			writer = new PrintWriter("robot.gnu", "UTF-8");
 			writer.println("set term postscript eps enhanced");
 			writer.println("set output \"robot.eps\"");
-			writer.println("set xlabel \"x\"");
-			writer.println("set ylabel \"y\"");
+			writer.println("set xlabel \"x (cm)\"");
+			writer.println("set ylabel \"y (cm)\"");
+			writer.println("set xrange [-" + GNU_XR + ":" + GNU_XR + "]");
+			writer.println("set yrange [-" + GNU_YR + ":" + GNU_YR + "]");
 			writer.println("set size ratio -1");
 			writer.println("set palette maxcolors 4");
-			writer.println("set palette defined (0 '#bbbbbb', 1 '#ff0000', 2 '#00ff00', 3 '#0000ff')");
-			writer.println("set label \"couldn't localise\" at screen 0.02, screen 0.36");
+			writer.println("set palette defined ("+GNU_LE+")");
+			writer.println("set label \"couldn't localise\" at screen "+GNU_TX+", screen "+GNU_TY);
 			writer.println("set label \"why? " + m +
-						   "\" at screen 0.02, screen 0.32");
+						   "\" at screen "+GNU_TX+", screen "+(GNU_TY-0.04));
 			writer.println("set object circle at first 0,0 radius char 0.5 fillcolor rgb 'red' fillstyle solid noborder");
 			writer.println("plot \"robot.data\" using 1:2:3 title \"Robot\" with points palette");
 		} catch(Exception e) {
@@ -164,6 +191,7 @@ public class Ping {
 	private static final float SONIC_FORWARD = 10.4f;
 	private static final float  CUTOFF_ANGLE = (float)Math.toRadians(60.0);
 	private static final float       DET_MIN = 0.5f;
+	private static final float     MAX_ERROR = 2.5f;
 	/* fixme: this is somewhere else */
 	private static final float     CLEARANCE = 10.0f;
 
@@ -289,6 +317,7 @@ public class Ping {
 			cov_xx_n2l = ss_xxl*nl - s_xl*s_xl;
 			cov_yy_n2l = ss_yyl*nl - s_yl*s_yl;
 			cov_xy_n2l = ss_xyl*nl - s_xl*s_yl;
+			System.err.println(" "+avg_xl+" "+avg_yl+" "+cov_xx_n2l+" "+cov_yy_n2l+" "+cov_xy_n2l);
 
 			for(int i = xl; ; i++) {
 				if(i >= size) i = 0;
@@ -310,24 +339,69 @@ public class Ping {
 			cov_xy_n2r = ss_xyr*nr - s_xr*s_yr;
 		}
 
-		/* get the equation from math */
-		float ml  = cov_xy_n2l / cov_xx_n2l;
-		float bl  = avg_yl - ml*avg_xl;
-
-		float mr  = cov_xy_n2r / cov_xx_n2r;
-		float br  = avg_yr - mr*avg_xr;
-
-		/* get the standard form; fixme: principal component analysis allows
-		 this to be numically stable, but I tried and it's hard */
+		/* get the equation from math and standard form;
+		 fixme: principal component analysis allows this to be numically
+		 stable, but I tried and it's hard; separate into 2 to be good */
 		/*         y = mx + b
 		  mx - y + b = 0
 		 (ss_xy / ss_xx) x -        y + ((s_y/n) - ss_xy / ss_xx * (s_x/n)) = 0
 		 (ss_xy)x          - (ss_xx)y + (ss_xx * (s_y/n) - ss_xy * (s_x/n)) = 0
 		 Ax + By + C = 0 */
 
+		/*float ml, bl, Al, Bl, Cl;
+		if(Math.abs(cov_xx_n2l) > Math.abs(cov_yy_n2l)) {
+			ml  = cov_xy_n2l / cov_xx_n2l;
+			bl  = avg_yl - ml*avg_xl;
+			Al =  cov_xy_n2l;
+			Bl = -cov_xx_n2l;
+			Cl =  cov_xx_n2l*avg_yl - cov_xy_n2l*avg_xl;
+		} else {
+			System.err.println("fliping!");
+			ml  = cov_xy_n2l / cov_yy_n2l;
+			bl  = avg_xl - ml*avg_yl;
+			ml = 1f / ml;
+			bl *= -ml;
+			Al =  cov_xy_n2l;
+			Bl = -cov_yy_n2l;
+			Cl =  cov_yy_n2l*avg_xl - cov_xy_n2l*avg_yl;
+		}*/
+
+		boolean isYFlipped = false, isXFlipped = false;
+
+		/* y(x) -> x(y) */
+		if(Math.abs(cov_xx_n2l) < Math.abs(cov_yy_n2l)) {
+			isYFlipped = true;
+			/* I don't think Java would appriciate *(int *)&a ^= b ^= a ^= b */
+			float t;
+			t      = avg_xl;
+			avg_xl = avg_yl;
+			avg_yl = t;
+			t          = cov_xx_n2l;
+			cov_xx_n2l = cov_yy_n2l;
+			cov_yy_n2l = t;
+		}
+
+		if(Math.abs(cov_xx_n2r) < Math.abs(cov_yy_n2r)) {
+			isXFlipped = true;
+			/* I don't think Java would appriciate *(int *)&a ^= b ^= a ^= b */
+			float t;
+			t      = avg_xr;
+			avg_xr = avg_yr;
+			avg_yr = t;
+			t          = cov_xx_n2r;
+			cov_xx_n2r = cov_yy_n2r;
+			cov_yy_n2r = t;
+		}
+
+		float ml  = cov_xy_n2l / cov_xx_n2l;
+		float bl  = avg_yl - ml*avg_xl;
+
 		float Al =  cov_xy_n2l;
 		float Bl = -cov_xx_n2l;
 		float Cl =  cov_xx_n2l*avg_yl - cov_xy_n2l*avg_xl;
+
+		float mr  = cov_xy_n2r / cov_xx_n2r;
+		float br  = avg_yr - mr*avg_xr;
 
 		float Ar =  cov_xy_n2r;
 		float Br = -cov_xx_n2r;
@@ -339,12 +413,14 @@ public class Ping {
 
 			/*one_norm = 1f / (float)Math.hypot(Al, Bl); <- no Math.hypot in nxj */
 			one_norm = 1f / (float)Math.sqrt(Al*Al + Bl*Bl);
+			System.err.print("Y: " + Cl + "; ");
 			if(Cl < 0) one_norm = -one_norm;
 			Al *= one_norm;
 			Bl *= one_norm;
 			Cl *= one_norm;
 			
 			one_norm = 1f / (float)Math.sqrt(Ar*Ar + Br*Br);
+			System.err.println("X: " + Cr + ";");
 			if(Cr < 0) one_norm = -one_norm;
 			Ar *= one_norm;
 			Br *= one_norm;
@@ -371,7 +447,7 @@ public class Ping {
 		float adbc = 1f / det;
 		float n =  d*adbc, m = -b*adbc;
 		float o = -c*adbc, p =  a*adbc;*/
-		if(det < DET_MIN) throw new Exception("det " + det + " :(");
+		//if(det < DET_MIN) throw new Exception("det " + det + " :(");
 
 		/* so we need a to spectrally decompose the matrix into a
 		 unitary (viz orthogonal) matrix (det 1) and diagonal eigenvalues by
@@ -404,6 +480,9 @@ public class Ping {
 			}
 			rms_er = (float)Math.sqrt(rms_er) / nr;
 		}
+		if(rms_el > MAX_ERROR || rms_er > MAX_ERROR) {
+			//throw new Exception("too noisy "+rms_er+","+rms_el);
+		}
 
 		/* in the QR and QL decomposion, the Q is unitary and the angle,
 		 tan t = -b/a = Ar/Br; tan t = c/d = -Bl/Al */
@@ -422,7 +501,7 @@ public class Ping {
 
 		/* choose appropriate comment \/ */
 		//Display.setText2("loco ("+Cl+", "+Cr+":"+Math.toDegrees(angle)+")");
-		write(left255, yAxis, xAxis, right255, yl, yh, xl, xh, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, det, rms_el, rms_er, angler, anglel, angle);
+		write(isYFlipped, isXFlipped, left255, yAxis, xAxis, right255, yl, yh, xl, xh, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, det, rms_el, rms_er, angler, anglel, angle);
 	}
 
 	/** given an array of pings and an index, sets [rangeLower, rangeHigher]
@@ -440,7 +519,7 @@ public class Ping {
 		if(about < 0 || about >= size) throw new IndexOutOfBoundsException("ping " + about);
 		boolean isLeftBlocked = false, isRightBlocked = false;
 		boolean chooseLeft = false;
-		float dx, dy, angle, angleComp, abs_da;
+		float dx, dy, angle, dist, angleComp, distComp, abs_da, choice;
 		int candidate;
 		int left, right;
 		Ping ping, leftPing, rightPing;
@@ -489,8 +568,16 @@ public class Ping {
 				}
 				angleComp = (float)Math.atan2(dy, dx);
 				abs_da = (angleComp > angle) ?
-				    (angleComp - angle) : (angle - angleComp);
+					(angleComp - angle) : (angle - angleComp);
+				if(abs_da > PI) abs_da = TWO_PI - abs_da;
+				/*System.err.print("["+candidate+"]" +
+								 Math.round(Math.toDegrees(angle))+
+								 "-"+
+								 Math.round(Math.toDegrees(angleComp))+
+								 "="+
+								 Math.round(Math.toDegrees(abs_da))+";");*/
 				if(abs_da > CUTOFF_ANGLE) {
+					/*System.err.print("stop("+chooseLeft+");");*/
 					if(chooseLeft) isLeftBlocked  = true;
 					else           isRightBlocked = true;
 					continue;
@@ -500,8 +587,12 @@ public class Ping {
 			if(chooseLeft) left = candidate;
 			else          right = candidate;
 		}
+		/*System.err.println("done");*/
+
 		rangeLower  = left;
 		rangeHigher = right;
 	}
+	private static final float TWO_PI = (float)(2*Math.PI);
+	private static final float     PI = (float)(Math.PI);
 
 }
