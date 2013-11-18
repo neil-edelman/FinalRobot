@@ -8,7 +8,7 @@ class Hardware {
 
 	/* basic settings for Sex Robot (default) */
 
-	/* from Driver */
+	/* from Driver / Swagbot */
 	public static SensorPort  sonicPort = SensorPort.S4;
 	public static SensorPort colourPort = SensorPort.S3;
 	public static SensorPort  lightPort = SensorPort.S1;
@@ -40,9 +40,10 @@ class Hardware {
 	public static float sonicForward = 10.4f;
 	public static float    clearance = 12.0f;
 
-	/* from Robot */
+	/* from Robot / Swagbot */
 	public static NXTRegulatedMotor  leftMotor = Motor.A;
 	public static NXTRegulatedMotor rightMotor = Motor.B;
+	public static NXTRegulatedMotor stakerMotor= Motor.C;
 	public static String                  name = "Sex Robot";
 	public static int                 navDelay = 100; /* ms */
 	public static float         angleTolerance = (float)Math.toRadians(0.1); /* rad */
