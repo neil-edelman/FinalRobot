@@ -79,10 +79,11 @@ public class Locobot extends Robot {
 		timer.setDelay(NAV_DELAY);
 
 		/* calculate */
-		if(Ping.correct(pings, odometer)) {
-			Display.setText("Loco " + odometer.getPosition());
-		} else {
-			Display.setText("Loco failed.");
+		try {
+			Ping.correct(pings, odometer);
+		} catch(Exception e) {
+			Display.setText(e.getMessage());
+			/* fixme: try again!!! */
 		}
 
 		/* send? */
