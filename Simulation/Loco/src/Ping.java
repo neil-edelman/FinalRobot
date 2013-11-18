@@ -49,7 +49,10 @@ public class Ping {
 		for(Ping ping : pings) {
 			if(ping.cm >= 255) continue;
 			System.out.println("" + ping.x + "\t" + ping.y + "\t" + ping.colour);
-		 }
+		}
+		/* force gnuplot to extend the colour values */
+		System.out.println("0\t0\t3");
+		System.out.println("0\t0\t0");
 	}
 
 	/* write(left, yAxis, xAxis, right, yl, yh, xl, xh, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle); */

@@ -4,6 +4,7 @@
  also does the details of localisiation */
 
 import java.lang.IllegalArgumentException;
+import java.lang.IndexOutOfBoundsException;
 import java.util.ArrayList;
 
 public class Ping {
@@ -49,7 +50,7 @@ public class Ping {
 	 distance are the walls (could fix this, but we're gaurateed this;) (3) the
 	 pings has sufficent pings to be useful (linear regression is taken of the
 	 two sides, so we'll need at least four pings; realistically more)
-	 fixme: I think this should be in Locobot
+	 @exception      OutOfBounds?
 	 @param pings    an ArrayList<Ping> of pings
 	 @param odometer an odometer to correct
 	 @return wheter the odometer was successfully localised */
@@ -60,8 +61,9 @@ public class Ping {
 		/* determine the area that is most close taking the minimum;
 		 should be the integral of all the area, but this is okay,
 		 we expect the closest thing to be the wall at the start */
+		final int size = pings.size();
 		int cmClosest = 255, cm;
-		int closest = 0, left, right, size = pings.size();
+		int closest = 0, left, right;
 		for(int i = 0; i < size; i++) {
 			cm = pings.get(i).cm;
 			if(cm < cmClosest) {
@@ -230,45 +232,62 @@ public class Ping {
 		/* the xy c\:oordinates: x = distance to the y-axis, vise versa */
 		odometer.addXY(Cl, Cr);
 		odometer.addRadians(angle);
-		Display.setText2("("+Cl+", "+Cr+":"+Math.toDegrees(angle)+")");
 		
 		/* comment this \/ */
+		Display.setText2("("+Cl+", "+Cr+":"+Math.toDegrees(angle)+")");
 		/*write(left, mid, right, nl, nr, ml, bl, mr, br, Al, Bl, Cl, Ar, Br, Cr, rms_el, rms_er, angler, anglel, angle);*/
 		/* /\ */
 		
 		return true;
 	}
 
-	/** working on it
+	/** 
+	 @author Neil */
+	/** given an array of pings and an index, sets expands a strightish line (within CUTOFF_ANGLE) and places the restults
+	 in rangeLower and rangeHigher; this was determined to be worse than blind
+	 picking the middle but gets rid of objects on the walls
 	 @author Neil */
 	private static void straightishLine(final ArrayList<Ping> pings, final int about) {
-		boolean isLeft = true, isRight = true;
-		int left, right;
+		final int size = pings.size();
+		if(about < 0 || about >= size) throw new IndexOutOfBoundsException("ping " + about);
+		boolean isLeftBlocked = false, isRightBlocked = false, chooseLeft = false;
 		float angle = 0;
 		int candidate;
-		Ping value;
+		int left, right;
+		Ping ping, leftPing, rightPing;
 
 		left = right = about;
 		for( ; ; ) {
-			if(isLeft) {
-				candidate = left - 1;
-				value = pings.get(candidate);
-				if(value.cm >= 255) {
-					isLeft = false;
-				} else {
-					// do sth smrt
-				}
-			} if(isRight) {
-				candidate = right + 1;
-				value = pings.get(candidate);
-				if(value.cm >= 255) {
-					isRight = false;
-				} else {
-					/* devivative . . . */
-				}
+			/* choose left and right until there are none,
+			 like the Doctor Who: Turn Left */
+			if(isLeftBlocked) {
+				if(isRightBlocked) break;
+				chooseLeft = false;
 			} else {
-				break;
+				if(isRightBlocked) {
+					chooseLeft = true;
+				} else {
+					chooseLeft = !chooseLeft;
+				}
 			}
+			/* move one over */
+			if(chooseLeft) {
+				candidate = left - 1;
+				if(candidate  < 0)    candidate = size - 1;
+			} else {
+				candidate = right + 1;
+				if(candidate >= size) candidate = 0;
+			}
+			ping = pings.get(candidate);
+			/* if it's 255? */
+			if(ping.cm >= 255) {
+				if(chooseLeft) isLeftBlocked  = true;
+				else           isRightBlocked = true;
+				continue;
+			}
+			if(chooseLeft) left = candidate;
+			else          right = candidate;
 		}
 	}
+
 }

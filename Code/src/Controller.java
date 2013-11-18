@@ -13,7 +13,9 @@ public class Controller {
 	float e, eLast;   /* setpoint - current value */
 	float integral, derivative;
 	float min, max;   /* limits */
-	boolean isLimit, isFirst = true;
+	float lastPid = 0;/* for limiting the accel */
+	float accelerationLimit;
+	boolean isLimit, isAccelerationLimit, isFirst = true;
 
 	/* just p
 	 @author Neil
@@ -29,7 +31,8 @@ public class Controller {
 	 @author Neil
 	 @param p proportional gain
 	 @param i integral gain
-	 @param d derivative gain */
+	 @param d derivative gain
+	 @see #Controller(final float) */
 	public Controller(final float p, final float i, final float d) {
 		this(p);
 		ki = i;
@@ -77,6 +80,19 @@ public class Controller {
 			integral = integral /* * FORGET*/ + e;
 		}
 
+		/* limit the acceleration */
+		if(isAccelerationLimit) {
+			float allowed;
+			if(pid < lastPid) {
+				allowed = lastPid - accelerationLimit * dt;
+				if(pid < allowed) pid = allowed;
+			} else if(pid > lastPid) {
+				allowed = lastPid + accelerationLimit * dt;
+				if(pid > allowed) pid = allowed;
+			}
+			lastPid = pid;
+		}
+
 		/* kp * e + ki * (int e) + kd * (d/dt e) */
 		return pid;
 	}
@@ -97,13 +113,31 @@ public class Controller {
 	 to have a limit
 	 @author Neil
 	 @param limit The limit (-/+) on the output and past which it will not
-	 record the integral. */
+	 record the integral.
+	 @throws IllegalArgumentException if the limit <= 0 */
 	public void reset(final float limit) {
 		if(limit <= 0) throw new IllegalArgumentException();
 		this.reset();
 		min = -limit;
 		max =  limit;
 		isLimit = true;		
+	}
+
+	/** limit acceleration; fixes stalling when battery voltage is low?
+	 @author Neil
+	 @param limit in /s
+	 @throws IllegalArgumentException if the limit <= 0 */
+	public void limitAcceleration(final float limit) {
+		if(limit <= 0f) throw new IllegalArgumentException("limit " + limit);
+		accelerationLimit = limit;
+		isAccelerationLimit = true;
+	}
+
+	/** lifts the acceleration limit
+	 @author Neil */
+	public void limitAcceleration() {
+		accelerationLimit = 0f;
+		isAccelerationLimit = false;
 	}
 
 	/** checking if it's w/i epsilon

@@ -63,8 +63,8 @@ public class Display implements TimerListener{
 
 	}
 
-	/* fixme: some sort of bounds check? */
 	/** sets the user-specified text string
+	 fixme: some sort of bounds check?
 	 @author Neil
 	 @param text text string */
 	public static void setText(String text) {

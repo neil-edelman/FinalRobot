@@ -38,6 +38,7 @@ public class Robot implements TimerListener {
 
 	/* Ziegler-Nichols method was used to get close to the optimum;
 	 the battery voltage causes some lag when low */
+	/* classic (aggresive) control; we want errors in the angle corrected fast */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f);
 	/* fixme!!!! this has not been optimised */
 	private Controller distancePID = new Controller(30f, 2f, 1f);
@@ -72,7 +73,9 @@ public class Robot implements TimerListener {
 	public void timedOut() {
 		/* get the latest from the odometer */
 		/*odometer.positionSnapshot();*/
-		/* forget that, our robot can predict the future */
+		/* forget that, our robot can predict the future; it's like that ep of
+		 Stargate, Avatar, where T'elc can see, in this case, 7.5 ms into the
+		 future in the simulation */
 		odometer.premonitionUpdate();
 		/* state machine */
 		switch(status) {
@@ -350,7 +353,16 @@ public class Robot implements TimerListener {
       odometer.setPosition(pos);
    }
 
-	/** set r/l speeds indepedently */
+	/** set r/l speeds indepedently; doesn't always work
+	 fixme: more testing, extensively
+	 1) hardware?
+	 2) chosen after? swap
+	 3) brick ports error?
+	 4) firmware error?
+	 5) nxj error?
+	 @author Neil
+	 @param final float l  left speed degrees/sec
+	 @param final float r  right speed degrees/sec */
 	protected void setSpeeds(final float l, final float r) {
 		leftMotor.setSpeed(l);
 		if(l > 0) {
@@ -371,7 +383,7 @@ public class Robot implements TimerListener {
 	}
 
 	/** [emergency/idle] stop (fixme: protected?) */
-	public void stop() {
+	protected void stop() {
 		leftMotor.stop();
 		rightMotor.stop();
 	}
