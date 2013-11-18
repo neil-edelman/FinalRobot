@@ -15,6 +15,7 @@ public class Ping {
 	/***** fixme: have it in Robot.java? */
 	private static final float    LIGHT_BACK = 12.2f;
 	private static final float SONIC_FORWARD = 10.4f;
+	//	private static final float SONIC_FORWARD = 8f;    //swagbot (version 2) tested: y value is off (doesn't work)
 	private static final float  CUTOFF_ANGLE = (float)Math.toRadians(60.0);
 	private static final float       DET_MIN = 0.8f;
 	private static final float     MAX_ERROR = 2.0f;

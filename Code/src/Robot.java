@@ -55,7 +55,7 @@ public class Robot implements TimerListener {
 		odometer = new Odometer(leftMotor, rightMotor);
 		/* set smooth -- DO NOT DO THIS IT MAKES IT LOCO; figure-8's, crashing
 		 on walls, etc; who know what it does, but it's NOT a accelertion
-		 limiter */
+		 limiter */ //TODO:lol -alex
 		/*leftMotor.setAcceleration(500);
 		rightMotor.setAcceleration(500);*/
 		/* start the timer for updates (timedOut) */
@@ -81,14 +81,15 @@ public class Robot implements TimerListener {
 		switch(status) {
 			case TRAVELLING:
             if(avoid) {
-                //avoidance when relocating to next scan point or when taking a block to the destination (i.e. not when moving to block or scanning)
-                if( findStatus == FindStatus.RELOCATING || findStatus == FindStatus.FINISHED ) {
-                   this.avoidance(30); 
-                }
-                //assuming its ID'ing and set lower limit
-                else {
-                   //this.avoidance(15);
-                }
+               this.avoidance(30);
+//                //avoidance when relocating to next scan point or when taking a block to the destination (i.e. not when moving to block or scanning)
+//                if( findStatus == FindStatus.RELOCATING || findStatus == FindStatus.FINISHED ) {
+//                   this.avoidance(20); 
+//                }
+//                //assuming its ID'ing and set lower limit
+//                else {
+//                   //this.avoidance(15);
+//                }
             }
 				this.travel();
 				break;
@@ -144,9 +145,14 @@ public class Robot implements TimerListener {
       Position p = odometer.getPosition();
       float angle = p.getDegrees();
       //turning right
-      if(this.turnRate < 0f && target.getDegrees() > angle) {
-         status = Status.IDLE;
-         this.stop();
+      if(this.turnRate < 0f) {
+         float left = target.getTheta() - 45f;
+         if(left < 0f)
+            left += 360f;
+         if( (angle < target.getDegrees() || angle < 0) && (angle > left || angle < 0) ) {
+            status = Status.IDLE;
+            this.stop();
+         }
       }
       //turning left
       if(this.turnRate > 0f) {
