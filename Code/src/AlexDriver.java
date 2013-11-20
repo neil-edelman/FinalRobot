@@ -14,7 +14,7 @@ class AlexDriver {
 	private static final int   BLUETOOTH_DELAY = 0;  /* 10000 is to short */
 	private static final boolean BLUETOOTH_USE = false;
 	private static final boolean    SERVER_USE = false;
-	private static final boolean      LOCO_USE = true;
+	private static final boolean      LOCO_USE = false;
 
 	private static final SensorPort  sonicPort = SensorPort.S4;
 	private static final SensorPort colourPort = SensorPort.S3;
@@ -135,8 +135,8 @@ class AlexDriver {
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
 
-		//robot.findBlocks();
-		//waitForIdle();
+//		robot.findBlocks();
+//		waitForIdle();
 
 		// stall until user decides to end program
 		//Button.waitForAnyPress();

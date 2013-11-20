@@ -49,8 +49,8 @@ public class Odometer implements TimerListener {
 	private static final int   ODO_DELAY = 25;
 	private static final float PI        = (float)Math.PI;
 	private static final float RADIUS    = 2.72f;
-	private static final float WHEELBASE = 16.15f; //sex robot (version 1)
-//   private static final float WHEELBASE = 19.7f;  //swagbot (version 2) tested, works well
+//	private static final float WHEELBASE = 16.15f; //sex robot (version 1)
+   private static final float WHEELBASE = 19.7f;  //swagbot (version 2) tested, works well
 	private final NXTRegulatedMotor leftMotor, rightMotor;
 
 	private Timer timer = new Timer(ODO_DELAY, this);

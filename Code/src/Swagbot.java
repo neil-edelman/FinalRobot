@@ -230,47 +230,9 @@ protected void scanning() {
          }
          else {
             Sound.beep();
-            //need to remember where the robot was going
-            storeTarget = this.getTarget();  
-            storeFindStatus = this.findStatus;
-            //determine obstacle position
-            Position pos = this.getPosition();
-            //turn avoidance on
-            this.findStatus = FindStatus.AVOIDING;
-            this.status = Status.FINDING;
-            backup();
-            //blocks while avoiding
-            //determines alternate point by shifting angle to obstacle by 45 left or right depending on orientation in the field and resumes
-            turnTo(pos.getDegrees() + 45f); //turn left 45 deg
-            while(this.status == Status.ROTATING) {}
-            int leftDistance = uListener.getDistance();
-            float avoidAngleAdjust = 0f;
-            int pingDiv = 1;
-            if( leftDistance > threshold + 10 ) {
-               //go left
-            }
-            else { //turn right 45 past obsticle
-               turnTo(pos.getDegrees() - 90f);
-               while(this.status == Status.ROTATING) {}
-               if ( leftDistance > uListener.getDistance() ) {
-                  //TODO:fucked, preliminary avoid angle to avoid walls
-                  turnTo(pos.getDegrees() + 45f);
-                  while(this.status == Status.ROTATING) {}
-                  avoidAngleAdjust = 30f;
-                  pingDiv = 2;
-                  if(pos.x < 30.48*4 && pos.getDegrees() > 45 && pos.getDegrees() < 180) avoidAngleAdjust = -30f; 
-               }
-            }
-
-            float avoidX = pos.x + (ping)/pingDiv*(float)Math.cos(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
-            float avoidY = pos.y + (ping)/pingDiv*(float)Math.sin(Math.toRadians(pos.getDegrees() + avoidAngleAdjust));
-            this.travelTo(avoidX,avoidY);
-            while(this.status == Status.ROTATING || this.status == Status.TRAVELLING) {}
-            //revert back to old state
-            this.findStatus = storeFindStatus;
-            if(this.findStatus != FindStatus.ID) travelTo(storeTarget.x,storeTarget.y);
+            avoidance.avoid(threshold);
          }
-      }
+     }
    }
    /** robot backs up at a constant speed for a constant time, used in avoidance
 	 @author Alex
