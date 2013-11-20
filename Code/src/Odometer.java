@@ -7,9 +7,9 @@
  degrees and convert them to radians; it's much faster converting them once vs
  converting atan2 10 times a second.
 <p>
- This is the improved, non-numerically-unstable, smart math odometer. */
-
-/* fixme: if we run faster, the period will have to decrese */
+ This is the improved, non-numerically-unstable, smart math odometer.
+<p>
+ fixme: if we run the robot faster, the period will have to decrese */
 
 /* from TA:
 Coordinate System:
@@ -111,6 +111,8 @@ public class Odometer implements TimerListener {
 		/* add it to the position at which the robot thinks it is */
 		synchronized(this) {
 			position.arc(r, d);
+			/* I know this isn't neccessary, just alternate, but it results in
+			 unreadability */
 			old.set(position);
 		}
 
@@ -124,9 +126,9 @@ public class Odometer implements TimerListener {
 	 update position used in getPosition, but only once per movement; you will
 	 probably want to call premonitionUpdate() instead to get rid of one-sided
 	 errors
-	 <p>
-	 deprecaited
-	 @author Neil */
+	 @author Neil
+	 @deprecated
+	 @see #premonitionUpdate() */
 	public void positionSnapshot() {
 		synchronized(this) {
 			pCopy.set(position);
@@ -153,13 +155,18 @@ public class Odometer implements TimerListener {
 
 	/* setters */
 
-	/** setters */
+	/** sets the position
+	 @author Neil
+	 @param pos position object */
 	public void setPosition(final Position pos) {
 		synchronized(this) {
 			position.set(pos);
 			old.set(pos);
 		}
 	}
+	
+	/* deprecated */
+
 	/*public void setRadians(final float t) {
 		synchronized(this) {
 			position.setRadians(t);
@@ -175,6 +182,7 @@ public class Odometer implements TimerListener {
 			position.setXY(x, y);
 		}
 	}*/
+
 	/** adds the radians directly to the current value
 	 @author Neil
 	 @param t [-PI, PI) */

@@ -16,28 +16,17 @@ import lejos.nxt.Button;
 
 public class Robot implements TimerListener {
 
-	/* should be in Driver, but causes crash in nxj api; just hard code */
-	private static final NXTRegulatedMotor  leftMotor = Motor.A;
-	private static final NXTRegulatedMotor rightMotor = Motor.B;
-
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING };
    public enum FindStatus { IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED, AVOIDING };
 
-	private   final static String   NAME = "Locobot";
-	protected static final int NAV_DELAY = 100; /* ms */
-
-	private static final float             ANGLE_TOLERANCE = (float)Math.toRadians(0.1); /* rad */
-	private static final float    ANGLE_MARGINAL_TOLERANCE = 2.0f; /* rad/s */
-	private static final float          DISTANCE_TOLERANCE = 1f; /* cm */
+	private static NXTRegulatedMotor leftMotor, rightMotor;
    private static final boolean  avoid = true;
 
    private float turnRate;
 
-	private static final float    DEFAULT_LIMIT_ANGLE = 350f;
-	private static final float DEFAULT_LIMIT_DISTANCE = 350f;
-
 	/* Ziegler-Nichols method was used to get close to the optimum;
 	 the battery voltage causes some lag when low */
+	/* classic (aggresive) control; we want errors in the angle corrected fast */
 	private Controller    anglePID = new Controller(0.6f * 2077f, 0.6f * 2077f / 1000f, 0.6f * 2077f * 1000f / 8f);
 	/* fixme!!!! this has not been optimised */
 	private Controller distancePID = new Controller(30f, 2f, 1f);
@@ -47,10 +36,12 @@ public class Robot implements TimerListener {
 	protected Position   target = new Position(), delta = new Position();
 	protected Odometer odometer;
 
-	protected Timer timer = new Timer(NAV_DELAY, this);
+	protected Timer timer = new Timer(Hardware.navDelay, this);
 
 	/** the constructor */
 	public Robot() {
+		leftMotor  = Hardware.leftMotor;
+		rightMotor = Hardware.rightMotor;
 		odometer = new Odometer(leftMotor, rightMotor);
 		/* set smooth -- DO NOT DO THIS IT MAKES IT LOCO; figure-8's, crashing
 		 on walls, etc; who know what it does, but it's NOT a accelertion
@@ -72,7 +63,9 @@ public class Robot implements TimerListener {
 	public void timedOut() {
 		/* get the latest from the odometer */
 		/*odometer.positionSnapshot();*/
-		/* forget that, our robot can predict the future */
+		/* forget that, our robot can predict the future; it's like that ep of
+		 Stargate, Avatar, where T'elc can see, in this case, 7.5 ms into the
+		 future in the simulation */
 		odometer.premonitionUpdate();
 		/* state machine */
 		switch(status) {
@@ -165,7 +158,7 @@ public class Robot implements TimerListener {
 
 	/** this is a shorcut to just specify the DEFAULT_LIMIT_ANGLE */
 	public void turnTo(final float degrees) {
-		this.turnTo(degrees, DEFAULT_LIMIT_ANGLE);
+		this.turnTo(degrees, Hardware.defaultLimitAngle);
 	}
 
 	/** this sets the target to a (-180,180] degree and the speed limit, turns */
@@ -185,8 +178,8 @@ public class Robot implements TimerListener {
 	public void travelTo(final float x, final float y) {
 
 		/* distance and angle need to be reset (we use them) */
-		anglePID.reset(DEFAULT_LIMIT_ANGLE);
-		distancePID.reset(DEFAULT_LIMIT_DISTANCE);
+		anglePID.reset(Hardware.defaultLimitAngle);
+		distancePID.reset(Hardware.defaultLimitDistance);
 
 		/* fixme: we should do a thing here that sets the line perp to the
 		 dest for travelTo oscillations */
@@ -232,11 +225,11 @@ public class Robot implements TimerListener {
 		/* apply magic (PID control, input the error and the time, output what
 		 the value should be so it gets to the setpoint fastest, in this case,
 		 the right wheel; the left is the inverse) */
-		float right = anglePID.nextOutput(delta.getTheta(), NAV_DELAY);
+		float right = anglePID.nextOutput(delta.getTheta(), Hardware.navDelay);
 
 		/* the PID control goes forever, but it's good enough within this
 		 tolerence (angle, derivative) then STOP */
-		if(anglePID.isWithin(ANGLE_TOLERANCE, ANGLE_MARGINAL_TOLERANCE)) {
+		if(anglePID.isWithin(Hardware.angleTolerance, Hardware.angleMarginalTolerance)) {
 			this.stop();
 			status = Status.IDLE;
 			return;
@@ -261,8 +254,8 @@ public class Robot implements TimerListener {
 		float distance = (float)Math.sqrt(delta.x*delta.x + delta.y*delta.y);
 
 		/* apply magic */
-		float turn  = anglePID.nextOutput(delta.getTheta(), NAV_DELAY);
-		float speed = distancePID.nextOutput(distance,      NAV_DELAY);
+		float turn  = anglePID.nextOutput(delta.getTheta(), Hardware.navDelay);
+		float speed = distancePID.nextOutput(distance,      Hardware.navDelay);
 
 		/* was going to put Math.cos(delta.getRadians()) to get lightning fast
 		 turns when starting away from the destiantion; a glaring bug with the
@@ -271,7 +264,7 @@ public class Robot implements TimerListener {
 
 		/* tolerence on the distance; fixme: have a tolerance on the derivative
 		 as soon as it won't go crazy and turn 180 degrees on overshoot */
-		if(distancePID.isWithin(DISTANCE_TOLERANCE)) {
+		if(distancePID.isWithin(Hardware.distanceTolerance)) {
 			this.stop();
 			status = Status.IDLE;
 			return;
@@ -340,13 +333,13 @@ public class Robot implements TimerListener {
 
 	/** returns conatant */
 	public String getName() {
-		return NAME;
+		return Hardware.name;
 	}
 
 	/** what should be printed when our robot is called eg in printf */
 	public String toString() {
 		synchronized(this) {
-			return NAME /*+ this.hashCode()*/ + " is " + status + " at " + odometer;
+			return Hardware.name /*+ this.hashCode()*/ + " is " + status + " at " + odometer;
 		}
 	}
 
@@ -356,7 +349,16 @@ public class Robot implements TimerListener {
       odometer.setPosition(pos);
    }
 
-	/** set r/l speeds indepedently */
+	/** set r/l speeds indepedently; doesn't always work
+	 fixme: more testing, extensively
+	 1) hardware?
+	 2) chosen after? swap
+	 3) brick ports error?
+	 4) firmware error?
+	 5) nxj error?
+	 @author Neil
+	 @param final float l  left speed degrees/sec
+	 @param final float r  right speed degrees/sec */
 	protected void setSpeeds(final float l, final float r) {
 		leftMotor.setSpeed(l);
 		if(l > 0) {
@@ -377,7 +379,7 @@ public class Robot implements TimerListener {
 	}
 
 	/** [emergency/idle] stop (fixme: protected?) */
-	public void stop() {
+	protected void stop() {
 		leftMotor.stop();
 		rightMotor.stop();
 	}

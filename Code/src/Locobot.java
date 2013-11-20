@@ -3,17 +3,13 @@
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
-import lejos.nxt.Sound;         /* pause */
+import lejos.nxt.Sound;
 import lejos.nxt.comm.RConsole;
+import lejos.util.Delay;
 
 import java.util.ArrayList;
 
 public class Locobot extends Robot {
-
-	/* SONAR_DELAY > (255cm) * 2 / (340m/s * 100cm/m) = 15ms (leJOS says 20ms) */
-	private static final int       SONAR_DELAY = 20;
-	private static final int        LOCO_DELAY = 30; /* SONAR_DELAY + processing */
-	private static final float      LOCO_SPEED = 150;
 
 	protected UltrasonicSensor sonic;
 	protected LightSensor      light;
@@ -21,22 +17,22 @@ public class Locobot extends Robot {
 	/** creates the Locobot
 	 @param sonicPort SensorPort on which the sonic sensor is
 	 @param lightPort SensorPort on which the light sensor facing the grond is */
-	public Locobot(final SensorPort sonicPort, final SensorPort lightPort) {
+	public Locobot() {
 		super();
-		sonic  = new UltrasonicSensor(sonicPort);
-		light  = new LightSensor(lightPort); /* not used, yet */
+		sonic  = new UltrasonicSensor(Hardware.sonicPort);
+		light  = new LightSensor(Hardware.lightPort); /* not used, yet */
 	}
 
-	private ArrayList<Ping> pings = new ArrayList<Ping>(128);
+	private ArrayList<Ping> pings = new ArrayList<Ping>(Hardware.defaultMaxPings);
 	private boolean isTurned = false;
 
 	/** overrides localise in Robot; this uses a faster timer and assumes that
 	 the localasition continues to completion where it will set it back
 	 @author Neil */
 	protected void localise() {
-		this.turn(LOCO_SPEED);
+		this.turn(Hardware.locoSpeed);
 		/* "Safe to call while start()ed" */
-		timer.setDelay(LOCO_DELAY);
+		timer.setDelay(Hardware.locoDelay);
 		status = Status.LOCALISING;
 	}
 
@@ -76,13 +72,15 @@ public class Locobot extends Robot {
 		 values to what they were pre-localising */
 		this.stop();
 		status = Status.IDLE;
-		timer.setDelay(NAV_DELAY);
+		timer.setDelay(Hardware.navDelay);
 
 		/* calculate */
-		if(Ping.correct(pings, odometer)) {
-			Display.setText("Loco " + odometer.getPosition());
-		} else {
-			Display.setText("Loco failed.");
+		try {
+			Ping.correct(pings, odometer);
+		} catch(Exception e) {
+			Display.setText(e.getMessage());
+			Sound.beep();
+			/* fixme: try again!!! */
 		}
 
 		/* send? */
@@ -116,7 +114,7 @@ public class Locobot extends Robot {
 	 @return The cm distance (unless some error.) */
 	public int pingSonar() {
 		sonic.ping();
-		Sound.pause(SONAR_DELAY);
+		Delay.msDelay(Hardware.sonarDelay);
 		return sonic.getDistance();
 	}
 

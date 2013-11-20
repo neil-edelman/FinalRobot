@@ -11,14 +11,6 @@ import bluetooth.*;
 
 class AlexDriver {
 
-	private static final int   BLUETOOTH_DELAY = 0;  /* 10000 is to short */
-	private static final boolean BLUETOOTH_USE = false;
-	private static final boolean    SERVER_USE = false;
-	private static final boolean      LOCO_USE = false;
-
-	private static final SensorPort  sonicPort = SensorPort.S4;
-	private static final SensorPort colourPort = SensorPort.S3;
-   private static final SensorPort lightPort = SensorPort.S1;
    private static Swagbot robot;
    private static Display display;
 
@@ -27,10 +19,15 @@ class AlexDriver {
 	 @author Alex, Neil */
 	public static void main(String args[]) {
 
+		/* the hardware profile for the robot */
+		Hardware.swagbotV2();
+		Hardware.useBluetooth = true;
+		Hardware.useServer    = false;
+
 		float destination_x = 50f;
 		float destination_y = 50f;
 
-		if(SERVER_USE) {
+		if(Hardware.useServer) {
 			BluetoothConnection conn = new BluetoothConnection();
 			// as of this point the bluetooth connection is closed again, and you can pair to another NXT (or PC) if you wish
 			
@@ -107,17 +104,17 @@ class AlexDriver {
 			}
 		}
 
-		if(BLUETOOTH_USE) {
+		if(Hardware.useBluetooth) {
 			Display.setText("Bluetooth...");
-			RConsole.openBluetooth(BLUETOOTH_DELAY);
+			RConsole.openBluetooth(Hardware.bluetoothDelay);
 			if(!RConsole.isOpen()) Display.setText("Never mind.");
 		}
 
-		robot   = new Swagbot(sonicPort,colourPort,lightPort,destination_x,destination_y);
+		robot   = new Swagbot(destination_x,destination_y);
 		display = new Display(robot);
 		monitorForExit();
 
-		if(LOCO_USE) {
+		if(Hardware.useLoco) {
 			robot.localise();
 		} else {
 			robot.setPosition(new Position(30.48f,30.48f,0f));
