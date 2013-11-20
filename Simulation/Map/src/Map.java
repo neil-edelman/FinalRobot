@@ -2,7 +2,8 @@ import java.lang.IllegalArgumentException;
 
 public class Map {
 
-	private static final int MAX_EXPLORE = -4;
+	private static final int MAX_EXPLORE = -5;
+	private static final int SCAN_RANGE = 7; /* dm, supposed to be 17, not really */
 
 	enum Square { UNCHARTED, OPEN, OBJECT, WOOD, STYROFOAM; }
 
@@ -12,19 +13,21 @@ public class Map {
 		map.fill(0, 0, 2, 2, Square.OPEN);
 		map.localise(2, 2);
 		System.err.println("Initial map:\n" + map);
-		for(int i = 1; i <= 25; i++) {
-			map.choose();
-			map.ping(map.x, map.y, map.xExp, map.yExp, Square.OPEN);
-			System.err.println("After " + i + " pings\n" + map + "\n");
+		for(int scans = 0; ; ) {
+			if(!map.move()) {
+				map.choose();
+				map.ping();
+				scans++;
+			}
+			System.err.println("After " + scans + " pings:\n" + map + "\n");
+			if(map.xSwag == map.xSize - 1) break;
 		}
 	}
 
-	private static final int SCAN_RANGE = 7; /* dm */
-
 	private byte map[][];
 	private final int xSize, ySize;
-	private int x, y;
-	private int xExp, yExp;
+	private       int xSwag, ySwag;
+	private       int xExpl, yExpl;
 
 	/* create a map
 	 @param x
@@ -35,6 +38,21 @@ public class Map {
 		map   = new byte[y][x];
 		xSize = x;
 		ySize = y;
+	}
+
+	public boolean move() {
+		int sq;
+		if(xSwag == xSize - 1 || ySwag == ySize - 1) return false;
+		sq = map[ySwag + 1][xSwag + 1];
+		if(sq != 1) return false;
+		sq = map[ySwag][xSwag + 1];
+		if(sq != 1) return false;
+		sq = map[ySwag + 1][xSwag];
+		if(sq != 1) return false;
+		System.out.println("Moving to (" + (xSwag + 1) + ", " + (ySwag + 1) + "):");
+		xSwag++;
+		ySwag++;
+		return true;
 	}
 
 	/** fill the rectangle [x1, y1]--[x2, y2] with sq
@@ -79,8 +97,8 @@ public class Map {
 	public void localise(final int x, final int y) {
 		if(x < 0 || x > xSize || y < 0 || y > ySize)
 			throw new IllegalArgumentException("illeagal "+x+","+y);
-		this.x = x;
-		this.y = y;
+		this.xSwag = x;
+		this.ySwag = y;
 	}
 
 	/** Bresenham's (un-optimised) with constant lenght
@@ -88,11 +106,10 @@ public class Map {
 	 @param y1
 	 @param x2
 	 @param y2 the line (x1, y1)--(x2, y2)
-	 @param sq how high to make it
-	 @throws IllegalArgumentException (x1, y1) is not on the map */
-	public void ping(int x1, int y1, int x2, int y2, final Square sq) {
-		if(x1 < 0 || x1 > xSize || y1 < 0 || y1 > ySize)
-			throw new IllegalArgumentException("illeagal "+x1+","+y1);
+	 @param sq how high to make it */
+	public void ping() {
+		int x1 = xSwag, y1 = ySwag, x2 = xExpl, y2 = yExpl;
+		Square sq = Square.OPEN;
 		// fixme: hmm, draw a thick line?
 		final int dx = (x1 > x2) ? (x1 - x2) : (x2 - x1);
 		final int sx = (x1 > x2) ? -1 : 1;
@@ -142,38 +159,48 @@ public class Map {
 	public void choose() {
 		byte box;
 		byte least = 99;
-		xExp = -1;
-		yExp = -1;
-		System.out.print("Choosing an unexlored place:\n");
+		xExpl = -1;
+		yExpl = -1;
+		System.out.print("Scanning an unexlored place t:\n");
 		for(int j = 0; j < ySize; j++) {
 			for(int i = 0; i < xSize; i++) {
 				if((box = map[j][i]) > 0) {
-					System.out.print("  *");
+					//System.out.print("  *");
 					continue;
 				}
-				int d = box + Math.round((float)Math.hypot(i - x, j - y));
-				System.out.print(((d < 0 || d > 9) ? (" ") : ("  ")) + d);
+				int d = box + Math.round((float)Math.hypot(i - xSwag, j - ySwag));
+				//System.out.print(((d < 0 || d > 9) ? (" ") : ("  ")) + d);
 				//System.out.print("[" + d + " < " + least + (d < least) + "]");
 				if(d < least) {
 					least = (byte)d;
-					xExp  = i;
-					yExp  = j;
+					xExpl = i;
+					yExpl = j;
 				}
 			}
-			System.out.print(" : "+least+" at (" + xExp + ", " + yExp + ")\n");
+			//System.out.print(" : "+least+" at (" + xExpl + ", " + yExpl + ")\n");
 		}
 	}
 
 	/** this is very inefficient */
 	public String toString() {
 		String m = "";
+		int x = 0, y = 0;
 		for(byte yIso[] : map) {
 			for(byte b : yIso) {
-				m += "" + ((b < 0 || b > 9) ? ("") : (" ")) + ((b > 0) ? "*" : b) + " ";
+				if((x == xSwag) && (y == ySwag)) {
+					m += " s ";
+				} else if((x == xExpl) && (y == yExpl)) {
+						m += " t ";
+				} else {
+					m += "" + ((b < 0 || b > 9) ? ("") : (" ")) + ((b > 0) ? "*" : b) + " ";
+				}
+				x++;
 			}
 			m += "\n";
+			x = 0;
+			y++;
 		}
-		m += "the robot (" + x + ", " + y + ") the target (" + xExp + ", " + yExp + ")";
+		//m += "the robot (" + xSwag + ", " + ySwag + ") the target (" + xExpl + ", " + yExpl + ")";
 		return m;
 	}
 }
