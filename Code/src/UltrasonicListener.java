@@ -8,6 +8,8 @@ Additionally, the get smallestping method allows the listener to accumulate a da
 or odometer method is running. Get smallest ping is used in this lab to scan from scan points and find the blocks using the
 ultrasonic sensor. The method sets the smallestping variables to the closest distance recored and corresponding theta from
 the odometer to targetTheta.
+
+ @author Alex
 */
 import lejos.nxt.UltrasonicSensor;
 import lejos.util.TimerListener;

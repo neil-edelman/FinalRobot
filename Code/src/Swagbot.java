@@ -1,3 +1,6 @@
+/* Swagbot extends Locobot; obstacle avoidence and gameplay logic
+ @author Alex */
+
 import lejos.nxt.SensorPort;
 import lejos.util.Timer;
 import lejos.nxt.Sound;
