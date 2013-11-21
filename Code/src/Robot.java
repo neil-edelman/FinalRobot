@@ -1,6 +1,8 @@
+/** this is the basic robot; just methods for moving around
+ @author Neil, Alex */
+
 import java.lang.IllegalArgumentException;
 
-import lejos.nxt.Motor; /* workaround for nxj error */
 import lejos.nxt.NXTRegulatedMotor;
 
 import lejos.nxt.Sound;
@@ -38,7 +40,7 @@ public class Robot implements TimerListener {
 
 	protected Timer timer = new Timer(Hardware.navDelay, this);
 
-	/** the constructor */
+	/** the constructor; make sure you set the hardware profile first! */
 	public Robot() {
 		leftMotor  = Hardware.leftMotor;
 		rightMotor = Hardware.rightMotor;
@@ -58,8 +60,9 @@ public class Robot implements TimerListener {
 		status = Status.IDLE;
 	}
 
-	/** this acts as the control; selects based on what it is doing as a state
-	 machine */
+	/** this acts as the control called every navDelay ms; selects based on
+	 what it is doing as a state machine; we were going to make it more
+	 complex, but it works well */
 	public void timedOut() {
 		/* get the latest from the odometer */
 		/*odometer.positionSnapshot();*/
@@ -122,15 +125,20 @@ public class Robot implements TimerListener {
 		}
 		this.setSpeeds(-rate, rate);
 	}
-   /** this sets a constant turing speed to angle (used in scanning) */
-   //position rate turns the robot left, negitive turns the robot right, to the specified angle
+   /** this sets a constant turing speed to angle (used in scanning)
+	<p>
+   position rate turns the robot left, negitive turns the robot right, to the
+	specified angle
+	@param rate specifies the rate at which the turn happens
+	@param angle the angle in degrees (-180,180] that you want to turn to */
    protected void turn(final float rate, final float angle) {
       this.setSpeeds(-rate,rate);
       target.setDegrees(angle);
       status = Status.SCANNING;
       this.turnRate = rate;
    }
-   /** used with scanning, allows the robot to constantly turn to an angle */
+   /** used with scanning, allows the robot to constantly turn to an angle
+	(use :turn to initate) */
    private void constantlyTurningTo() {
       Position p = odometer.getPosition();
       float angle = p.getDegrees();
@@ -156,12 +164,15 @@ public class Robot implements TimerListener {
       }
    }
 
-	/** this is a shorcut to just specify the DEFAULT_LIMIT_ANGLE */
+	/** this is a shorcut to just specify the DEFAULT_LIMIT_ANGLE
+	 @param degrees (-180,180] */
 	public void turnTo(final float degrees) {
 		this.turnTo(degrees, Hardware.defaultLimitAngle);
 	}
 
-	/** this sets the target to a (-180,180] degree and the speed limit, turns */
+	/** this sets the target to a (-180,180] degree and the speed limit, turns
+	 @param degrees (-180,180]
+	 @param limit sets the speed limit */
 	public void turnTo(final float degrees, final float limit) {
 		if(degrees <= -180 || degrees > 180) throw new IllegalArgumentException();
 
@@ -174,7 +185,9 @@ public class Robot implements TimerListener {
 		status = Status.ROTATING;
 	}
 
-	/** this sets the target to (x, y) and travels */
+	/** this sets the target to (x, y) in cm and travels
+	 @param x
+	 @param y */
 	public void travelTo(final float x, final float y) {
 
 		/* distance and angle need to be reset (we use them) */
@@ -190,7 +203,12 @@ public class Robot implements TimerListener {
 		status = Status.TRAVELLING;
 	}
 
-	/** this sets the target to (x, y) and the travel and turn limits and travels */
+	/** this sets the target to (x, y) in cm and the travel and turn limits and
+	 travels
+	 @param x
+	 @param y
+	 @param travelLimit the speed limit
+	 @param turnLimit   the speed limit */
 	public void travelTo(final float x, final float y, final float travelLimit, final float turnLimit) {
 
 		/* distance and angle need to be reset (we use them) */
@@ -288,7 +306,8 @@ public class Robot implements TimerListener {
       System.err.println("no finding blocks");
       status = Status.IDLE;
    }
-   /** complementary method: runs in parallel with travel */
+   /** complementary method: runs in parallel with travel
+	@param threshold in cm */
    protected void avoidance(int threshold) {
       System.err.println("no avoidance");
    }
@@ -345,6 +364,8 @@ public class Robot implements TimerListener {
 
 	/* output functions */
 
+	/** correct the position
+	 @param pos the new position */
    public void setPosition(Position pos) {
       odometer.setPosition(pos);
    }
@@ -356,7 +377,9 @@ public class Robot implements TimerListener {
 	 3) brick ports error?
 	 4) firmware error?
 	 5) nxj error?
-	 @author Neil
+	 ahh I figured it out, I think, the motors were stalling due to low battery
+	 voltage; that's what you get for using an acutator as a motor; fixed in
+	 Controller; untested
 	 @param final float l  left speed degrees/sec
 	 @param final float r  right speed degrees/sec */
 	protected void setSpeeds(final float l, final float r) {
@@ -378,7 +401,7 @@ public class Robot implements TimerListener {
 		}
 	}
 
-	/** [emergency/idle] stop (fixme: protected?) */
+	/** [emergency/idle] stop */
 	protected void stop() {
 		leftMotor.stop();
 		rightMotor.stop();
