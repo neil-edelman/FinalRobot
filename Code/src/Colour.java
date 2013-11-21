@@ -3,7 +3,8 @@
  the different substances, and pick the closest (Cartesan distance to
  normalised colour values.) A better model would be to multiply the components
  by the eigenvalues of their sensitivety like CIE colour model, but we don't
- know this. */
+ know this.
+ @author Neil */
 
 /* import javax.vecmath.Vector3f; <- nxj does not have this, write our own :[ */
 /* import java.lang.Comparable; */
@@ -27,7 +28,6 @@ public class Colour {
 	Vector3f colourDiff = new Vector3f();
 
 	/** constructs a new styrofoam/wood colour-reconising class
-	 @author Neil
 	 @param port The port the colour sensor is plugged into */
 	public Colour(final SensorPort port) {
 
@@ -41,7 +41,6 @@ public class Colour {
 	}
 
 	/** gets the colour from the sensor right now
-	 @author Neil
 	 @return the colour as and rgb [0..1] */
 	private Vector3f getColour() {
 		ColorSensor.Color c;
@@ -63,7 +62,6 @@ public class Colour {
 	}
 
 	/** senses the colour at the current location
-	 @author Neil
 	 @return The most likely colour as a Value enum. */
 	public Value getColourValue() {
 		Vector3f          colour;
@@ -102,7 +100,6 @@ public class Colour {
 
 	/** how certain we are that the object in front of colour sensor is
 	 styrofoam?
-	 @author Neil
 	 @return The probability [0..1] */
 	public float getStyrofoamProbability() {
 		Vector3f          colour;
@@ -133,13 +130,11 @@ public class Colour {
 class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	public float r, g, b;
 	
-	/** empty constructor
-	 @author Neil */
+	/** empty constructor */
 	public Vector3f() {
 	}
 	
 	/** fill constructor
-	 @author Neil
 	 @param r
 	 @param g
 	 @param b The colour values in [0..1]. */
@@ -148,7 +143,6 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	}
 	
 	/** fill
-	 @author Neil
 	 @param r
 	 @param g
 	 @param b The colour values in [0..1]. */
@@ -162,7 +156,6 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	}
 	
 	/** returns the length squared
-	 @author Neil
 	 @return length squared */
 	public float lengthSquared() {
 		return r*r + g*g + b*b;
@@ -170,14 +163,12 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	
 	/** returns the length, computes the lenght squared so make sure it's
 	 "small"
-	 @author Neil
 	 @return length */
 	public float length() {
 		return (float)Math.sqrt(this.lengthSquared());
 	}
 
-	/** normalises this vector in place
-	 @author Neil */
+	/** normalises this vector in place */
 	public void normalize() {
 		float d = length();
 		
@@ -191,7 +182,6 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	}
 	
 	/** subtract a Vector3f
-	 @author Neil
 	 @param x The variable to subatact. */
 	public void sub(final Vector3f x) {
 		r -= x.r;
@@ -200,7 +190,6 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	}
 
 	/** set the varible to the subtraction x - y
-	 @author Neil
 	 @param x +
 	 @param y - */
 	public void sub(final Vector3f x, final Vector3f y) {
@@ -210,7 +199,6 @@ class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	}
 
 	/** to string
-	 @author Neil
 	 @return The printed value as a string. */
 	public String toString() {
 		return "(" + r + ", " + g + ", " + b + ")";

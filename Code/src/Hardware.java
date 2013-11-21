@@ -1,4 +1,5 @@
-/** to keep the different robots in one place */
+/** to keep the different robots in one place
+ @author Neil */
 
 import lejos.nxt.SensorPort;
 import lejos.nxt.Motor;

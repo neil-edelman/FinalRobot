@@ -1,4 +1,5 @@
-/** Controller: implements float PID control with 0 as the setpoint. */
+/** Controller: implements float PID control with 0 as the setpoint.
+ @author Neil */
 
 import java.lang.IllegalArgumentException;
 
@@ -18,7 +19,6 @@ public class Controller {
 	boolean isLimit, isAccelerationLimit, isFirst = true;
 
 	/* just p
-	 @author Neil
 	 @param p proportional gain */
 	public Controller(final float p) {
 		if(p <= 0) throw new IllegalArgumentException();
@@ -28,7 +28,6 @@ public class Controller {
 	}
 
 	/* pid
-	 @author Neil
 	 @param p proportional gain
 	 @param i integral gain
 	 @param d derivative gain
@@ -40,7 +39,6 @@ public class Controller {
 	}
 
 	/** returns the next step for the error and dt specified
-	 @author Neil
 	 @param error input error
 	 @param dt the time in milliseconds
 	 @return the output according to the pid values set */
@@ -98,8 +96,7 @@ public class Controller {
 	}
 
 	/** reset the all the state varibles; this allows the controller to
-	 be used more then once
-	 @author Neil */
+	 be used more then once */
 	public void reset() {
 		isFirst    = true;
 		isLimit    = false;
@@ -111,7 +108,6 @@ public class Controller {
 	/** resets the pid and sets [limit] on the next time you use it;
 	 it is perfectly all right to reset(limit) the first time you use it
 	 to have a limit
-	 @author Neil
 	 @param limit The limit (-/+) on the output and past which it will not
 	 record the integral.
 	 @throws IllegalArgumentException if the limit <= 0 */
@@ -124,7 +120,6 @@ public class Controller {
 	}
 
 	/** limit acceleration; fixes stalling when battery voltage is low?
-	 @author Neil
 	 @param limit in /s
 	 @throws IllegalArgumentException if the limit <= 0 */
 	public void limitAcceleration(final float limit) {
@@ -133,15 +128,13 @@ public class Controller {
 		isAccelerationLimit = true;
 	}
 
-	/** lifts the acceleration limit
-	 @author Neil */
+	/** lifts the acceleration limit */
 	public void limitAcceleration() {
 		accelerationLimit = 0f;
 		isAccelerationLimit = false;
 	}
 
 	/** checking if it's w/i epsilon
-	 @author Neil
 	 @param tolerance
 	 @return True if the last error is within tolerance. */
 	public boolean isWithin(final float tolerance) {
@@ -149,7 +142,6 @@ public class Controller {
 	}
 
 	/** checking if it's w/i epsilon and has settled
-	 @author Neil
 	 @param tolerance
 	 @param marginal
 	 @return True if the last error is within tolerance and marginal
@@ -160,8 +152,7 @@ public class Controller {
 		return (derivative >= -marginal) || (derivative >= marginal);
 	}
 
-	/** print useful things
-	 @author Neil */
+	/** print useful things */
 	public String toString() {
 		return "Cont" + this.hashCode() + "(" + (int)e + ":" + kp + "," + ki + "," + kd + ")";
 	}

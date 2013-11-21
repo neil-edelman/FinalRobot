@@ -230,7 +230,7 @@ protected void scanning() {
          }
          else {
             Sound.beep();
-            avoidance.avoid(threshold);
+            // ? avoidance.avoid(threshold);
          }
      }
    }

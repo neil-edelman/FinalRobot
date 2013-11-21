@@ -42,7 +42,7 @@ public class Robot implements TimerListener {
 	public Robot() {
 		leftMotor  = Hardware.leftMotor;
 		rightMotor = Hardware.rightMotor;
-		odometer = new Odometer(leftMotor, rightMotor);
+		odometer = new Odometer(/*leftMotor, rightMotor*/);
 		/* set smooth -- DO NOT DO THIS IT MAKES IT LOCO; figure-8's, crashing
 		 on walls, etc; who know what it does, but it's NOT a accelertion
 		 limiter */ //TODO:lol -alex

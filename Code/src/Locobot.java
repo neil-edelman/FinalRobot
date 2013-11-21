@@ -1,4 +1,5 @@
-/** localising robot extends robot */
+/** localising robot extends robot
+ @author Neil */
 
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.LightSensor;
@@ -27,8 +28,7 @@ public class Locobot extends Robot {
 	private boolean isTurned = false;
 
 	/** overrides localise in Robot; this uses a faster timer and assumes that
-	 the localasition continues to completion where it will set it back
-	 @author Neil */
+	 the localasition continues to completion where it will set it back */
 	protected void localise() {
 		this.turn(Hardware.locoSpeed);
 		/* "Safe to call while start()ed" */
@@ -37,8 +37,7 @@ public class Locobot extends Robot {
 	}
 
 	/** overrides localising in Robot; turns and computes best-fit lines from
-	 sensor data and modifies the odometer accordingly
-	 @author Neil */
+	 sensor data and modifies the odometer accordingly */
 	protected void localising() {
 
 		Position p = odometer.getPosition();

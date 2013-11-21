@@ -1,4 +1,5 @@
-/** this is a driver that instantaties a Robot and makes it do stuff */
+/** this is a driver that instantaties a Robot and makes it do stuff
+ @author Alex */
 
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
@@ -6,8 +7,6 @@ import lejos.nxt.LCD;
 import lejos.nxt.comm.RConsole;
 
 import bluetooth.*;
-
-/** this is a driver that instantaties a Robot and makes it do stuff */
 
 class AlexDriver {
 
@@ -165,7 +164,9 @@ class AlexDriver {
    }
 
 
-
+	/** waits for the robot to be idle (eg completed a turn, or travelled to a
+	 destination
+	 @author Alex */
    public static void waitForIdle() {
          while(robot.getStatus() != Robot.Status.IDLE || robot.getFindStatus() != Robot.FindStatus.IDLE) {
 		}
@@ -182,6 +183,7 @@ class AlexDriver {
          travel to the first cross of vertical and horizontal lines
          face 90 (straight)
    findBlocks: not working -- in progress
+	@author Alex
    */
    public static void runTests() {
       robot.localise(); 
@@ -202,7 +204,8 @@ class AlexDriver {
       robot.stop();
       return;
    }
-   /** quick test -- turns left 30 degrees and back, spin/travels to -5,-5 and returns */
+   /** quick test -- turns left 30 degrees and back, spin/travels to -5,-5 and returns
+	@author Alex */
    public static void runAbridgedTests() {
       robot.turnTo(30f,250);
       waitForIdle();

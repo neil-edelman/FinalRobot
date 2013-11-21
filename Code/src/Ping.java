@@ -1,7 +1,9 @@
 /** this is a struct to store ultrasonic sonar information, we want this to be
- as small as possible since we're storing a lot of them
+ as small as possible since we're potentally storing a lot of them
  
- also does the details of localisiation */
+ also does the details of localisiation
+ 
+ @author Neil */
 
 import java.lang.IllegalArgumentException;
 import java.lang.IndexOutOfBoundsException;
@@ -23,7 +25,6 @@ public class Ping {
 	private int colour;    /* gnuplot */
 	
 	/** records a ping
-	 @author Neil
 	 @param p       position of the reading
 	 @param reading cm reading of the ping */
 	public Ping(final Position p, final int reading) {
@@ -36,12 +37,10 @@ public class Ping {
 		y = p.y + (float)Math.sin(a) * b;
 	}
 	
-	/** getters for logging
-	 @author Neil */
+	/** getters for logging */
 	Position getPosition() { return position; }
 	
-	/** getters for logging
-	 @author Neil */
+	/** getters for logging */
 	int getCm() { return cm; }
 	
 	/** corrects the odometer heading and distances based on pings from
@@ -308,7 +307,6 @@ public class Ping {
 	 <p>
 	 this was determined to be worse than blind picking the middle in some cases
 	 but gets rid of objects on the walls
-	 @author Neil
 	 @param pings list of pings
 	 @param about an index into pings
 	 @throws IndexOutOfBoundsException if the about is not an index */

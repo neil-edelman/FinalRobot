@@ -1,6 +1,7 @@
-import java.lang.IllegalArgumentException;
+/* Position: defines a position as x, y, theta
+ @author Neil */
 
-/* Position: defines a position */
+import java.lang.IllegalArgumentException;
 
 class Position {
 	private static final float PI     = (float)Math.PI;
@@ -13,13 +14,11 @@ class Position {
 
 	/* constructors */
 
-	/** empty constructor
-	 @author Neil */
+	/** empty constructor */
 	public Position() {
 	}
 
 	/** float (x, y) constructor
-	 @author Neil
 	 @param x
 	 @param y The (x, y). */
 	public Position(final float x, final float y) {
@@ -28,7 +27,6 @@ class Position {
 	}
 
 	/** float (x, y, degrees) constructor
-	 @author Neil
 	 @param x
 	 @param y   (x, y)
 	 @param deg degrees */
@@ -42,20 +40,19 @@ class Position {
 	/* getters */
 
 	/** convert to degrees
-	 @author Neil
 	 @return degrees (-180, 180] */
 	public float getDegrees() {
 		return (float)Math.toDegrees(t);
 	}
 
 	/** native
-	 @author Neil
 	 @return radians (-PI, PI] */
 	public float getRadians() {
 		return t;
 	}
 
-	/** phased out; do not use */
+	/** phased out; do not use; too confusing
+	 @depreciated use :getRadians() */
 	public float getTheta() {
 		return t;
 	}
@@ -63,7 +60,6 @@ class Position {
 	/* setters */
 
 	/** set the position, overrides the old
-	 @author Neil
 	 @param p A position object that you wish to clone. */
 	public void set(final Position p) {
 		x = p.x;
@@ -72,7 +68,6 @@ class Position {
 	}
 
 	/** set the degrees, overrides the old
-	 @author Neil
 	 @param deg Degrees (-180, 180] */
 	public void setDegrees(final float deg) {
 		if(t <= -180 || t > 180) throw new IllegalArgumentException();
@@ -80,21 +75,20 @@ class Position {
 	}
 
 	/** set the radians, overrides the old
-	 @author Neil
 	 @param t radians (-PI, PI] */
 	public void setRadians(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t = t;
 	}
 
-	/** phased out; do not use (too confusing) */
-	/*public void setTheta(final float t) {
+	/** phased out; do not use (too confusing)
+	 @depreciated use :setRadians(t) */
+	public void setTheta(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t = t;
-	}*/
+	}
 
 	/** set the x, y, overrides the old
-	 @author Neil
 	 @param x
 	 @param y Any value. */
 	public void setXY(final float x, final float y) {
@@ -105,7 +99,6 @@ class Position {
 	/* operators */
 
 	/** add the x, y to the current x, y
-	 @author Neil
 	 @param x
 	 @param y Any value. */
 	public void addXY(final float x, final float y) {
@@ -114,7 +107,6 @@ class Position {
 	}
 
 	/** set the position to a - b, overrides the old
-	 @author Neil
 	 @param a
 	 @param b The positions. */
 	public void subXY(final Position a, final Position b) {
@@ -123,8 +115,8 @@ class Position {
 	}
 
 	/** add t to the current theta
-	 @author Neil
-	 @param t An angle within (-PI, PI] */
+	 @param t An angle within (-PI, PI]
+	 @throws IllegalArgumentException if t <= -PI || t > PI */
 	public void addRadians(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t += t;
@@ -133,7 +125,6 @@ class Position {
 	}
 
 	/** set theta to theta_a - theta_b, overrides the old
-	 @author Neil
 	 @param a
 	 @param b */
 	public void subTheta(final Position a, final Position b) {
@@ -149,7 +140,6 @@ class Position {
 	 this results in a heart, if you draw it out for parametric const dist
 	 <p>
 	 this is used in odometer
-	 @author Neil
 	 @param angle (-PI, PI]
 	 @param dist  A distance. */
 	public void arc(final float angle, final float dist) {
@@ -180,7 +170,6 @@ class Position {
 	}
 
 	/** sets this to the prediction of the O(1) future
-	 @author Neil
 	 @param final Position p  the current position
 	 @param final Position o  the old position (assumes you take approimately
 	 equal time steps) */
@@ -203,8 +192,7 @@ class Position {
 		else if(t > PI) t -= TWO_PI;
 	}
 
-	/**
-	 @author Neil
+	/** prints useful debug info
 	 @return string */
 	public String toString() {
 		return "(" + (int)x + "," + (int)y + ":" + (int)Math.toDegrees(t) + ")";

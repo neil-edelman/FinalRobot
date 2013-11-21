@@ -1,4 +1,6 @@
-/* Lab 4, Group 51 -- Alex Bhandari-Young and Neil Edelman */
+/* This is a robot display for actually printing to the robot.
+ @see :setText
+ @author Alex */
 
 //import java.lang.IllegalArgumentException;
 
@@ -42,8 +44,7 @@ public class Display implements TimerListener{
 		owner = this;
 	}
 
-	/** TimerListener function that updates the text
-	 @author Alex */
+	/** TimerListener function that updates the text */
 	public void timedOut() {
 		Position position = robot.getPosition();
 		LCD.clear();
