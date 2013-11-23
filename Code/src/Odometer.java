@@ -87,6 +87,10 @@ public class Odometer implements TimerListener {
 		int  left = leftMotor.getTachoCount();
 		int right = rightMotor.getTachoCount();
 
+		/* doesn't do anything */
+		//if(leftMotor.isStalled())  Display.setText("L Stall "+left);
+		//if(rightMotor.isStalled()) Display.setText("R Stall "+right);
+
 		/* translate into traveled and turned (in some int units) */
 		int delTraveled = right + left;
 		int delTurn     = right - left;
