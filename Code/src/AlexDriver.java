@@ -6,6 +6,16 @@ import lejos.nxt.SensorPort;
 import lejos.nxt.LCD;
 import lejos.nxt.comm.RConsole;
 
+import AStar.Types;
+import AStar.AStar;
+import AStar.TypeMap;
+import AStar.FieldMap;
+import AStar.GoalNode2D;
+import AStar.ISearchNode;
+import AStar.SearchAndAvoidNode2D;
+import java.util.ArrayList;
+import java.util.*;
+
 import bluetooth.*;
 
 class AlexDriver {
@@ -20,8 +30,9 @@ class AlexDriver {
 
 		/* the hardware profile for the robot */
 		Hardware.swagbotV2();
-		Hardware.useBluetooth = true;
+		Hardware.useBluetooth = false;
 		Hardware.useServer    = false;
+		Hardware.useLoco      = false;
 
 		float destination_x = 50f;
 		float destination_y = 50f;
@@ -121,15 +132,16 @@ class AlexDriver {
 		waitForIdle();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
-		robot.travelTo(60.96f, 60.96f);
-		waitForIdle();
-		robot.turnTo(90f);
-		waitForIdle();
+//		robot.travelTo(60.96f, 60.96f);
+//		waitForIdle();
+//		robot.turnTo(90f);
+//		waitForIdle();
 
 		//robot.travelTo(destination_x, destination_y);
 		//runTests();
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
+      travelWithAStar(180,180);
 
 //		robot.findBlocks();
 //		waitForIdle();
@@ -151,6 +163,33 @@ class AlexDriver {
 		/* close bt connection */
 		if(RConsole.isOpen()) RConsole.close();
 	}
+	/** Waits for the robot subtask to finish and return to finding or become idle.
+	 @author Alex */
+   public static void waitForSubTask() {
+         while(robot.getStatus() != Robot.Status.IDLE || robot.getStatus() != Robot.Status.FINDING) {
+		}
+   }
+   /** Robot will travel to coordinates using AStar.
+    @author Alex
+    @return void
+   */
+   public static void travelWithAStar(int x, int y) {
+      followPath(robot.straightenPath(robot.getPathTo(x/10,y/10)));
+   }
+   /** Robot will follow the input path.
+    @author Alex
+    @return void
+   */
+   public static void followPath(ArrayList<ISearchNode> path) {
+      path.remove(0);
+//      int count = 1;
+      for(ISearchNode node : path) {
+         robot.travelTo(node.getX()*10,node.getY()*10,350,350);
+         waitForIdle();
+//           System.out.println("T"+count+": ("+node.getX()*10+","+node.getY()*10+")");
+//           count++;
+      }
+   }
 
    private static void monitorForExit() {
       //spawn thread for exit

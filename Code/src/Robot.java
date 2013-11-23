@@ -22,7 +22,7 @@ public class Robot implements TimerListener {
    public enum FindStatus { IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED, AVOIDING };
 
 	private static NXTRegulatedMotor leftMotor, rightMotor;
-   private static final boolean  avoid = true;
+   private static final boolean  avoid = false;
 
    private float turnRate;
 

@@ -7,6 +7,17 @@ import lejos.nxt.Sound;
 
 import java.util.ArrayList;
 
+import AStar.Types;
+import AStar.AStar;
+import AStar.TypeMap;
+import AStar.FieldMap;
+import AStar.GoalNode2D;
+import AStar.ISearchNode;
+import AStar.SearchAndAvoidNode2D;
+import java.util.ArrayList;
+import java.util.*;
+
+
 public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 
    private UltrasonicListener uListener;
@@ -28,6 +39,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private Position storeTarget;
    private FindStatus storeFindStatus;
 	private ArrayList<Ping> pingsList = new ArrayList<Ping>(128);
+   private TypeMap map = new FieldMap((int)(12 * 30.48 / 10),(int)(12 * 30.48 / 10)); //eventually: 10 cm node distance
 
 	private Colour colour;
 
@@ -56,6 +68,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       this.DESTINATION_X = x;
       this.DESTINATION_Y = y;
 	   colour = new Colour(Hardware.colourPort);
+      this.map.set(90/10,90/10,Types.OBSTACLE);
    }
 
    //**********************************
@@ -248,5 +261,51 @@ protected void scanning() {
          Thread.currentThread().interrupt();
       }
       this.stop();
+   }
+   /** Use A* algorithm to determine the shortest path to the target while avoiding known obstacles
+    @author Alex
+    @return ArrayList<ISearchNode>*/
+   public ArrayList<ISearchNode> getPathTo(int destinationX, int destinationY) {
+      GoalNode2D goalNode = new GoalNode2D(destinationX, destinationY);
+      ISearchNode initialNode = new SearchAndAvoidNode2D(this.map, (int)this.getPosition().x/10, (int)this.getPosition().y/10, null, goalNode);
+      ArrayList<ISearchNode> path = new AStar().shortestPath(initialNode, goalNode);
+      path = straightenPath(path);
+//      for (int i = 0; i < path.size(); i++) {
+//         System.out.println("Element number " + i + " is " + path.get(i));
+      return path;
+   }
+   /** A* package used returns the path in terms of points every node, this removes nodes that form a line
+    @author Alex
+    @return ArrayList<ISearchNode>*/
+   public ArrayList<ISearchNode> straightenPath(ArrayList<ISearchNode> path) {
+      int px = 0, py = 0, count;
+      float m = 0;
+
+      ArrayList<ISearchNode> output = new ArrayList<ISearchNode>();
+
+      count = 0;
+      
+      for (ISearchNode current : path) {
+         if (count >= 2) { //Determine if new point is on the line
+            float newM = (float)(current.getY() - py) / (current.getX() - px);
+            if (Math.abs(m - newM) > 0.00001f) { //Is not on the line
+               output.add(current);
+               count = 0;
+            } else {
+               output.remove(output.size() - 1);
+               output.add(current);
+               count = 3;
+            }
+         } else {
+            count++;
+            if (count == 2) {
+               m = (float)(current.getY() - py) / (current.getX() - px);
+            }
+            px = current.getX();
+            py = current.getY();
+            output.add(current);
+         }
+      }
+      return output;
    }
 } 
