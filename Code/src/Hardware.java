@@ -52,6 +52,7 @@ class Hardware {
 	public static float      distanceTolerance = 1f; /* cm */
 	public static float      defaultLimitAngle = 350f;
 	public static float   defaultLimitDistance = 350f;
+	/* public static float               maxSpeed = 50f; */
 
 	/** hw Sex Robot + localisation */
 	public static void locobot() {

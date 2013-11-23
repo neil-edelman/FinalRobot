@@ -50,6 +50,8 @@ public class Robot implements TimerListener {
 		 limiter */ //TODO:lol -alex
 		/*leftMotor.setAcceleration(500);
 		rightMotor.setAcceleration(500);*/
+		/*anglePID.limitAcceleration(0.05f);
+		distancePID.limitAcceleration(0.05f); <- nope */
 		/* start the timer for updates (timedOut) */
 		timer.start();
 	}
@@ -382,7 +384,14 @@ public class Robot implements TimerListener {
 	 Controller; untested
 	 @param final float l  left speed degrees/sec
 	 @param final float r  right speed degrees/sec */
-	protected void setSpeeds(final float l, final float r) {
+	protected void setSpeeds(float l, float r) {
+		/* this is a hack, but better than the the more complex solution */
+		/*if(l > Hardware.maxSpeed)       l =  Hardware.maxSpeed;
+		else if(l < -Hardware.maxSpeed) l = -Hardware.maxSpeed;
+		if(r > Hardware.maxSpeed)       r =  Hardware.maxSpeed;
+		else if(r < -Hardware.maxSpeed) r = -Hardware.maxSpeed;
+		 okay, the problem is definately an NXT error */
+		/* oh good grief */
 		leftMotor.setSpeed(l);
 		if(l > 0) {
 			leftMotor.forward();

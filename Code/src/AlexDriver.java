@@ -20,7 +20,9 @@ class AlexDriver {
 
 		/* the hardware profile for the robot */
 		Hardware.swagbotV2();
-		Hardware.useBluetooth = true;
+		//Hardware.locobot();
+		Hardware.useLoco      = false;
+		Hardware.useBluetooth = false;
 		Hardware.useServer    = false;
 
 		float destination_x = 50f;
@@ -121,7 +123,7 @@ class AlexDriver {
 		waitForIdle();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
-		robot.travelTo(60.96f, 60.96f);
+		robot.travelTo(-30f,0f/*60.96f, 60.96f*/);
 		waitForIdle();
 		robot.turnTo(90f);
 		waitForIdle();
