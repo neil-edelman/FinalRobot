@@ -391,7 +391,11 @@ public class Robot implements TimerListener {
 		if(r > Hardware.maxSpeed)       r =  Hardware.maxSpeed;
 		else if(r < -Hardware.maxSpeed) r = -Hardware.maxSpeed;
 		 okay, the problem is definately an NXT error */
+
 		/* oh good grief */
+		if(l < 0f) l = 0f;
+		if(r < 0f) r = 0f;
+
 		leftMotor.setSpeed(l);
 		if(l > 0) {
 			leftMotor.forward();

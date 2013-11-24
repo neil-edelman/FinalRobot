@@ -58,9 +58,11 @@ public class Odometer implements TimerListener {
 	 ints just loop back */
 	private int intTraveled, intTurn;
 
-	Position position = new Position();
-	Position      old = new Position();
-	Position    pCopy = new Position();
+	private Position position = new Position();
+	private Position      old = new Position();
+	private Position    pCopy = new Position();
+
+	private final float halfWheelbase;
 
 	/** constructor
 	 @param leftMotor
@@ -68,8 +70,9 @@ public class Odometer implements TimerListener {
 	 RADIUS and WHEELBASE apart (potentially calibrated using
 	 CalibrateRadius/Wheelbase) */
 	public Odometer() {
-		this.leftMotor  = Hardware.leftMotor;
-		this.rightMotor = Hardware.rightMotor;
+		this.leftMotor     = Hardware.leftMotor;
+		this.rightMotor    = Hardware.rightMotor;
+		this.halfWheelbase = Hardware.wheelbase * 0.5f;
 		timer.start();
 	}
 
@@ -105,9 +108,11 @@ public class Odometer implements TimerListener {
 		/* (i/2) / (w/2) * (2Pi r) * (1/360) */
 		float r = (delTurn / Hardware.wheelbase) * (PI * Hardware.radius) / (180f); /* radians */
 
+		//float width = (r > 0f) ? r * halfWheelbase : -r * halfWheelbase;
+
 		/* add it to the position at which the robot thinks it is */
 		synchronized(this) {
-			position.arc(r, d);
+			position.arc(r, d/* + width*/);
 			/* I know this isn't neccessary, just alternate, but it results in
 			 unreadability */
 			old.set(position);

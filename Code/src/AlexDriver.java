@@ -132,11 +132,11 @@ class AlexDriver {
 		waitForIdle();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
-		robot.travelTo(-30f,0f/*60.96f, 60.96f*/);
+		robot.travelTo(60.96f, 60.96f);
 		//robot.travelTo(60.96f, 60.96f);
-		//waitForIdle();
-		//robot.turnTo(90f);
-		//waitForIdle();
+		waitForIdle();
+		robot.turnTo(90f);
+		waitForIdle();
 
 		//robot.travelTo(destination_x, destination_y);
 		//runTests();

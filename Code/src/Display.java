@@ -50,12 +50,12 @@ public class Display implements TimerListener{
 		LCD.clear();
 		LCD.drawString("" + robot.getName(), 0, 0, true);
 		LCD.drawString("" + robot.getStatus() + " | " + robot.getFindStatus(), 0, 1);
-		LCD.drawString("pos: " + position, 0, 2);
+		LCD.drawString("p" + position, 0, 2);
 		LCD.drawString(drawText, 0, 3, true);
-      LCD.drawString("SmPing:   " + robot.getSmallestPing(), 0, 4);
-      LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 5);
-      LCD.drawString("UDist:    " + robot.getDistance(), 0, 6);
-      LCD.drawString("UFDist:   " + robot.getFilteredDistance(), 0, 7);
+//      LCD.drawString("SmPing:   " + robot.getSmallestPing(), 0, 4);
+//      LCD.drawString("TTheta:   " + robot.getTargetTheta(), 0, 5);
+//      LCD.drawString("UDist:    " + robot.getDistance(), 0, 6);
+//      LCD.drawString("UFDist:   " + robot.getFilteredDistance(), 0, 7);
 
 //      LCD.drawString("Distance:", 0, 5);
 //      LCD.drawString("MedFilter:", 0, 6);
