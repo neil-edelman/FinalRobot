@@ -393,8 +393,8 @@ public class Robot implements TimerListener {
 		 okay, the problem is definately an NXT error */
 
 		/* oh good grief */
-		if(l < 0f) l = 0f;
-		if(r < 0f) r = 0f;
+		//if(l < 0f) l = 0f;
+		//if(r < 0f) r = 0f;
 
 		leftMotor.setSpeed(l);
 		if(l > 0) {
