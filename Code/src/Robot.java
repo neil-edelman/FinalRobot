@@ -14,6 +14,8 @@ import lejos.util.Timer;
 import lejos.util.TimerListener;
 import lejos.nxt.Button;
 
+import lejos.nxt.comm.RConsole;
+
 /* Robot */
 
 public class Robot implements TimerListener {
@@ -44,7 +46,7 @@ public class Robot implements TimerListener {
 	public Robot() {
 		leftMotor  = Hardware.leftMotor;
 		rightMotor = Hardware.rightMotor;
-		odometer = new Odometer(/*leftMotor, rightMotor*/);
+		odometer = new Odometer();
 		/* set smooth -- DO NOT DO THIS IT MAKES IT LOCO; figure-8's, crashing
 		 on walls, etc; who know what it does, but it's NOT a accelertion
 		 limiter */ //TODO:lol -alex
@@ -176,7 +178,9 @@ public class Robot implements TimerListener {
 	 @param degrees (-180,180]
 	 @param limit sets the speed limit */
 	public void turnTo(final float degrees, final float limit) {
-		if(degrees <= -180 || degrees > 180) throw new IllegalArgumentException();
+		if(degrees <= -180 || degrees > 180) {
+			throw new IllegalArgumentException("turnTo " + degrees);
+		}
 
 		/* anglePID, which we need, could have old values, reset it */
 		anglePID.reset(limit);
@@ -275,12 +279,8 @@ public class Robot implements TimerListener {
 
 		/* apply magic */
 		float turn  = anglePID.nextOutput(delta.getTheta(), Hardware.navDelay);
-		float speed = distancePID.nextOutput(distance,      Hardware.navDelay);
-
-		/* was going to put Math.cos(delta.getRadians()) to get lightning fast
-		 turns when starting away from the destiantion; a glaring bug with the
-		 firmwear causes the 2nd motor, when swiching signs, to stop, but the
-		 report back to the odometer that it's kept going */
+		float speed = distancePID.nextOutput(distance, Hardware.navDelay) *
+		              (float)Math.cos(delta.getRadians());
 
 		/* tolerence on the distance; fixme: have a tolerance on the derivative
 		 as soon as it won't go crazy and turn 180 degrees on overshoot */
@@ -384,7 +384,7 @@ public class Robot implements TimerListener {
 	 Controller; untested
 	 @param final float l  left speed degrees/sec
 	 @param final float r  right speed degrees/sec */
-	protected void setSpeeds(float l, float r) {
+	protected void setSpeeds(final float l, final float r) {
 		/* this is a hack, but better than the the more complex solution */
 		/*if(l > Hardware.maxSpeed)       l =  Hardware.maxSpeed;
 		else if(l < -Hardware.maxSpeed) l = -Hardware.maxSpeed;
@@ -392,10 +392,11 @@ public class Robot implements TimerListener {
 		else if(r < -Hardware.maxSpeed) r = -Hardware.maxSpeed;
 		 okay, the problem is definately an NXT error */
 
-		/* oh good grief */
-		//if(l < 0f) l = 0f;
-		//if(r < 0f) r = 0f;
-
+		/* send? */
+		if(RConsole.isOpen()) {
+			RConsole.println("" + l + ", " + r);
+		}
+		
 		leftMotor.setSpeed(l);
 		if(l > 0) {
 			leftMotor.forward();

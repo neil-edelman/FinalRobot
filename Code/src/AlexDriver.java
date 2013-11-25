@@ -30,7 +30,7 @@ class AlexDriver {
 
 		/* the hardware profile for the robot */
 		Hardware.swagbotV2();
-		Hardware.useBluetooth = true;
+		Hardware.useBluetooth = false;
 		Hardware.useServer    = false;
 		Hardware.useLoco      = true;
 
@@ -132,8 +132,7 @@ class AlexDriver {
 		waitForIdle();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
-		//robot.travelTo(60.96f, 60.96f);
-		//robot.travelTo(60.96f, 60.96f);
+		robot.travelTo(60.96f, 60.96f);
 		waitForIdle();
 		robot.turnTo(90f);
 		waitForIdle();
@@ -164,6 +163,7 @@ class AlexDriver {
 		/* close bt connection */
 		if(RConsole.isOpen()) RConsole.close();
 	}
+
 	/** Waits for the robot subtask to finish and return to finding or become idle.
 	 @author Alex */
    public static void waitForSubTask() {

@@ -21,7 +21,7 @@ public class Controller {
 	/* just p
 	 @param p proportional gain */
 	public Controller(final float p) {
-		if(p <= 0) throw new IllegalArgumentException();
+		if(p <= 0) throw new IllegalArgumentException("Con p=" + p);
 		kp = p;
 		ki = 0;
 		kd = 0;

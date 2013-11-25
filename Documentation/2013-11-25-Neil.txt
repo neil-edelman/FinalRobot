@@ -1,0 +1,11 @@
+%%
+
+I worked on a picture for the poster; the poster is already printed.
+
+%%
+
+The robot is not working (Exception) when I came in. It's exceptionally slow to upload by Bluetooth, but I can't upload by USB.
+
+%%
+
+It's rapidly becoming apparent that Swagbot's rear wheels are scraping, introducing error into my odometer.
