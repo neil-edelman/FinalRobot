@@ -64,6 +64,23 @@ public class FieldMap implements TypeMap {
 		}
 	}
 
+	/** this is very inefficient (because of String)
+	 @author Neil */
+	public String toString() {
+		String m = "";
+		int x = 0, y = 0;
+		for(byte yIso[] : map) {
+			for(byte b : yIso) {
+				m += "" + Types.values()[b];
+				x++;
+			}
+			m += "\n";
+			x = 0;
+			y++;
+		}
+		return m;
+	}
+
 	/** Bresenham's (un-optimised) with constant lenght
 	 @param x1
 	 @param y1
