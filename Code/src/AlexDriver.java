@@ -1,5 +1,6 @@
 /** this is a driver that instantaties a Robot and makes it do stuff
  @author Alex */
+ 
 
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
@@ -22,6 +23,7 @@ class AlexDriver {
 
    private static Swagbot robot;
    private static Display display;
+   private static StartCorner corner;
 
    private static float x1;
    private static float y1;
@@ -39,6 +41,8 @@ class AlexDriver {
 		Hardware.useServer    = false; /* change to true in our final robot */
 		Hardware.useLoco      = true;
 
+      FieldMap map = new FieldMap((int)(12 * 30.48 / 10),(int)(12 * 30.48 / 10)); //eventually: 10 cm node distance
+
 		float destination_x = 50f;
 		float destination_y = 50f;
 
@@ -53,7 +57,8 @@ class AlexDriver {
 				destination_x = 0;
 				destination_y = 0;
 			} else {
-				StartCorner corner = t.startingCorner;
+				corner = t.startingCorner;
+
 				PlayerRole role = t.role;
 				// green zone is defined by these (bottom-left and top-right) corners:
 				int[] greenZone = t.greenZone;
@@ -72,7 +77,6 @@ class AlexDriver {
 				y2 = 30.48f * (float)greenZone[3];
 		      destination_x = (x1 + x2)/2;
 		      destination_y = (y1 + y2)/2;
-
 				//convert to cm, rotated
 				x1 = (float)redZone[0] + 1f;
 				y1 = (float)redZone[1] + 1f;
@@ -83,7 +87,18 @@ class AlexDriver {
 				y1 = 30.48f * (float)redZone[1];
 				x2 = 30.48f * (float)redZone[2];
 				y2 = 30.48f * (float)redZone[3];
-
+            if(x1 > x2) {
+               float hold = x1;
+               x1 = x2;
+               x2 = hold;
+            }
+            if(y1 > y2) {
+               float hold = y1;
+               y1 = y2;
+               y2 = hold;
+            }
+            //set red zone
+            map.fill((int)(x1/10f),(int)(y1/10f),(int)(x2/10f),(int)(y2/10f),Types.OBSTACLE);
 				// print out the transmission information to the LCD
 				conn.printTransmission();
 			}
@@ -95,7 +110,7 @@ class AlexDriver {
 			if(!RConsole.isOpen()) Display.setText("Never mind.");
 		}
 
-		robot   = new Swagbot(destination_x,destination_y);
+		robot   = new Swagbot(map,destination_x,destination_y);
 		display = new Display(robot);
 		monitorForExit();
 
@@ -116,8 +131,9 @@ class AlexDriver {
 		//runTests();
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
-//      travelWithAStar(180,180);
-
+      travelWithAStar(30,30);
+      map.set(60/10,60/10,Types.OBSTACLE);
+      travelWithAStar(90,90);
 //		robot.findBlocks();
 //		waitForIdle();
 
@@ -135,6 +151,39 @@ class AlexDriver {
 //         System.out.println(colour.getColourValue() == Colour.Value.STYROFOAM);
 //		}
 		
+
+
+		/* close bt connection */
+		if(RConsole.isOpen()) RConsole.close();
+	}
+
+	/** Waits for the robot subtask to finish and return to finding or become idle.
+	 @author Alex */
+   public static void waitForSubTask() {
+         while(robot.getStatus() != Robot.Status.IDLE || robot.getStatus() != Robot.Status.FINDING) {
+		}
+   }
+   /** Robot will travel to coordinates using AStar.
+    @author Alex
+    @return void
+   */
+   public static void travelWithAStar(int x, int y) {
+      followPath(robot.straightenPath(robot.getPathTo(x/10,y/10)));
+   }
+   /** Robot will follow the input path.
+    @author Alex
+    @return void
+   */
+   public static void followPath(ArrayList<ISearchNode> path) {
+      path.remove(0);
+//      int count = 1;
+      for(ISearchNode node : path) {
+         robot.travelTo(node.getX()*10,node.getY()*10,350,350);
+         waitForIdle();
+//           System.out.println("T"+count+": ("+node.getX()*10+","+node.getY()*10+")");
+//           count++;
+      }
+   }
    public static void transform() {
       float destination_x = x1;
       float destination_y = y1;
@@ -177,38 +226,6 @@ class AlexDriver {
       x2 = destination_x;
       y2 = destination_y;
 
-   }
-
-		/* close bt connection */
-		if(RConsole.isOpen()) RConsole.close();
-	}
-
-	/** Waits for the robot subtask to finish and return to finding or become idle.
-	 @author Alex */
-   public static void waitForSubTask() {
-         while(robot.getStatus() != Robot.Status.IDLE || robot.getStatus() != Robot.Status.FINDING) {
-		}
-   }
-   /** Robot will travel to coordinates using AStar.
-    @author Alex
-    @return void
-   */
-   public static void travelWithAStar(int x, int y) {
-      followPath(robot.straightenPath(robot.getPathTo(x/10,y/10)));
-   }
-   /** Robot will follow the input path.
-    @author Alex
-    @return void
-   */
-   public static void followPath(ArrayList<ISearchNode> path) {
-      path.remove(0);
-//      int count = 1;
-      for(ISearchNode node : path) {
-         robot.travelTo(node.getX()*10,node.getY()*10,350,350);
-         waitForIdle();
-//           System.out.println("T"+count+": ("+node.getX()*10+","+node.getY()*10+")");
-//           count++;
-      }
    }
 
    private static void monitorForExit() {

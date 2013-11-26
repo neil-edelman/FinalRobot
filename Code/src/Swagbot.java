@@ -39,7 +39,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private Position storeTarget;
    private FindStatus storeFindStatus;
 	private ArrayList<Ping> pingsList = new ArrayList<Ping>(128);
-   private TypeMap map = new FieldMap((int)(12 * 30.48 / 10),(int)(12 * 30.48 / 10)); //eventually: 10 cm node distance
+   private FieldMap map;
 
 	private Colour colour;
 
@@ -59,7 +59,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 	}
 
 	/** the constructor */
-   public Swagbot(final float x, final float y) {
+   public Swagbot(FieldMap map, final float x, final float y) {
       super();
       uListener = new UltrasonicListener(this.sonic);
       uTimer = new Timer(10/*round-up to int 9.375*/,uListener); //timeout value in ms
@@ -68,7 +68,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       this.DESTINATION_X = x;
       this.DESTINATION_Y = y;
 	   colour = new Colour(Hardware.colourPort);
-      this.map.set(90/10,90/10,Types.OBSTACLE);
+      this.map = map;
    }
 
    //**********************************
