@@ -3,7 +3,7 @@ cd bin
 #nxj -b -n "Sex Robot" Driver
 #nxj -b -d 0016530FE494 AlexDriver
 # Swagbot
-nxj -r -b -od debug -d 0016530E5586 AlexDriver
+nxj -r -b -d 0016530E5586 Calibrate
 
 # to upload:
 # turn the robot on

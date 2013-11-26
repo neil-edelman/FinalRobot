@@ -31,7 +31,9 @@ class Position {
 	 @param y   (x, y)
 	 @param deg degrees */
 	public Position(final float x, final float y, final float deg) {
-		if(deg > 180 || deg <= -180) throw new IllegalArgumentException();
+		if(deg > 180 || deg <= -180) {
+			throw new IllegalArgumentException("Pos t=" + deg);
+		}
 		this.x = x;
 		this.y = y;
 		this.t = (float)Math.toRadians(deg);

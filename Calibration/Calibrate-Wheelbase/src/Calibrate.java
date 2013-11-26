@@ -12,7 +12,9 @@ public class Calibrate {
 	/* you know this from experimenting, enter it in */
 	private static final float RADIUS      = 2.707f;
 	/* this is the variable that you are varying */
-	private static final float WHEELBASE   = 16.061533f;
+	/*private static final float WHEELBASE   = 16.061533f;*/
+	/* for swagbot */
+	private static final float WHEELBASE   = 19.63f;
 
 	static final NXTRegulatedMotor lMotor = Motor.A, rMotor = Motor.B;
 

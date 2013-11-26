@@ -1,0 +1,8 @@
+Calibrate-Radius: the radius is the same as Locobot.
+
+2013-11-25 Test 128.9: hardware Swagbot-2_2, software Calibrate-Radius 13d0d32ce4
+
+16 - not nearly enough
+19.7 +10\deg
+19.6 -5\deg
+19.63 perfect

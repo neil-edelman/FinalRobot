@@ -21,7 +21,7 @@ public class Controller {
 	/* just p
 	 @param p proportional gain */
 	public Controller(final float p) {
-		if(p <= 0) throw new IllegalArgumentException();
+		if(p <= 0) throw new IllegalArgumentException("Con p=" + p);
 		kp = p;
 		ki = 0;
 		kd = 0;
@@ -70,6 +70,23 @@ public class Controller {
 		/* limit output and update to values for the next time; should be
 		 integral * FORGET ^ dt + e but not noticable */
 		eLast = e;
+		/*if(isLimit || isAccelerationLimit) {
+			float minAllowed, maxAllowed;
+			if(isLimit && isAccelerationLimit) {
+				minAllowed = lastPid - accelerationLimit * dt;
+				maxAllowed = lastPid + accelerationLimit * dt;
+				minAllowed = (minAllowed > min) ? (minAllowed) : (min);
+				maxAllowed = (maxAllowed < max) ? (maxAllowed) : (max);
+			} else if(isLimit) {
+				minAllowed = min;
+				maxAllowed = max;
+			} else {
+				minAllowed = lastPid - accelerationLimit * dt;
+				maxAllowed = lastPid + accelerationLimit * dt;
+			}
+			if(pid > maxAllowed)      pid = maxAllowed;
+			else if(pid < minAllowed) pid = minAllowed;
+			else                 integral = integral *//* * FORGET*//* + e;*/
 		if(isLimit) {
 			if(pid > max)      pid = max;
 			else if(pid < min) pid = min;
