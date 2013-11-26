@@ -31,7 +31,7 @@ class AlexDriver {
 		/* the hardware profile for the robot */
 		Hardware.swagbotV2();
 		Hardware.useBluetooth = false;
-		Hardware.useServer    = false;
+		Hardware.useServer    = false; /* change to true in our final robot */
 		Hardware.useLoco      = true;
 
 		float destination_x = 50f;
