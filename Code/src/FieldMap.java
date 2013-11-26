@@ -1,6 +1,7 @@
 package AStar;
 
 import java.lang.IllegalArgumentException;
+//import AStar;
 
 public class FieldMap implements TypeMap {
 
@@ -69,7 +70,7 @@ public class FieldMap implements TypeMap {
 	 @param x2
 	 @param y2 the line (x1, y1)--(x2, y2)
 	 @param sq how high to make it */
-	public void ping(Ping ping) {
+/*	public void ping(Ping ping) {
 		int x1 = Math.round(ping.position.x / CM_PER_MAP);
 		int y1 = Math.round(ping.position.x / CM_PER_MAP);
 		int x2 = ping.x, y2 = ping.y;
@@ -80,17 +81,18 @@ public class FieldMap implements TypeMap {
 		final int dy = (y1 > y2) ? (y1 - y2) : (y2 - y1);
 		final int sy = (y1 > y2) ? -1 : 1;
 		int err = dx - dy;
-		/* fixme: draw a rectangle fountain-fill */
+		// fixme: draw a rectangle fountain-fill *
 		for(int length = 0; length < SCAN_RANGE; length++) {
 			if(x1 == x2 && y1 == y2) {
-				this.set(x1, y1, Types.OBSTACE);
+				this.set(x1, y1, Types.OBSTACLE);
 				break;
 			}
-			this.set(x1, y1, sq); /* fixme: aaaaauugh NO */
+			this.set(x1, y1, sq); // fixme: aaaaauugh NO *
 			int e2 = err << 1;
 			if(e2 > -dx) { err -= dy; x1 += sx; }
 			if(e2 <  dy) { err += dx; y1 += sy; }
 		}
 	}
+*/
 
 }
