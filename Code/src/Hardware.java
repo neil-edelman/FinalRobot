@@ -29,7 +29,7 @@ class Hardware {
 
 	/* from Odometer */
 	public static int    odoDelay = 25;
-	public static float    radius = 2.72f;
+	public static float    radius = /*2.72f*/2.707f;
 	public static float wheelbase = 16.15f;
 
 	/* from Ping */
@@ -69,12 +69,12 @@ class Hardware {
 		name = "Swagbot v2";
 		useLoco = true;
 
-		wheelbase    = 19.7f; //swagbot (version 2) tested, works well
-		clearance    = 16f;
+		clearance    = 16f; // about
+		//wheelbase    = 19.7f; //swagbot (version 2) tested, works well
+		wheelbase    = 19.63f; /* more accurate -Neil */
 		//sonicForward = 8f; //swagbot (version 2) tested: y value is off (doesn't work)
-		sonicForward = 9.0f;
-		/*angleTolerance    = (float)Math.toRadians(0.5);
-		distanceTolerance = 1.5f;*/
+		sonicForward = 9.0f; /* measured -Neil */
+		
 	}
 
 }
