@@ -41,7 +41,7 @@ class AlexDriver {
 		Hardware.useServer    = false; /* change to true in our final robot */
 		Hardware.useLoco      = false;
 
-      FieldMap map = new FieldMap((int)(12 * 30.48 / 10),(int)(12 * 30.48 / 10)); //eventually: 10 cm node distance
+      FieldMap map = new FieldMap(12 * 3, 12 * 3); // ~10 cm node distance
 
 		float destination_x = 50f;
 		float destination_y = 50f;
