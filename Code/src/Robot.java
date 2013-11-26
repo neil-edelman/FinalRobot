@@ -14,7 +14,7 @@ import lejos.util.Timer;
 import lejos.util.TimerListener;
 import lejos.nxt.Button;
 
-import lejos.nxt.comm.RConsole;
+//import lejos.nxt.comm.RConsole;
 
 /* Robot */
 
@@ -393,9 +393,9 @@ public class Robot implements TimerListener {
 		 okay, the problem is definately an NXT error */
 
 		/* send? */
-		if(RConsole.isOpen()) {
+		/*if(RConsole.isOpen()) {
 			RConsole.println("" + l + ", " + r);
-		}
+		}*/
 		
 		leftMotor.setSpeed(l);
 		if(l > 0) {

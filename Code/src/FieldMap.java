@@ -71,7 +71,7 @@ public class FieldMap implements TypeMap {
 		int x = 0, y = 0;
 		for(byte yIso[] : map) {
 			for(byte b : yIso) {
-				m += "" + Types.values()[b];
+				m += " " + Types.values()[b].getSymbol();
 				x++;
 			}
 			m += "\n";
