@@ -122,17 +122,17 @@ class AlexDriver {
 		waitForIdle();
 
 		/* Neil: loco, travel to the 2nd square, and turn to 90 */
-		robot.travelTo(60.96f, 60.96f);
-		waitForIdle();
-		robot.turnTo(90f);
-		waitForIdle();
+		//robot.travelTo(60.96f, 60.96f);
+		//waitForIdle();
+		//robot.turnTo(90f);
+		//waitForIdle();
 
 		//robot.travelTo(destination_x, destination_y);
 		//runTests();
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
-      travelWithAStar(30,30);
-      //map.fill(1-60/10,1-60/10,1+60/10,1+60/10,Types.OBSTACLE);
+      //travelWithAStar(30,30);
+      map.fill(60/10-1,60/10-1,1+60/10,1+60/10,Types.OBSTACLE);
       travelWithAStar(90,90);
 //		robot.findBlocks();
 //		waitForIdle();
