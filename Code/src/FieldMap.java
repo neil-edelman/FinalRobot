@@ -45,7 +45,7 @@ public class FieldMap implements TypeMap {
 	 @param sq what to set it to */
 	public void fill(int x1, int y1, int x2, int y2, Types type) {
 		if(x1 > x2 || y1 > y2 || x1 >= xSize || y1 >= ySize || x2 < 0 || y2 < 0) {
-         throw new IllegalArgumentException("Illegal Fill");
+         //throw new IllegalArgumentException("Illegal Fill");
       }
 		if(x1 < 0)      x1 = 0;
 		if(y1 < 0)      y1 = 0;

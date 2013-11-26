@@ -132,7 +132,7 @@ class AlexDriver {
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
       travelWithAStar(30,30);
-      map.set(60/10,60/10,Types.OBSTACLE);
+      //map.fill(1-60/10,1-60/10,1+60/10,1+60/10,Types.OBSTACLE);
       travelWithAStar(90,90);
 //		robot.findBlocks();
 //		waitForIdle();
