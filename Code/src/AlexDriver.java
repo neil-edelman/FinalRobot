@@ -23,6 +23,11 @@ class AlexDriver {
    private static Swagbot robot;
    private static Display display;
 
+   private static float x1;
+   private static float y1;
+   private static float x2;
+   private static float y2;
+
 	/** the entry-point where we create our robot
 	 @param args[] ignored
 	 @author Alex, Neil */
@@ -55,60 +60,30 @@ class AlexDriver {
 				// red zone is defined by these (bottom-left and top-right) corners:
 				int[] redZone = t.redZone;
 				
-				//convert to cm, unrotated
-				float x1 = 30.48f * (float)greenZone[0] + 30.48f;
-				float y1 = 30.48f * (float)greenZone[1] + 30.48f;
-				float x2 = 30.48f * (float)greenZone[2] + 30.48f;
-				float y2 = 30.48f * (float)greenZone[3] + 30.48f;
-				
-				//[cos -sin]-1
-				//[sin  cos]
-				float a = 1f,b = 0f,c = 0f,d = 1f;
-				//rotate coordinates to robot's localise position
-				// what is StateCorner? FIXME!
-				/*switch(corner) {
-				 case StateCorner.BOTTOM_LEFT: //0 degrees
-				 break;
-				 case StateCorner.BOTTOM_RIGHT: //-90 degrees
-				 a = 0;
-				 b = -1;
-				 c = 1;
-				 d = 0;
-				 break;
-				 case StateCorner.TOP_LEFT: //90 degrees
-				 a = 0;
-				 b = 1;
-				 c = -1;
-				 d = 0;
-				 break;
-				 case StateCorner.TOP_RIGHT: // 180 degrees
-				 a = -1f;
-				 d = -1f;
-				 break;
-				 }*/
-				
-				float greenZone_x1 = a*x1 + b*y1;
-				float greenZone_y1 = c*x1 + d*y1;
-				float greenZone_x2 = a*x2 + b*y2;
-				float greenZone_y2 = c*x2 + d*y2;
-				
-				if (corner == StartCorner.BOTTOM_LEFT) {
-				}
-				else if (corner == StartCorner.BOTTOM_RIGHT) {
-					float hold = destination_y;
-					destination_y = 8 - destination_x;
-					destination_x = hold;
-				}
-				else if (corner == StartCorner.TOP_LEFT) {
-					float hold = destination_x;
-					destination_x = 8 - destination_y;
-					destination_y = hold;
-				}
-				else if (corner == StartCorner.TOP_RIGHT) {
-					destination_x = 8 - destination_x;
-					destination_y = 8 - destination_y;
-				}
-				
+				//convert to cm, rotated
+				x1 = (float)greenZone[0] + 1f;
+				y1 = (float)greenZone[1] + 1f;
+				x2 = (float)greenZone[2] + 1f;
+				y2 = (float)greenZone[3] + 1f;
+            transform();
+			   x1 = 30.48f * (float)greenZone[0];
+				y1 = 30.48f * (float)greenZone[1];
+				x2 = 30.48f * (float)greenZone[2];
+				y2 = 30.48f * (float)greenZone[3];
+		      destination_x = (x1 + x2)/2;
+		      destination_y = (y1 + y2)/2;
+
+				//convert to cm, rotated
+				x1 = (float)redZone[0] + 1f;
+				y1 = (float)redZone[1] + 1f;
+				x2 = (float)redZone[2] + 1f;
+				y2 = (float)redZone[3] + 1f;
+            transform();
+			   x1 = 30.48f * (float)redZone[0];
+				y1 = 30.48f * (float)redZone[1];
+				x2 = 30.48f * (float)redZone[2];
+				y2 = 30.48f * (float)redZone[3];
+
 				// print out the transmission information to the LCD
 				conn.printTransmission();
 			}
@@ -160,6 +135,50 @@ class AlexDriver {
 //         System.out.println(colour.getColourValue() == Colour.Value.STYROFOAM);
 //		}
 		
+   public static void transform() {
+      float destination_x = x1;
+      float destination_y = y1;
+		if (corner == StartCorner.BOTTOM_LEFT) {
+		}
+		else if (corner == StartCorner.BOTTOM_RIGHT) {
+			float hold = destination_y;
+			destination_y = 12 - destination_x;
+			destination_x = hold;
+		}
+		else if (corner == StartCorner.TOP_LEFT) {
+			float hold = destination_x;
+			destination_x = 12 - destination_y;
+			destination_y = hold;
+		}
+		else if (corner == StartCorner.TOP_RIGHT) {
+			destination_x = 12 - destination_x;
+			destination_y = 12 - destination_y;
+		}
+      x1 = destination_x;
+      y1 = destination_y;
+      destination_x = x2;
+      destination_y = y2;
+		if (corner == StartCorner.BOTTOM_LEFT) {
+		}
+		else if (corner == StartCorner.BOTTOM_RIGHT) {
+			float hold = destination_y;
+			destination_y = 12 - destination_x;
+			destination_x = hold;
+		}
+		else if (corner == StartCorner.TOP_LEFT) {
+			float hold = destination_x;
+			destination_x = 12 - destination_y;
+			destination_y = hold;
+		}
+		else if (corner == StartCorner.TOP_RIGHT) {
+			destination_x = 12 - destination_x;
+			destination_y = 12 - destination_y;
+		}
+      x2 = destination_x;
+      y2 = destination_y;
+
+   }
+
 		/* close bt connection */
 		if(RConsole.isOpen()) RConsole.close();
 	}
