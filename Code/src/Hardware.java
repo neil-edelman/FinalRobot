@@ -75,6 +75,9 @@ class Hardware {
 		//sonicForward = 8f; //swagbot (version 2) tested: y value is off (doesn't work)
 		sonicForward = 9.0f; /* measured -Neil */
 		
+		angleTolerance = (float)Math.toRadians(0.5); /* rad */
+		angleMarginalTolerance = 2.0f; /* rad/s */
+		distanceTolerance = 3f; /* cm */
 	}
 
 }
