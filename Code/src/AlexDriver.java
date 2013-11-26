@@ -113,7 +113,7 @@ class AlexDriver {
 		robot   = new Swagbot(map,destination_x,destination_y);
 		display = new Display(robot);
 		monitorForExit();
-
+		
 		if(Hardware.useLoco) {
 			robot.localise();
 		} else {
@@ -152,6 +152,9 @@ class AlexDriver {
 //		}
 		
 
+		if(RConsole.isOpen()) {
+			RConsole.println("Map:\n" + map);
+		}
 
 		/* close bt connection */
 		if(RConsole.isOpen()) RConsole.close();
