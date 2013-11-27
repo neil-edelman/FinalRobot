@@ -39,7 +39,7 @@ class AlexDriver {
 		Hardware.swagbotV2();
 		Hardware.useBluetooth = false;
 		Hardware.useServer    = true; /* change to true in our final robot */
-		Hardware.useLoco      = false;
+		Hardware.useLoco      = true;
 
       FieldMap map = new FieldMap(12 * 3, 12 * 3); // ~10 cm node distance
 
