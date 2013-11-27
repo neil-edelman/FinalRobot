@@ -38,7 +38,7 @@ class AlexDriver {
 		/* the hardware profile for the robot */
 		Hardware.swagbotV2();
 		Hardware.useBluetooth = false;
-		Hardware.useServer    = false; /* change to true in our final robot */
+		Hardware.useServer    = true; /* change to true in our final robot */
 		Hardware.useLoco      = false;
 
       FieldMap map = new FieldMap((int)(12 * 30.48 / 10),(int)(12 * 30.48 / 10)); //eventually: 10 cm node distance
@@ -127,15 +127,15 @@ class AlexDriver {
 		//robot.turnTo(90f);
 		//waitForIdle();
 
-		//robot.travelTo(destination_x, destination_y);
+		robot.travelTo(destination_x, destination_y);
 		//runTests();
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
       //travelWithAStar(30,30);
-      map.fill(60/10-1,60/10-1,1+60/10,1+60/10,Types.OBSTACLE);
-      travelWithAStar(90,90);
-//		robot.findBlocks();
-//		waitForIdle();
+      //map.fill(60/10-1,60/10-1,1+60/10,1+60/10,Types.OBSTACLE);
+      //travelWithAStar(90,90);
+		//robot.findBlocks();
+		waitForIdle();
 
 		// stall until user decides to end program
 		//Button.waitForAnyPress();

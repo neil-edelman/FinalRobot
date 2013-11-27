@@ -161,7 +161,12 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          //if styroform go to destination!
          if(this.getColour() == Colour.Value.STYROFOAM) { //is styrofoam, grab and move
             Sound.beep();
+            Position position = this.getPosition();
+            int x = (int)(position.x + (smallestPing)*(float)Math.cos(position.getRadians()));
+            int y = (int)(position.y + (smallestPing)*(float)Math.sin(position.getRadians()));
+            map.fill(x-1,y-1,x+1,y+1,Types.NONE);
             this.findStatus = FindStatus.FOUND;
+            this.travelTo(x,y,250,250);
          }
          else { //is wood move on
             Sound.buzz();
@@ -229,9 +234,13 @@ protected void scanning() {
       //record pings
 		if(ping < 0 || ping > 255) { //check out of bounds
 			Display.setText("Ping value out of bounds" + ping);
-		} else {
+		} 
+      else if(ping < SCAN_THRESHOLD){
 			// record
          pingsList.add(new Ping(pos,ping));
+         int x = (int)(pos.x + (ping)*(float)Math.cos(pos.getRadians()));
+         int y = (int)(pos.y + (ping)*(float)Math.sin(pos.getRadians()));
+         map.fill(x-1,y-1,x+1,y+1,Types.OBSTACLE);
 		}
 
 
