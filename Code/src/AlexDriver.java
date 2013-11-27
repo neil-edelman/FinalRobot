@@ -64,7 +64,18 @@ class AlexDriver {
 				int[] greenZone = t.greenZone;
 				// red zone is defined by these (bottom-left and top-right) corners:
 				int[] redZone = t.redZone;
-				
+
+				/************ untested!!! if the role is defender, switch the
+				 green zone and the red zone! should work, right? now it's
+				 always going to the green zone
+				 -Neil *********/
+				if(t.role == PlayerRole.GARBAGECOLLECTOR) {
+					redZone   = t.greenZone;
+					greenZone = t.redZone;
+				}
+
+				/* you make a homogenous matrix and this would be easy to do in
+				 one step without risk of error -Neil */
 				//convert to cm, rotated
 				x1 = (float)greenZone[0] + 1f;
 				y1 = (float)greenZone[1] + 1f;
