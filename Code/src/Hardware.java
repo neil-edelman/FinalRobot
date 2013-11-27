@@ -44,7 +44,7 @@ class Hardware {
 	/* from Robot / Swagbot */
 	public static NXTRegulatedMotor  leftMotor = Motor.A;
 	public static NXTRegulatedMotor rightMotor = Motor.B;
-	public static NXTRegulatedMotor stakerMotor= Motor.C;
+	public static NXTRegulatedMotor stackerMotor= Motor.C;
 	public static String                  name = "Sex Robot";
 	public static int                 navDelay = 100; /* ms */
 	public static float         angleTolerance = (float)Math.toRadians(0.1); /* rad */

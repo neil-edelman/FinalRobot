@@ -19,11 +19,11 @@ public class Ping {
 	private static int rangeLower, rangeHigher;
 	
 	/* struct is all these; fixme: compress space */
-	private Position position = new Position();
-	private int      cm;
-	private float    x, y; /* derived */
+	public/*private*/ Position position = new Position();
+	public/*private*/ int      cm;
+	public/*private*/ float    x, y; /* derived */
 	private int colour;    /* gnuplot */
-	
+
 	/** records a ping
 	 @param p       position of the reading
 	 @param reading cm reading of the ping */

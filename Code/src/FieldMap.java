@@ -1,8 +1,13 @@
 package AStar;
 
 import java.lang.IllegalArgumentException;
+//import AStar;
 
 public class FieldMap implements TypeMap {
+
+	static final float CM_PER_MAP = 30.48f / 3f;
+	/* 170 cm (that's what it says in the docs; don't have time to test) */
+	static final float SCAN_RANGE = 17f;
 
    public byte[][] map;
    private int xSize;
@@ -37,6 +42,7 @@ public class FieldMap implements TypeMap {
    public boolean checkBounds(int x, int y) {
       return !( x > map.length || x < 0 || y > map[0].length || y < 0 );
    }
+
 	/** fill the rectangle [x1, y1]--[x2, y2] with sq
 	 @param x1
 	 @param y1
@@ -57,4 +63,53 @@ public class FieldMap implements TypeMap {
 			}
 		}
 	}
+
+	/** this is very inefficient (because of String)
+	 @author Neil */
+	public String toString() {
+		String m = "";
+		int x = 0, y = 0;
+		for(byte yIso[] : map) {
+			for(byte b : yIso) {
+				m += " " + Types.values()[b].getSymbol();
+				x++;
+			}
+			m += "\n";
+			x = 0;
+			y++;
+		}
+		return m;
+	}
+
+	/** Bresenham's (un-optimised) with constant lenght
+	 @param x1
+	 @param y1
+	 @param x2
+	 @param y2 the line (x1, y1)--(x2, y2)
+	 @param sq how high to make it */
+/*	public void ping(Ping ping) {
+		int x1 = Math.round(ping.position.x / CM_PER_MAP);
+		int y1 = Math.round(ping.position.x / CM_PER_MAP);
+		int x2 = ping.x, y2 = ping.y;
+		Types sq = Types.NONE;
+		// fixme: hmm, draw a thick line?
+		final int dx = (x1 > x2) ? (x1 - x2) : (x2 - x1);
+		final int sx = (x1 > x2) ? -1 : 1;
+		final int dy = (y1 > y2) ? (y1 - y2) : (y2 - y1);
+		final int sy = (y1 > y2) ? -1 : 1;
+		int err = dx - dy;
+		// fixme: draw a rectangle fountain-fill *
+		for(int length = 0; length < SCAN_RANGE; length++) {
+			if(x1 == x2 && y1 == y2) {
+				this.set(x1, y1, Types.OBSTACLE);
+				break;
+			}
+			this.set(x1, y1, sq); // fixme: aaaaauugh NO *
+			int e2 = err << 1;
+			if(e2 > -dx) { err -= dy; x1 += sx; }
+			if(e2 <  dy) { err += dx; y1 += sy; }
+		}
+	}
+*/
+
 }

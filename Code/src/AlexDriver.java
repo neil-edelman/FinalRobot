@@ -39,9 +39,9 @@ class AlexDriver {
 		Hardware.swagbotV2();
 		Hardware.useBluetooth = false;
 		Hardware.useServer    = true; /* change to true in our final robot */
-		Hardware.useLoco      = false;
+		Hardware.useLoco      = true;
 
-      FieldMap map = new FieldMap((int)(12 * 30.48 / 10),(int)(12 * 30.48 / 10)); //eventually: 10 cm node distance
+      FieldMap map = new FieldMap(12 * 3, 12 * 3); // ~10 cm node distance
 
 		float destination_x = 50f;
 		float destination_y = 50f;
@@ -64,17 +64,28 @@ class AlexDriver {
 				int[] greenZone = t.greenZone;
 				// red zone is defined by these (bottom-left and top-right) corners:
 				int[] redZone = t.redZone;
-				
+
+				/************ untested!!! if the role is defender, switch the
+				 green zone and the red zone! should work, right? now it's
+				 always going to the green zone
+				 -Neil *********/
+				if(t.role == PlayerRole.GARBAGECOLLECTOR) {
+					redZone   = t.greenZone;
+					greenZone = t.redZone;
+				}
+
+				/* you make a homogenous matrix and this would be easy to do in
+				 one step without risk of error -Neil */
 				//convert to cm, rotated
 				x1 = (float)greenZone[0] + 1f;
 				y1 = (float)greenZone[1] + 1f;
 				x2 = (float)greenZone[2] + 1f;
 				y2 = (float)greenZone[3] + 1f;
             transform();
-			   x1 = 30.48f * (float)greenZone[0];
-				y1 = 30.48f * (float)greenZone[1];
-				x2 = 30.48f * (float)greenZone[2];
-				y2 = 30.48f * (float)greenZone[3];
+			   x1 = 30.48f * x1;
+				y1 = 30.48f * y1;
+				x2 = 30.48f * x2;
+				y2 = 30.48f * y2;
 		      destination_x = (x1 + x2)/2;
 		      destination_y = (y1 + y2)/2;
 				//convert to cm, rotated
@@ -83,10 +94,10 @@ class AlexDriver {
 				x2 = (float)redZone[2] + 1f;
 				y2 = (float)redZone[3] + 1f;
             transform();
-			   x1 = 30.48f * (float)redZone[0];
-				y1 = 30.48f * (float)redZone[1];
-				x2 = 30.48f * (float)redZone[2];
-				y2 = 30.48f * (float)redZone[3];
+			   x1 = 30.48f * x1;
+				y1 = 30.48f * y1;
+				x2 = 30.48f * x2;
+				y2 = 30.48f * y2;
             if(x1 > x2) {
                float hold = x1;
                x1 = x2;
@@ -113,9 +124,14 @@ class AlexDriver {
 		robot   = new Swagbot(map,destination_x,destination_y);
 		display = new Display(robot);
 		monitorForExit();
-
+		
 		if(Hardware.useLoco) {
-			robot.localise();
+         try {
+			   robot.localise();
+         }
+         catch(Exception e) {
+            robot.localise();
+         }
 		} else {
 			robot.setPosition(new Position(30.48f,30.48f,0f));
 		}
@@ -127,14 +143,14 @@ class AlexDriver {
 		//robot.turnTo(90f);
 		//waitForIdle();
 
-		robot.travelTo(destination_x, destination_y);
+		//robot.travelTo(destination_x, destination_y);
 		//runTests();
 		//runAbridgedTests();
 		//robot.scanLeft(90f);
       //travelWithAStar(30,30);
       //map.fill(60/10-1,60/10-1,1+60/10,1+60/10,Types.OBSTACLE);
       //travelWithAStar(90,90);
-		//robot.findBlocks();
+		robot.findBlocks();
 		waitForIdle();
 
 		// stall until user decides to end program
@@ -152,6 +168,9 @@ class AlexDriver {
 //		}
 		
 
+		if(RConsole.isOpen()) {
+			RConsole.println("Map:\n" + map);
+		}
 
 		/* close bt connection */
 		if(RConsole.isOpen()) RConsole.close();
