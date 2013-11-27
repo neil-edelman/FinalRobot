@@ -41,7 +41,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 	private ArrayList<Ping> pingsList = new ArrayList<Ping>(128);
    private FieldMap map;
 
-	private Colour colour;
+	private Colour  colour;
+	private Stacker stacker;
 
 	/**
 	 @author Neil
@@ -63,11 +64,12 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       super();
       uListener = new UltrasonicListener(this.sonic);
       uTimer = new Timer(10/*round-up to int 9.375*/,uListener); //timeout value in ms
-      uTimer.start();
+      uTimer.start(); /* holy cow -Neil */
       Sound.setVolume(100);
       this.DESTINATION_X = x;
       this.DESTINATION_Y = y;
-	   colour = new Colour(Hardware.colourPort);
+	   colour  = new Colour(Hardware.colourPort);
+	   stacker = new Stacker(colour, this);
       this.map = map;
    }
 
@@ -112,8 +114,37 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    /** overridden from Robot: contains the code for finding blocks and placing them in the destination
 	 @author Alex
 	 @return void */
-   protected void finding() {
-         
+	protected void finding() {
+
+		/* @author Neil
+		 I've appropriated the findStatus.FINISHED to say when we've collected
+		 two blocks and are returning; this tests (hopefully) when the
+		 Status.TRAVELLING is finished and the FindStatus.FINISHED is set
+		 which would be at the end when we've collected blocks and are at the
+		 green zone */
+		if(status == Status.IDLE && findStatus == FindStatus.FINISHED) {
+			findStatus = FindStatus.IDLE;
+			timer.stop();
+			stacker.greenZone(); /* blocks */
+			this.setSpeeds(-100, 100);
+			timer.start(); /* <- done, not really necesary */
+		}
+		/* I don't know what Swagbot's behaivoir should be, but I itend to test
+		 every 100 ms if it has a block */
+		if(stacker.hasBlock()) {
+			timer.stop();
+			/* hasTwoBricks() has code for storing a block (blocking! that's
+			 why we pause the timer) and returns whether we've stacked two */
+			if(stacker.hasTwoBricks()) {
+				/* travel to the destination! fixme: this is the dest, right? */
+				this.travelTo(DESTINATION_X, DESTINATION_Y);
+				findStatus = FindStatus.FINISHED;
+			}
+			timer.start();
+			return;
+		}
+
+
       //find blocks from search point (starts in corner and progresses along board)
       if(this.findStatus == FindStatus.TURNING) {
          this.findStatus = FindStatus.SCANNING;
