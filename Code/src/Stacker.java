@@ -39,7 +39,7 @@ class Stacker {
 	/** okay, non-blocking; whatever
 	 @author Neil */
 	public boolean hasBlock() {
-		return colour.getStyrofoamProbability() > 0.6f;
+		return colour.getStyrofoamProbability() > 0.77f;
 	}
 
 	/** only called on hasBlock true (this needs to be re-written) */
