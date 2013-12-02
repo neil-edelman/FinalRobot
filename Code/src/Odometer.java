@@ -1,5 +1,4 @@
-/** Odometer running in background will keep track of proprioception.
-<p>
+/*
 Coordinate System:
 					  90 Deg: y axis                     
                             |                            
@@ -13,7 +12,13 @@ Coordinate System:
        negative theta       |      negative theta        
                             |                            
                      -90 Deg: -y axis                    
-@Alex
+*/
+
+import lejos.util.Timer;
+import lejos.util.TimerListener;
+import lejos.nxt.NXTRegulatedMotor;
+
+/** Odometer running in background will keep track of proprioception.
 <p>
  The odometer runs in standard co-ordinates (ISO 80000-2:2009)
  with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
@@ -32,11 +37,6 @@ Coordinate System:
  old_theta = -new_theta + 90 and conversly new_theta = -old_theta + 90. -Alex
 <p>
  @author Neil */
-
-import lejos.util.Timer;
-import lejos.util.TimerListener;
-import lejos.nxt.NXTRegulatedMotor;
-
 public class Odometer implements TimerListener {
 
 	private static final float PI        = (float)Math.PI;
