@@ -1,3 +1,22 @@
+/*
+Coordinate System:
+					  90 Deg: y axis                     
+                            |                            
+       positive theta       |      positive theta        
+                            |                            
+                            |                            
+ 180 Deg: -x axis __________|__________ 0 Deg: x axis
+  branch cut (-180, 180]    |                            
+                            |                            
+                            |                            
+       negative theta       |      negative theta        
+                            |                            
+                     -90 Deg: -y axis                    
+*/
+import lejos.util.Timer;
+import lejos.util.TimerListener;
+import lejos.nxt.NXTRegulatedMotor;
+
 /** Odometer running in background will keep track of proprioception.
 <p>
  The odometer runs in standard co-ordinates (ISO 80000-2:2009)
@@ -16,27 +35,7 @@ them once vs converting atan2 10 times a second.
  counterclockwise and opposed to clockwise. The conversion is
  old_theta = -new_theta + 90 and conversly new_theta = -old_theta + 90. -Alex
 <p>
- from the TA -Alex:
- Coordinate System:
-					  90 Deg: y axis                     
-                            |                            
-       positive theta       |      positive theta        
-                            |                            
-                            |                            
- 180 Deg: -x axis __________|__________ 0 Deg: x axis
-  branch cut (-180, 180]    |                            
-                            |                            
-                            |                            
-       negative theta       |      negative theta        
-                            |                            
-                     -90 Deg: -y axis                    
- 
  @author Neil */
-
-import lejos.util.Timer;
-import lejos.util.TimerListener;
-import lejos.nxt.NXTRegulatedMotor;
-
 public class Odometer implements TimerListener {
 
 	private static final float PI        = (float)Math.PI;

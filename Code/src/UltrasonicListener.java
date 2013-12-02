@@ -1,3 +1,8 @@
+import lejos.nxt.UltrasonicSensor;
+import lejos.util.TimerListener;
+import java.util.Arrays;
+import java.lang.Math;
+
 /**
 This class pings the ultrasonic sensor after 10ms and accumulates values. getDistance simply gets the last pinged distance.
 The getFilteredDistance() method implements the median standard deviation method to return a median filtered distance.
@@ -10,11 +15,6 @@ ultrasonic sensor. The method sets the smallestping variables to the closest dis
 the odometer to targetTheta.
  @author Alex
 */
-import lejos.nxt.UltrasonicSensor;
-import lejos.util.TimerListener;
-import java.util.Arrays;
-import java.lang.Math;
-
 public class UltrasonicListener implements TimerListener {
 
    //   public static final int OUTLIER_THESHOLD = 40;

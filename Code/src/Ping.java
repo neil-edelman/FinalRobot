@@ -1,3 +1,7 @@
+import java.lang.IllegalArgumentException;
+import java.lang.IndexOutOfBoundsException;
+import java.util.ArrayList;
+
 /** The Ping class is intended for a single ultrasonic ping with a single or
  multiple returns. The idea is that it’s going to be in an array. Each ping
  has a Position and cm, which gives x and y. There is also a static method
@@ -15,11 +19,6 @@
  <p>
  also does the details of localisiation
  @author Neil */
-
-import java.lang.IllegalArgumentException;
-import java.lang.IndexOutOfBoundsException;
-import java.util.ArrayList;
-
 public class Ping {
 	/********* copy/paste here ************/
 

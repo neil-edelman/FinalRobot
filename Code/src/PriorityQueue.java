@@ -1,13 +1,12 @@
-/**This was added to the AStar package because lejos does not support PriorityQueue from the standard java libraries.It replicated the functionality needed
-for AStar to function correctly.
-@author Alex
-*/
-
 package AStar;
 
 import java.util.Iterator;
 import java.util.ArrayList;
 
+/**This was added to the AStar package because lejos does not support PriorityQueue from the standard java libraries.It replicated the functionality needed
+for AStar to function correctly.
+@author Alex
+*/
 public class PriorityQueue implements Iterable<ISearchNode> {
 
    private ArrayList<ISearchNode> queue;

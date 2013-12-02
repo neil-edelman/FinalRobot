@@ -1,3 +1,7 @@
+import java.lang.IllegalArgumentException;
+
+/*<N extends Number> was so cool, but aritmetic operations can't be applied to
+ Number */
 /** For traveling and turning we used PID controllers with zero as our
  setpoint. The PID controllers are created with
  public Controller(final float p) or
@@ -22,10 +26,6 @@
 Controller: implements float PID control with 0 as the setpoint.
  @author Neil */
 
-import java.lang.IllegalArgumentException;
-
-/*<N extends Number> was so cool, but aritmetic operations can't be applied to
- Number */
 public class Controller {
 	/* this causes the controller to slowly forget values in the distant past;
 	 should be < 1 */

@@ -1,10 +1,11 @@
-/** Code blonges to Jonas David Nick, https://github.com/jonasnick */
+/** Code blonges to Jonas David Nick, https://github.com/jonasnick
+*/
 package AStar;
 import AStar.ISearchNode;
 
 /**
  * Implements trivial functions for a search node.
- */
+@author Jonas David Nick*/
 public abstract class ASearchNode implements ISearchNode {
     private Double g = 0.0;
     // total estimated cost of the node

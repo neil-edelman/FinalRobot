@@ -1,3 +1,19 @@
+import java.lang.IllegalArgumentException;
+
+import lejos.nxt.NXTRegulatedMotor;
+
+import lejos.nxt.Sound;
+import lejos.nxt.SensorPort;
+import lejos.nxt.LightSensor;
+import lejos.nxt.UltrasonicSensor;
+
+import lejos.util.Timer;
+import lejos.util.TimerListener;
+import lejos.nxt.Button;
+
+//import lejos.nxt.comm.RConsole;
+
+/* Robot */
 /** The Robot class provides the basic functionality of the robot (turnTo and
  travelTo as well as getters and setters to the odometer)
  as well as the structural framework for classes that extend it such as
@@ -29,24 +45,6 @@ Status is used by the Robot class whereas FindStatus is inherited and used by
 <p>
  this is the basic robot; just methods for moving around
  @author Neil, Alex */
-
-import java.lang.IllegalArgumentException;
-
-import lejos.nxt.NXTRegulatedMotor;
-
-import lejos.nxt.Sound;
-import lejos.nxt.SensorPort;
-import lejos.nxt.LightSensor;
-import lejos.nxt.UltrasonicSensor;
-
-import lejos.util.Timer;
-import lejos.util.TimerListener;
-import lejos.nxt.Button;
-
-//import lejos.nxt.comm.RConsole;
-
-/* Robot */
-
 public class Robot implements TimerListener {
 
 	public enum Status { IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING };

@@ -1,12 +1,11 @@
-/** Enables Hardware profiling, allowing us to switch hardware in one call.
- <p>
- to keep the different robots in one place
- @author Neil */
-
 import lejos.nxt.SensorPort;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 
+/** Enables Hardware profiling, allowing us to switch hardware in one call.
+ <p>
+ We have two difference robots that we want to switch between: Locobot and Swagbot. This allows us to keep the different robots in one place
+ @author Neil */
 class Hardware {
 
 	/* basic settings for Sex Robot (default) */

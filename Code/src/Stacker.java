@@ -1,12 +1,11 @@
-/** The stacker class allows the robot to operate the stacking mechanism.
- The greenZone method is called by Swagbot when the robot is in the
-green zone and allows the robot to stack the blocks.
-@author Xavier,Neil */
-
 import lejos.nxt.Sound;
 import lejos.nxt.NXTRegulatedMotor;
 import lejos.util.Delay;
 
+/** The stacker class allows the robot to operate the stacking mechanism.
+ The greenZone method is called by Swagbot when the robot is in the
+green zone and allows the robot to stack the blocks.
+@author Xavier,Neil */
 class Stacker {
 
 	/************* this is untested! if you get to testing it, @Alex *******/

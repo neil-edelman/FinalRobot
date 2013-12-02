@@ -1,6 +1,3 @@
-/** localising robot extends robot
- @author Neil */
-
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
@@ -10,6 +7,8 @@ import lejos.util.Delay;
 
 import java.util.ArrayList;
 
+/** Locobot adds localisation fuctionality to the standard robot through the localise() method.
+ @author Neil */
 public class Locobot extends Robot {
 
 	protected UltrasonicSensor sonic;

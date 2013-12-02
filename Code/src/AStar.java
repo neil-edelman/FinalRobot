@@ -1,4 +1,5 @@
-/** Code blonges to Jonas David Nick, https://github.com/jonasnick */
+/** Code blonges to Jonas David Nick, https://github.com/jonasnick 
+*/
 package AStar;
 import AStar.ISearchNode;
 import java.util.*;
@@ -7,6 +8,7 @@ import java.util.*;
  * an initial to a goal node.Nodes have to implement the
  * ISearchNode and IGoalNode interface respectively. 
  *
+@author Jonas David Nick
  */
 public class AStar {
     // Amount of debug output 0,1,2

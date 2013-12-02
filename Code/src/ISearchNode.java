@@ -1,9 +1,11 @@
-/** Code blonges to Jonas David Nick, https://github.com/jonasnick */
+/**Code blonges to Jonas David Nick, https://github.com/jonasnick.Interface for the goal node used to specify the goal for A*
+*/
 package AStar;
 import java.util.*;
 
 /**
  * Interface of a search node.
+ @author Jonas David Nick
  */
 public interface ISearchNode extends Comparable<ISearchNode> {
     // total estimated cost of the node

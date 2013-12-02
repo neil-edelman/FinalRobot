@@ -3,7 +3,9 @@ package AStar;
 import AStar.ASearchNode;
 import AStar.ISearchNode;
 import java.util.*;
-
+/** Implementation of the SeachNode in 2D.
+@author Jonas David Nick
+*/
 public abstract class SearchNode2D extends ASearchNode {
     protected int x;
     protected int y;

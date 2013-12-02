@@ -1,7 +1,3 @@
-/** The Driver for the robot, it instantiates the robot(type Swagbot) gets the
- bluetooth values and calles localise(), waits for idle and then findBlocks().
- @author Alex */ 
-
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
 import lejos.nxt.LCD;
@@ -18,7 +14,14 @@ import java.util.ArrayList;
 import java.util.*;
 
 import bluetooth.*;
+/** The Driver for the robot, it instantiates the robot(type Swagbot) gets the
+ bluetooth values and calles localise(), waits for idle and then findBlocks()
+ The public static void main(String args[]) method which interfaces with the
+ Bluetooth server and instantiates the robot.Also contains helper methods and
+ test methods.
+ <p>
 
+ @author Alex */ 
 class Driver {
 
    private static Swagbot robot;

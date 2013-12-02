@@ -1,3 +1,5 @@
+import java.lang.IllegalArgumentException;
+
 /** Defines a position as x, y, theta and the things you can do (set,
  getDegrees, etc.) Of particular interest, since Positions are used in
  Odometer, you have: public void arc(final float angle, final float dist)
@@ -9,9 +11,6 @@
  <p>
  Position: defines a position as x, y, theta
  @author Neil */
-
-import java.lang.IllegalArgumentException;
-
 class Position {
 	private static final float PI     = (float)Math.PI;
 	private static final float TWO_PI = (float)(2.0 * Math.PI);

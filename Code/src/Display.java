@@ -1,3 +1,9 @@
+//import java.lang.IllegalArgumentException;
+
+import lejos.nxt.LCD;
+import lejos.util.Timer;
+import lejos.util.TimerListener;
+
 /** The display class is updates the screen every timedOut. We print the robot
  name, the current values of the status and findstatus
  variables.setText() allows strings to be written to the screen. This can be
@@ -10,13 +16,6 @@
  This is a robot display for actually printing to the robot.
  @see :setText
  @author Alex */
-
-//import java.lang.IllegalArgumentException;
-
-import lejos.nxt.LCD;
-import lejos.util.Timer;
-import lejos.util.TimerListener;
-
 public class Display implements TimerListener{
 	public static final int LCD_REFRESH = 500;
 

@@ -3,6 +3,8 @@ package AStar;
 import AStar.IGoalNode;
 import AStar.ISearchNode;
 import AStar.SearchNode2D;
+/** Implementation of the goalnode in 2D.
+@author Jonas David Nick*/
 public class GoalNode2D implements IGoalNode {
     private int x;
     private int y;
