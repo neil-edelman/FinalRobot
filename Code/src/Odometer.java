@@ -1,13 +1,13 @@
 /** Odometer running in background will keep track of proprioception.
 <p>
  The odometer runs in standard co-ordinates (ISO 80000-2:2009)
- with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
- approxomations about zero) eg counter-clockwise radians from x; this is the
- same used in Math.atan2 and all trig and grade school. The travelTo (and
- turnTo) take degrees and convert them to radians; it's much faster converting
- them once vs converting atan2 10 times a second.
+with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
+approximations about zero) eg counter-clockwise radians from x; this is the
+same used in Math.atan2 and all trig and grade school. The travelTo (and
+turnTo) take degrees and convert them to radians; it's much faster converting
+them once vs converting atan2 10 times a second.
 <p>
- This is the improved, non-numerically-unstable int math odometer.
+ This is the improved, non-numerically-unstable int math odometer./** Odometer running in background will keep track of proprioception.
 <p>
  fixme: if we run the robot faster, the period should decrese
 <p>
@@ -16,7 +16,7 @@
  counterclockwise and opposed to clockwise. The conversion is
  old_theta = -new_theta + 90 and conversly new_theta = -old_theta + 90. -Alex
 <p>
- from the TA:
+ from the TA -Alex:
  Coordinate System:
 					  90 Deg: y axis                     
                             |                            

@@ -1,4 +1,6 @@
-/** to keep the different robots in one place
+/** Enables Hardware profiling, allowing us to switch hardware in one call.
+ <p>
+ to keep the different robots in one place
  @author Neil */
 
 import lejos.nxt.SensorPort;

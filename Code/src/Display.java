@@ -1,4 +1,8 @@
-/* This is a robot display for actually printing to the robot.
+/** This is a robot display for printing to the robot.
+ public static void setText(String text) allows the robot to enter it’s own
+ text while the display is running. It is idempotent.
+ <p>
+ This is a robot display for actually printing to the robot.
  @see :setText
  @author Alex */
 

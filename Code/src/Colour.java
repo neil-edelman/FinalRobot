@@ -1,9 +1,11 @@
-/** This method is O(2^{n-1}), but n is 2, so it's okay. We normalise our
- colours to make it lighting-independent. Compare with experimetal value for
- the different substances, and pick the closest (Cartesan distance to
+/** The colour class has methods for distinguishing obstacles.
+<p>
+This method is O(2^{n-1}), but n is 2 (styrofoam and wood.) We normalise our
+ colours to make it lighting-independent. Compare with experimental value for
+ the different substances, and pick the closest (Cartesian distance to
  normalised colour values.) A better model would be to multiply the components
- by the eigenvalues of their sensitivety like CIE colour model, but we don't
- know this.
+ by the eigenvalues of their sensitivity like CIE colour model, but we don't
+ know this a priori.
  @author Neil */
 
 /* import javax.vecmath.Vector3f; <- nxj does not have this, write our own :[ */

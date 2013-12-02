@@ -1,4 +1,8 @@
-/** this is a driver that instantaties a Robot and makes it do stuff
+/** The public static void main(String args[]) method which interfaces with the
+ Bluetooth server and instantiates the robot. Also contains helper methods and
+ test methods.
+ <p>
+ this is a driver that instantaties a Robot and makes it do stuff
  @author Alex */
  
 

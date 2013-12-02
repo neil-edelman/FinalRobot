@@ -1,4 +1,13 @@
-/* Position: defines a position as x, y, theta
+/** Defines a position as x, y, theta and the things you can do (set,
+ getDegrees, etc.) Of particular interest, since Positions are used in
+ Odometer, you have: public void arc(final float angle, final float dist)
+ which adds to the position an arc specified by a distance and an angle which
+ is divided up along the distance evenly; uses affine transformations and the
+ calculus of rectification; the Taylor expansion is O(3); and
+ public void expectation(final Position p, final Position o) which sets this to
+ the prediction of the O(1) future.
+ <p>
+ Position: defines a position as x, y, theta
  @author Neil */
 
 import java.lang.IllegalArgumentException;

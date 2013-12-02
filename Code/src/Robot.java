@@ -1,4 +1,25 @@
-/** this is the basic robot; just methods for moving around
+/** The Robot class contains the enums Status and FindStatus. A case statement
+ in the timedOut method of this class calls the method corresponding to the
+ robot’s state. This method will contain the suffix "ing", which denotes that
+ it is constantly called for the duration of the given state and will check
+ conditions to determine when to given task has been completed. For example
+ when the robot’s status is IDLE, it checks its status every timedOut and then
+ breaks from the case statement, doing nothing else. Calling the turnTo method
+ will set the robot’s status  to ROTATING and the target heading to turn to.
+ Following timedOut’s will call the turning method, which checks the robot's
+ heading relative to the target heading. When the robot has turned within the
+ angle threshold of the target angle, the robot’s status is set back to IDLE.
+<p>
+Status<hr>
+states: IDLE, ROTATING, TRAVELLING, LOCALISING, SCANNING, FINDING 
+ <p>
+FindStatus <hr>
+states: IDLE, TURNING, SCANNING, SCANNED, ID, FOUND, RELOCATING, FINISHED, AVOIDING
+<p>
+Status is used by the Robot class whereas FindStatus is inherited and used by
+ Swagbot.
+<p>
+ this is the basic robot; just methods for moving around
  @author Neil, Alex */
 
 import java.lang.IllegalArgumentException;
