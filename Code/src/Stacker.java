@@ -1,4 +1,5 @@
-/** The stacker class allows the robot to operate the stacking mechanism.The greenZone method is called by Swagbot when the robot is in the
+/** The stacker class allows the robot to operate the stacking mechanism.
+ The greenZone method is called by Swagbot when the robot is in the
 green zone and allows the robot to stack the blocks.
 @author Xavier,Neil */
 

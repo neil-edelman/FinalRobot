@@ -1,4 +1,25 @@
-/** Controller: implements float PID control with 0 as the setpoint.
+/** For traveling and turning we used PID controllers with zero as our
+ setpoint. The PID controllers are created with
+ public Controller(final float p) or
+ public Controller(final float p, final float i, final float d) specifying the
+ proportional, integral, and derivative gains. We used the heuristic
+ Ziegler–Nichols tuning method to set the gains (very aggressively in turning,
+ since when traveling a small distance, the turns must be fast.) The PID
+ controller uses public float nextOutput(final float error, final float dt)
+ which generalises the error and the time which that error happened. It has
+ private variables which keep track of the integral and the derivative. It
+ also has public void reset() and public void reset(final float limit) which
+ resets the PID for use in the next control, with an optional limit. In this
+ case, the actuator is the output and the limit is a speed limit, but
+ generalises to other situations. We also have
+ public void limitAcceleration(final float limit) and
+ public void limitAcceleration(), which take in s^{-2}. Practically, the
+ turnTo uses anglePID and the travelTo uses distancePID and anglePID. Roughtly
+ speaking, the errors are derived from subtracting the
+ Cartesian (distancePID) and angular (anglePID) coördinates from each other
+ using the L^2 Euclidean norm and the circle norm respectively.
+ <p>
+Controller: implements float PID control with 0 as the setpoint.
  @author Neil */
 
 import java.lang.IllegalArgumentException;

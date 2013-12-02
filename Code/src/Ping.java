@@ -1,8 +1,19 @@
-/** this is a struct to store ultrasonic sonar information, we want this to be
+/** The Ping class is intended for a single ultrasonic ping with a single or
+ multiple returns. The idea is that it’s going to be in an array. Each ping
+ has a Position and cm, which gives x and y. There is also a static method
+ public static void correct(final ArrayList<Ping> pings, final Odometer
+ odometer) throws Exception which does most of the work in localisation. This
+ in turn calls private static void straightishLine(final ArrayList<Ping> pings,
+ final int about) twice, one for the y-axis and one for the x-axis. correct
+ draws a straightishLine though the x and y axes (thus it will not be confused
+ when a block is placed against the side.) It then fits it using the
+ covariances and the variance of each of the axes and determines the
+ coödinaties and updates the Odometer. Basically.
+<p>
+ this is a struct to store ultrasonic sonar information, we want this to be
  as small as possible since we're potentally storing a lot of them
- 
+ <p>
  also does the details of localisiation
- 
  @author Neil */
 
 import java.lang.IllegalArgumentException;

@@ -1,6 +1,6 @@
-/** The Driver for the robot, it instantiates the robot(type Swagbot) gets the bluetooth values and calles localise(), waits for idle and then findBlocks().
- @author Alex */
- 
+/** The Driver for the robot, it instantiates the robot(type Swagbot) gets the
+ bluetooth values and calles localise(), waits for idle and then findBlocks().
+ @author Alex */ 
 
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;

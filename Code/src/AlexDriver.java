@@ -3,8 +3,7 @@
  test methods.
  <p>
  this is a driver that instantaties a Robot and makes it do stuff
- @author Alex */
- 
+ @author Alex */ 
 
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
