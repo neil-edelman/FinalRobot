@@ -20,7 +20,6 @@ import java.util.ArrayList;
  also does the details of localisiation
  @author Neil */
 public class Ping {
-	/********* copy/paste here ************/
 
 	private static final float TWO_PI = (float)(2*Math.PI);
 	private static final float     PI = (float)(Math.PI);
@@ -312,8 +311,8 @@ public class Ping {
 	}
 	
 	/** given an array of pings and an index, sets [rangeLower, rangeHigher]
-	 to be anything that sort of looks like a stright line (within CUTOFF_ANGLE)
-	 about that point
+	 to be anything that sort of looks like a stright line
+	 (within Hardware.cutoffAngle) about that point
 	 <p>
 	 this was determined to be worse than blind picking the middle in some cases
 	 but gets rid of objects on the walls

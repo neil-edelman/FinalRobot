@@ -62,7 +62,7 @@ class Position {
 	}
 
 	/** phased out; do not use; too confusing
-	 @depreciated use :getRadians() */
+	 @deprecated use :getRadians() */
 	public float getTheta() {
 		return t;
 	}
@@ -92,7 +92,7 @@ class Position {
 	}
 
 	/** phased out; do not use (too confusing)
-	 @depreciated use :setRadians(t) */
+	 @deprecated use :setRadians(t) */
 	public void setTheta(final float t) {
 		if(t <= -PI || t > PI) throw new IllegalArgumentException();
 		this.t = t;

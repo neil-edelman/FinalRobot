@@ -8,7 +8,8 @@ green zone and allows the robot to stack the blocks.
 @author Xavier,Neil */
 class Stacker {
 
-	/************* this is untested! if you get to testing it, @Alex *******/
+	/* this is untested; Alex can you test it Tomorrow in the morning? -Neil
+	 I've got it. -Alex */
 	private static final float STACKING_SPEED = 100f;
 
 	private static final int openAngle  = -15;
@@ -38,7 +39,7 @@ class Stacker {
 		Hardware.stackerMotor.rotateTo(closeAngle);
 	}
 
-	/** okay, non-blocking; whatever
+	/** non-blocking to get the Swagbots downward colour sensor
 	 @author Neil */
 	public boolean hasBlock() {
 		return colour.getStyrofoamProbability() > 0.77f;

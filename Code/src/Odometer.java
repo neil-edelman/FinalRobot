@@ -1,4 +1,5 @@
-/*
+/** Odometer running in background will keep track of proprioception.
+<p>
 Coordinate System:
 					  90 Deg: y axis                     
                             |                            
@@ -12,21 +13,16 @@ Coordinate System:
        negative theta       |      negative theta        
                             |                            
                      -90 Deg: -y axis                    
-*/
-import lejos.util.Timer;
-import lejos.util.TimerListener;
-import lejos.nxt.NXTRegulatedMotor;
-
-/** Odometer running in background will keep track of proprioception.
+@Alex
 <p>
  The odometer runs in standard co-ordinates (ISO 80000-2:2009)
-with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
-approximations about zero) eg counter-clockwise radians from x; this is the
-same used in Math.atan2 and all trig and grade school. The travelTo (and
-turnTo) take degrees and convert them to radians; it's much faster converting
-them once vs converting atan2 10 times a second.
+ with the branch cut (-Pi, Pi] (we don't want a branch cut in our small angle
+ approximations about zero) eg counter-clockwise radians from x; this is the
+ same used in Math.atan2 and all trig and grade school. The travelTo (and
+ turnTo) take degrees and convert them to radians; it's much faster converting
+ them once vs converting atan2 10 times a second.
 <p>
- This is the improved, non-numerically-unstable int math odometer./** Odometer running in background will keep track of proprioception.
+ This is the improved, non-numerically-unstable int math odometer.
 <p>
  fixme: if we run the robot faster, the period should decrese
 <p>
@@ -36,6 +32,11 @@ them once vs converting atan2 10 times a second.
  old_theta = -new_theta + 90 and conversly new_theta = -old_theta + 90. -Alex
 <p>
  @author Neil */
+
+import lejos.util.Timer;
+import lejos.util.TimerListener;
+import lejos.nxt.NXTRegulatedMotor;
+
 public class Odometer implements TimerListener {
 
 	private static final float PI        = (float)Math.PI;
@@ -135,10 +136,10 @@ public class Odometer implements TimerListener {
 		}
 	}
 
-	/** this eliminates one-sided errors by predicting the future; also
+	/** this eliminates one-sided errors by predicting the future;
 	 this stores a copy of the actal position (which is volitale) in pCopy;
-	 pCopy is called when reading position . . . you must call this instead
-	 of positionSnapshot */
+	 pCopy is called when reading position . . . viz you must call this to
+	 update position used in getPosition, but only once per movement */
 	public void premonitionUpdate() {
 		synchronized(this) {
 			pCopy.expectition(position, old);

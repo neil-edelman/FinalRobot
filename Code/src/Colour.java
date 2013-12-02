@@ -122,12 +122,14 @@ public class Colour {
 
 
 
-/* helper class */
-/* package javax.vecmath does not exist; aaaaauuuuuuggghht wtf */
-
 /* this is a normalised colour on 19:13 bit fixed point
  3*255^2 = 195 075 (18 bit) */
 /* no, that's complicated, just use floats */
+
+/** Helper class for Colour: "package javax.vecmath does not exist" (NXJ)
+ so we write our own private class. Only does stuff that's useful for Colour.
+ @author Neil */
+
 class Vector3f /*implements Comparable<ColourNorm> <- only int */ {
 	public float r, g, b;
 	

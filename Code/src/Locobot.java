@@ -91,8 +91,8 @@ public class Locobot extends Robot {
 
 	}
 
-	/** pings the sonar; blocks SONAR_DELAY + calculation time
-	<p>
+	/** pings the sonar; blocks Hardware.sonarDelay + calculation time
+	 from the nxj docs:
 	 "The return value is in centimeters. If no echo was detected, the
 	 returned value is 255. The maximum range of the sensor is about
 	 170 cm."
