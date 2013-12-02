@@ -1,5 +1,5 @@
-/* This is a robot display for actually printing to the robot.
- @see :setText
+/** The display class is updates the screen every timedOut.We print the robot name, the current values of the status and findstatus
+variables.setText() allows strings to be written to the screen.This can be used to write any variable to the screen for debugging.
  @author Alex */
 
 //import java.lang.IllegalArgumentException;

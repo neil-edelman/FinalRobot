@@ -1,3 +1,7 @@
+/**Types contains the types of objects that can be stored in the map.The only types used for the competition were NONE and OBSTACLE.
+@author Alex
+*/
+
 package AStar;
 
 public enum Types {

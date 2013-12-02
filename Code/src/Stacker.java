@@ -1,4 +1,6 @@
-/** @author Xavier */
+/** The stacker class allows the robot to operate the stacking mechanism.The greenZone method is called by Swagbot when the robot is in the
+green zone and allows the robot to stack the blocks.
+@author Xavier,Neil */
 
 import lejos.nxt.Sound;
 import lejos.nxt.NXTRegulatedMotor;
@@ -60,7 +62,10 @@ class Stacker {
 			return false;
 		}
 	}
-	
+   /** Stacks the blocks the robot is holding. 
+   Print statments are included for debugging as well as unexpected behavior with the rotateTo method turning past the given angle.
+   There was believed that the print statments might stop the problem. Whether this work or not is unknown. We added them last minute.
+   @author Xavier,Neil,Alex*/	
 	public void greenZone() {
 		Display.setText("Victory!");
 		swag.stop();

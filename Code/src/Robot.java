@@ -1,4 +1,7 @@
-/** this is the basic robot; just methods for moving around
+/** The Robot class provides the basic functionality of the robot (turnTo and travelTo as well as getters and setters to the odometer)
+as well as the structural framework for classes that extend it such as Swagbot.It is a state machine that stores the status of the
+robot in the status variable of type Status.The findStatus variable and enum are used by Swagbot when the robot is finding blocks.
+The case statments in the timedOut method explain the flow of the program.
  @author Neil, Alex */
 
 import java.lang.IllegalArgumentException;

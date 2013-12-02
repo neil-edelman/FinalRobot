@@ -1,4 +1,11 @@
-/* Swagbot extends Locobot; obstacle avoidence and gameplay logic
+/** Swagbot adds functionality for findingBlocks and avoidance.AStar was initially supposed to be implemented here in it's entirety.However we did not
+plan this correctly as travelWithAStar is blocking and this class is a timerlistener.The travelWithAStar method was moved to the main method where it was
+used during the first two heats of the competition but later removed because it was causing problems.It would be possible to implement AStar correctly with a
+couple days more work, but we learned about the issues too late to deal with them.
+Additionally, the get smallestping method allows the listener to accumulate a data set of pings while a blocking navigation
+or odometer method is running. Get smallest ping is used in this lab to scan from scan points and find the blocks using the
+ultrasonic sensor. The method sets the smallestping variables to the closest distance recored and corresponding theta from
+the odometer to targetTheta.
  @author Alex */
 
 import lejos.nxt.SensorPort;
@@ -73,17 +80,6 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 	   stacker = new Stacker(altColour, this);
       this.map = map;
    }
-
-   //**********************************
-   //override color hack -- for demo, color in locobot not working -- TODO:can remove this when we get it working
-	/* Neil: you were calling super() with the parameter order reversed; trying
-	 to read colour from a light sensor . . . I have stuck the colour in here
-	 instead of in Locobot so it's all Good */
-/*   Colour colour = new Colour(SensorPort.S3); 
-   public Colour.Value getColour() {
-      return colour.getColourValue();
-   }*/
-   //**********************************
 
    /** returns the ultrasonic sensor's unfiltered distance */
    public int getDistance() {

@@ -1,3 +1,7 @@
+/**TypeMap is the interface for FieldMap.
+@author Alex
+*/
+
 package AStar;
 
 public interface TypeMap {
