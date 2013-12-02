@@ -1,4 +1,12 @@
-/** The Robot class contains the enums Status and FindStatus. A case statement
+/** The Robot class provides the basic functionality of the robot (turnTo and
+ travelTo as well as getters and setters to the odometer)
+ as well as the structural framework for classes that extend it such as
+ Swagbot. It is a state machine that stores the status of the
+ robot in the status variable of type Status.The findStatus variable and enum
+ are used by Swagbot when the robot is finding blocks.
+ The case statments in the timedOut method explain the flow of the program.
+<p> 
+ The Robot class contains the enums Status and FindStatus. A case statement
  in the timedOut method of this class calls the method corresponding to the
  robot’s state. This method will contain the suffix "ing", which denotes that
  it is constantly called for the duration of the given state and will check

@@ -1,4 +1,9 @@
-/** This is a robot display for printing to the robot.
+/** The display class is updates the screen every timedOut. We print the robot
+ name, the current values of the status and findstatus
+ variables.setText() allows strings to be written to the screen. This can be
+ used to write any variable to the screen for debugging.
+<p>
+ This is a robot display for printing to the robot.
  public static void setText(String text) allows the robot to enter it’s own
  text while the display is running. It is idempotent.
  <p>

@@ -1,4 +1,11 @@
-/* Swagbot extends Locobot; obstacle avoidence and gameplay logic
+/** Swagbot adds functionality for findingBlocks and avoidance.AStar was initially supposed to be implemented here in it's entirety.However we did not
+plan this correctly as travelWithAStar is blocking and this class is a timerlistener.The travelWithAStar method was moved to the main method where it was
+used during the first two heats of the competition but later removed because it was causing problems.It would be possible to implement AStar correctly with a
+couple days more work, but we learned about the issues too late to deal with them.
+Additionally, the get smallestping method allows the listener to accumulate a data set of pings while a blocking navigation
+or odometer method is running. Get smallest ping is used in this lab to scan from scan points and find the blocks using the
+ultrasonic sensor. The method sets the smallestping variables to the closest distance recored and corresponding theta from
+the odometer to targetTheta.
  @author Alex */
 
 import lejos.nxt.SensorPort;
@@ -31,8 +38,8 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private static final float FRONT_EXTENSION_LENGTH = 22.5f; //bumper length from wheel base
    private static final float X_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //used as mins and maxes in determining target
    private static final float Y_LOW_BOUND  = 0f      + FRONT_EXTENSION_LENGTH; //origin in corner
-   private static final float X_HIGH_BOUND = 8*30.48f - FRONT_EXTENSION_LENGTH; //4 tiles by
-   private static final float Y_HIGH_BOUND = 8*30.48f - FRONT_EXTENSION_LENGTH; //8 tiles
+   private static final float X_HIGH_BOUND = 12*30.48f - FRONT_EXTENSION_LENGTH; //4 tiles by
+   private static final float Y_HIGH_BOUND = 12*30.48f - FRONT_EXTENSION_LENGTH; //8 tiles
    private float adjust_x = 30.48f; //designates the point on the field to be searched from
    private float adjust_y = 30.48f; //values are (0,0);(30,30);(30,60);(30,90)...etc
    private float targetX,targetY;
@@ -40,6 +47,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
    private FindStatus storeFindStatus;
 	private ArrayList<Ping> pingsList = new ArrayList<Ping>(128);
    private FieldMap map;
+   private Colour altColour = new Colour(SensorPort.S2);
 
 	private Colour  colour;
 	private Stacker stacker;
@@ -69,20 +77,9 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
       this.DESTINATION_X = x;
       this.DESTINATION_Y = y;
 	   colour  = new Colour(Hardware.colourPort);
-	   stacker = new Stacker(colour, this);
+	   stacker = new Stacker(altColour, this);
       this.map = map;
    }
-
-   //**********************************
-   //override color hack -- for demo, color in locobot not working -- TODO:can remove this when we get it working
-	/* Neil: you were calling super() with the parameter order reversed; trying
-	 to read colour from a light sensor . . . I have stuck the colour in here
-	 instead of in Locobot so it's all Good */
-/*   Colour colour = new Colour(SensorPort.S3); 
-   public Colour.Value getColour() {
-      return colour.getColourValue();
-   }*/
-   //**********************************
 
    /** returns the ultrasonic sensor's unfiltered distance */
    public int getDistance() {
@@ -122,7 +119,7 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
 		 Status.TRAVELLING is finished and the FindStatus.FINISHED is set
 		 which would be at the end when we've collected blocks and are at the
 		 green zone */
-		if(status == Status.IDLE && findStatus == FindStatus.FINISHED) {
+		if(findStatus == FindStatus.FINISHED) {
 			findStatus = FindStatus.IDLE;
 			timer.stop();
 			stacker.greenZone(); /* blocks */
@@ -192,7 +189,12 @@ public class Swagbot extends Locobot {//Swagbot extends Localisingbot
          //if styroform go to destination!
          if(this.getColour() == Colour.Value.STYROFOAM) { //is styrofoam, grab and move
             Sound.beep();
+            Position position = this.getPosition();
+            int x = (int)(position.x + (smallestPing)*(float)Math.cos(position.getRadians()));
+            int y = (int)(position.y + (smallestPing)*(float)Math.sin(position.getRadians()));
+            map.fill(x-1,y-1,x+1,y+1,Types.NONE);
             this.findStatus = FindStatus.FOUND;
+            this.travelTo(x,y,250,250);
          }
          else { //is wood move on
             Sound.buzz();
@@ -260,9 +262,13 @@ protected void scanning() {
       //record pings
 		if(ping < 0 || ping > 255) { //check out of bounds
 			Display.setText("Ping value out of bounds" + ping);
-		} else {
+		} 
+      else if(ping < SCAN_THRESHOLD){
 			// record
          pingsList.add(new Ping(pos,ping));
+         int x = (int)(pos.x + (ping)*(float)Math.cos(pos.getRadians()));
+         int y = (int)(pos.y + (ping)*(float)Math.sin(pos.getRadians()));
+         map.fill(x-1,y-1,x+1,y+1,Types.OBSTACLE);
 		}
 
 

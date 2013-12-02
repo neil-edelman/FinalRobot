@@ -1,3 +1,8 @@
+/**This was added to the AStar package because lejos does not support PriorityQueue from the standard java libraries.It replicated the functionality needed
+for AStar to function correctly.
+@author Alex
+*/
+
 package AStar;
 
 import java.util.Iterator;

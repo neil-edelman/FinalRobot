@@ -1,3 +1,8 @@
+/**The FieldMap is used to store obstacles, which the ISearchNode of the AStar package avoids when determining the shortest path.This
+is was added to the AStar package written by Jonas Nick, and is original work.
+@author Alex
+*/
+
 package AStar;
 
 import java.lang.IllegalArgumentException;
